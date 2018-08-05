@@ -31,6 +31,18 @@
    </property>
    <item>
     <widget class="PreviewArea" name="previewArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
@@ -42,10 +54,16 @@
    <item>
     <widget class="QWidget" name="toolBar" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -192,14 +210,20 @@
            <property name="prefix">
             <string>x</string>
            </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
            <property name="minimum">
-            <double>0.010000000000000</double>
+            <double>0.200000000000000</double>
            </property>
            <property name="maximum">
-            <double>1024.000000000000000</double>
+            <double>8.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>1.000000000000000</double>
            </property>
            <property name="value">
-            <double>2.000000000000000</double>
+            <double>1.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -235,6 +259,18 @@
    </item>
    <item>
     <widget class="QWidget" name="timeLinePanel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0">
       <property name="spacing">
        <number>2</number>
@@ -389,6 +425,18 @@
    </item>
    <item>
     <widget class="QWidget" name="cropPanel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>2</number>
@@ -644,11 +692,15 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <layout class="QVBoxLayout" name="statusBarLayout"/>
+   </item>
   </layout>
   <zorder>toolBar</zorder>
   <zorder>previewArea</zorder>
   <zorder>cropPanel</zorder>
   <zorder>timeLinePanel</zorder>
+  <zorder>verticalLayoutWidget</zorder>
  </widget>
  <customwidgets>
   <customwidget>

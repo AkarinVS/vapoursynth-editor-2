@@ -15,6 +15,7 @@
 
 class QEvent;
 class QMoveEvent;
+class QWheelEvent;
 class QResizeEvent;
 class QKeyEvent;
 class QMenu;
@@ -135,6 +136,8 @@ protected slots:
 
 	void slotSaveGeometry();
 
+    void slotSaveBookmarkToFile();
+
 protected:
 
 	virtual void stopAndCleanUp() override;
@@ -178,6 +181,9 @@ protected:
 	void saveGeometryDelayed();
 
 	Ui::PreviewDialog m_ui;
+
+    QStatusBar *scriptStatusBar;
+    QStatusBar *mainStatusBar;
 
 	PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
 
@@ -224,6 +230,7 @@ protected:
 	QAction * m_pActionGoToPreviousBookmark;
 	QAction * m_pActionGoToNextBookmark;
 	QAction * m_pActionPasteShownFrameNumberIntoScript;
+    QAction * m_pActionSaveBookmarkToFile;
 
 	std::map<QString, ZoomMode> m_actionIDToZoomModeMap;
 

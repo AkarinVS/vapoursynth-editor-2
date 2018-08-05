@@ -245,6 +245,7 @@ void VSScriptProcessorDialog::clearFramesCache()
 // END OF void VSScriptProcessorDialog::stopAndCleanUp()
 //==============================================================================
 
+// This layout cannot be controlled on the caller side
 void VSScriptProcessorDialog::createStatusBar()
 {
 	QLayout * pLayout = layout();

@@ -93,6 +93,7 @@ const char ACTION_ID_TIMELINE_GO_TO_NEXT_BOOKMARK[] =
 	"timeline_go_to_next_bookmark";
 const char ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT[] =
 	"paste_shown_frame_number_into_script";
+const char ACTION_ID_SAVE_BOOKMARK_TO_FILE[] = "save_bookmark_to_file";
 const char ACTION_ID_MOVE_TEXT_BLOCK_UP[] = "move_text_block_up";
 const char ACTION_ID_MOVE_TEXT_BLOCK_DOWN[] = "move_text_block_down";
 const char ACTION_ID_TOGGLE_COMMENT[] = "toggle_comment";

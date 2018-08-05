@@ -21,8 +21,11 @@
 #include <QToolTip>
 #include <QCursor>
 #include <QStandardPaths>
+#include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
+#include <QTextStream>
 #include <QScrollBar>
 #include <QPoint>
 #include <QMenu>
@@ -101,12 +104,26 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	, m_pPlayTimer(nullptr)
 	, m_alwaysKeepCurrentFrame(DEFAULT_ALWAYS_KEEP_CURRENT_FRAME)
 	, m_pGeometrySaveTimer(nullptr)
+
 {
 	m_ui.setupUi(this);
 	setWindowIcon(QIcon(":preview.png"));
 
 	m_iconPlay = QIcon(":play.png");
 	m_iconPause = QIcon(":pause.png");
+
+        // add the scriptStatusBar from the ScriptStatusBarWidget here
+        scriptStatusBar = new QStatusBar(this);
+        scriptStatusBar->addPermanentWidget(m_pStatusBarWidget, 1);
+        scriptStatusBar->setMaximumHeight(100);
+        m_ui.statusBarLayout->addWidget(scriptStatusBar);
+
+        // add a statusbar here in PreviewDialog because of Qt limitation, couldn't add it in the ui
+        mainStatusBar = new QStatusBar(this);
+        m_ui.statusBarLayout->addWidget(mainStatusBar);
+        mainStatusBar->setMinimumHeight(22);
+        mainStatusBar->setMaximumHeight(30);
+        mainStatusBar->setStyleSheet("border-top: 1px dashed #959595");
 
 	m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
 		m_pSettingsManager, this);
@@ -117,7 +134,8 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
 	createActionsAndMenus();
 
-	createStatusBar();
+        //createStatusBar(); // replaced by adding it to a layout directly in here
+
 	m_pStatusBarWidget->setColorPickerVisible(
 		m_pSettingsManager->getColorPickerVisible());
 
@@ -1490,6 +1508,9 @@ void PreviewDialog::createActionsAndMenus()
 		{&m_pActionPasteShownFrameNumberIntoScript,
 			ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT,
 			false, SLOT(slotPasteShownFrameNumberIntoScript())},
+                {&m_pActionSaveBookmarkToFile,
+                        ACTION_ID_SAVE_BOOKMARK_TO_FILE,
+                        false, SLOT(slotSaveBookmarkToFile())},
 	};
 
 	for(ActionToCreate & item : actionsToCreate)
@@ -1642,6 +1663,8 @@ void PreviewDialog::createActionsAndMenus()
 
 	addAction(m_pActionPasteShownFrameNumberIntoScript);
 	m_pPreviewContextMenu->addAction(m_pActionPasteShownFrameNumberIntoScript);
+
+        m_pPreviewContextMenu->addAction(m_pActionSaveBookmarkToFile);
 
 //------------------------------------------------------------------------------
 
@@ -2053,7 +2076,7 @@ void PreviewDialog::setTitle()
 
 void PreviewDialog::saveTimelineBookmarks()
 {
-	QString l_scriptName = scriptName();
+        QString l_scriptName = scriptName();
 	if(l_scriptName.isEmpty())
 		return;
 
@@ -2125,4 +2148,54 @@ void PreviewDialog::saveGeometryDelayed()
 }
 
 // END OF void PreviewDialog::saveGeometryDelayed()
+//==============================================================================
+
+void PreviewDialog::slotSaveBookmarkToFile()
+{
+    if(m_playing)
+            return;
+
+    std::set<int> bookmarks = m_ui.frameNumberSlider->bookmarks();
+
+    if(bookmarks.size() > 0)
+    {
+        // get file path and fileName without extension
+        QFileInfo fileInfo(scriptName());
+        QString filePath = fileInfo.absolutePath();
+        QString scriptFileName = fileInfo.baseName();
+
+        QString fileName = QFileDialog::getSaveFileName(this,
+                            tr("Save bookmark"), filePath + QDir::separator() + scriptFileName,
+                            tr("Text file (*.txt)"));
+
+        if (fileName.isEmpty())
+            return;
+        else
+        {
+            QFile file(fileName);
+            if (!file.open(QIODevice::WriteOnly))
+            {
+                QMessageBox::information(this, tr("Unable to open file"),
+                             file.errorString());
+                return;
+            }
+
+            QStringList bookmarksStringList;
+            for(int i : bookmarks)
+                    bookmarksStringList += QString::number(i);
+
+            QString bookmarksString = bookmarksStringList.join(", ");
+
+            QTextStream out(&file);
+            out << bookmarksString;
+
+            this->mainStatusBar->showMessage("bookmark saved to "+ fileName, 3000);
+        }
+
+
+    }
+    return;
+
+}
+// END OF void PreviewDialog::saveBookmarkToFile()
 //==============================================================================
