@@ -13,8 +13,9 @@ public:
 
 protected:
     // reimplement wheelEvent for more reasonable scale when zoom out
-    void wheelEvent(QWheelEvent* event) override;
+    void wheelEvent(QWheelEvent * event) override;
 
+    void mousePressEvent(QMouseEvent * event) override;
 };
 
 #endif // ZOOM_RATIO_SPINBOX_H
