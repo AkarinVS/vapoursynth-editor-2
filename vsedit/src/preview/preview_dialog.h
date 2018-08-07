@@ -158,6 +158,8 @@ protected:
 
 	void setUpCropPanel();
 
+    void createMainStatusBar();
+
 	bool requestShowFrame(int a_frameNumber);
 
 	void setPreviewPixmap();

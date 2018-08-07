@@ -111,18 +111,12 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	m_iconPlay = QIcon(":play.png");
 	m_iconPause = QIcon(":pause.png");
 
-        // add the scriptStatusBar from the ScriptStatusBarWidget here
-        scriptStatusBar = new QStatusBar(this);
-        scriptStatusBar->addPermanentWidget(m_pStatusBarWidget, 1);
-        scriptStatusBar->setMaximumHeight(100);
-        m_ui.statusBarLayout->addWidget(scriptStatusBar);
+    // create scriptStatusBar and mainStatusBar in ui
+    createStatusBar();
+    createMainStatusBar();
 
-        // add a statusbar here in PreviewDialog because of Qt limitation, couldn't add it in the ui
-        mainStatusBar = new QStatusBar(this);
-        m_ui.statusBarLayout->addWidget(mainStatusBar);
-        mainStatusBar->setMinimumHeight(22);
-        mainStatusBar->setMaximumHeight(30);
-        mainStatusBar->setStyleSheet("border-top: 1px dashed #959595");
+    m_ui.mainLayout->addWidget(m_pStatusBar); // created from createStatusBar()
+    m_ui.mainLayout->addWidget(mainStatusBar); // created from createMainStatusBar()
 
 	m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
 		m_pSettingsManager, this);
@@ -131,9 +125,7 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	m_pPlayTimer->setTimerType(Qt::PreciseTimer);
 	m_pPlayTimer->setSingleShot(true);
 
-	createActionsAndMenus();
-
-        //createStatusBar(); // replaced by adding it to a layout directly in here
+    createActionsAndMenus(); // for context menu on right mouse click
 
 	m_pStatusBarWidget->setColorPickerVisible(
 		m_pSettingsManager->getColorPickerVisible());
@@ -1504,10 +1496,10 @@ void PreviewDialog::createActionsAndMenus()
 			false, SLOT(slotGoToNextBookmark())},
 		{&m_pActionPasteShownFrameNumberIntoScript,
 			ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT,
-			false, SLOT(slotPasteShownFrameNumberIntoScript())},
-                {&m_pActionSaveBookmarkToFile,
-                        ACTION_ID_SAVE_BOOKMARK_TO_FILE,
-                        false, SLOT(slotSaveBookmarkToFile())},
+			false, SLOT(slotPasteShownFrameNumberIntoScript())},                
+        {&m_pActionSaveBookmarkToFile,
+            ACTION_ID_SAVE_BOOKMARK_TO_FILE,
+            false, SLOT(slotSaveBookmarkToFile())},
 	};
 
 	for(ActionToCreate & item : actionsToCreate)
@@ -1827,6 +1819,18 @@ void PreviewDialog::setUpCropPanel()
 }
 
 // END OF void PreviewDialog::setUpCropPanel()
+//==============================================================================
+
+void PreviewDialog::createMainStatusBar()
+{
+    mainStatusBar = new QStatusBar(this);
+    mainStatusBar->setMinimumHeight(22);
+    mainStatusBar->setMaximumHeight(30);
+    mainStatusBar->setStyleSheet("border-top: 1px dashed #959595");
+
+}
+
+// END OF void createMainStatusBar()
 //==============================================================================
 
 bool PreviewDialog::requestShowFrame(int a_frameNumber)
