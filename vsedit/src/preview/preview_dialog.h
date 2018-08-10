@@ -152,6 +152,8 @@ protected:
 
 	void createActionsAndMenus();
 
+    void setUpFrameNumberSliderBig();
+
 	void setUpZoomPanel();
 
 	void setUpTimeLinePanel();

@@ -77,7 +77,9 @@ signals:
 
 	void signalSliderMoved(int a_frame);
 
-	void signalFrameChanged(int a_frame);
+    void signalFrameChanged(int a_frame);
+
+    void signalFrameRangeChanged(int a_min, int a_max);
 
 	void signalSliderPressed();
 	void signalSliderReleased();

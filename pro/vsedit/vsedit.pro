@@ -205,6 +205,7 @@ HEADERS += $${COMMON_DIRECTORY}/common-src/jobs/job.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/jobs/job_variables.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/timeline_slider/timeline_slider.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/zoom_ratio_spinbox.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/timeline_slider_big.h
 
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.h
@@ -253,6 +254,7 @@ SOURCES += $${COMMON_DIRECTORY}/common-src/jobs/job.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/jobs/job_variables.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/timeline_slider/timeline_slider.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/zoom_ratio_spinbox.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/timeline_slider_big.cpp
 
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.cpp

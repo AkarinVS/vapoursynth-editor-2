@@ -13,7 +13,6 @@ void ZoomRatioSpinBox::wheelEvent(QWheelEvent * event)
 {
     QDoubleSpinBox::wheelEvent(event);
 
-    this->setSingleStep(0.2);
     double zoomRatio = value();
     int delta = event->delta();
 
@@ -28,8 +27,7 @@ void ZoomRatioSpinBox::wheelEvent(QWheelEvent * event)
         zoomRatio = floor(zoomRatio);
         setValue(zoomRatio);
     }
-
-    event->ignore(); // important, set this to not override original's behavior
+    event->ignore();
 }
 
 // END OF ZoomRatioSpinBox::wheelEvent(QWheelEvent * event)
@@ -39,7 +37,6 @@ void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * event)
 {
     QDoubleSpinBox::mousePressEvent(event);
 
-    this->setSingleStep(0.2);
     double zoomRatio = value();
     int mousePositionY = event->y();
 
