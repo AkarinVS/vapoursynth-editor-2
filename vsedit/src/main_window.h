@@ -79,6 +79,8 @@ private:
 
 	void createActionsAndMenus();
 
+    void createToolBars();
+
 	void fillRecentScriptsMenu();
 
 	bool saveScriptToFile(const QString& a_filePath);

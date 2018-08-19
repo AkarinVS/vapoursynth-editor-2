@@ -37,6 +37,7 @@
 #include <QUrl>
 #include <QDateTime>
 #include <QTimer>
+#include <QToolBar>
 
 //==============================================================================
 
@@ -159,6 +160,8 @@ MainWindow::MainWindow() : QMainWindow()
 		this, &MainWindow::slotSaveGeometry);
 
 	createActionsAndMenus();
+
+    createToolBars();
 
 	slotChangeWindowTitle();
 
@@ -697,6 +700,23 @@ void MainWindow::createActionsAndMenus()
 }
 
 // END OF void MainWindow::createActionsAndMenus()
+//==============================================================================
+
+void MainWindow::createToolBars()
+{
+    QToolBar * mainToolBar = addToolBar(tr("Toolbar"));
+    mainToolBar->setMovable(false);
+    mainToolBar->toggleViewAction()->setEnabled(false); // not hidable
+
+    mainToolBar->addAction(m_pActionNewScript);
+    mainToolBar->addAction(m_pActionOpenScript);
+    mainToolBar->addAction(m_pActionSaveScript);
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(m_pActionPreview);
+    mainToolBar->addAction(m_pActionBenchmark);
+}
+
+// END OF void MainWindow::createToolBars()
 //==============================================================================
 
 void MainWindow::fillRecentScriptsMenu()
