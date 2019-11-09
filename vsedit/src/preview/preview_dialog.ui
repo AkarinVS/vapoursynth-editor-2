@@ -30,6 +30,7 @@
     <number>0</number>
    </property>
    <item>
+<<<<<<< HEAD
     <widget class="PreviewArea" name="previewArea">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -50,6 +51,9 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
+=======
+    <widget class="PreviewArea" name="previewArea"/>
+>>>>>>> 4490d06bc097e7849ced7d57b56ad03008984851
    </item>
    <item>
     <widget class="TimeLineSliderBig" name="frameNumberSliderBig">
@@ -758,7 +762,7 @@ QSlider::handle:horizontal {
  <customwidgets>
   <customwidget>
    <class>PreviewArea</class>
-   <extends>QScrollArea</extends>
+   <extends>QWidget</extends>
    <header>../../src/preview/preview_area.h</header>
    <container>1</container>
   </customwidget>
