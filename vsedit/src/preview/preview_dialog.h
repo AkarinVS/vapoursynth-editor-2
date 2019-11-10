@@ -152,7 +152,7 @@ protected:
 
 	void createActionsAndMenus();
 
-    void setUpFrameNumberSliderBig();
+//    void setUpFrameNumberSliderBig();
 
 	void setUpZoomPanel();
 

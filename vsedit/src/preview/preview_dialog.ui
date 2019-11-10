@@ -30,70 +30,7 @@
     <number>0</number>
    </property>
    <item>
-<<<<<<< HEAD
-    <widget class="PreviewArea" name="previewArea">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-=======
-    <widget class="PreviewArea" name="previewArea"/>
->>>>>>> 4490d06bc097e7849ced7d57b56ad03008984851
-   </item>
-   <item>
-    <widget class="TimeLineSliderBig" name="frameNumberSliderBig">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">.QSlider {
-    min-height: 30px;
-    max-height: 30px;
-	background-color: #d9d9d9;    
-}
-
-.QSlider::groove:horizontal {
-    border: 0px solid #262626;
-}
-
-.QSlider::handle:horizontal {   	
-    width: 8px;
-    height: 45px;
-   	border: 2px solid #909090;
-	background-color: #606060;
-}</string>
-     </property>
-     <property name="pageStep">
-      <number>0</number>
-     </property>
-     <property name="tracking">
-      <bool>true</bool>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickInterval">
-      <number>0</number>
-     </property>
-    </widget>
+    <widget class="PreviewArea" name="previewArea" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="toolBar" native="true">
@@ -757,7 +694,6 @@ QSlider::handle:horizontal {
   <zorder>previewArea</zorder>
   <zorder>cropPanel</zorder>
   <zorder>timeLinePanel</zorder>
-  <zorder>frameNumberSliderBig</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -776,11 +712,6 @@ QSlider::handle:horizontal {
    <class>ZoomRatioSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header>../../common-src/qt_widgets_subclasses/zoom_ratio_spinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>TimeLineSliderBig</class>
-   <extends>QSlider</extends>
-   <header>../../common-src/qt_widgets_subclasses/timeline_slider_big.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

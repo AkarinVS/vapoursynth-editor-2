@@ -143,7 +143,7 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	setUpCropPanel();
 	setUpTimeLinePanel();
 
-    setUpFrameNumberSliderBig(); // create bigger frame slider
+//    setUpFrameNumberSliderBig(); // create bigger frame slider
 
 	m_ui.colorPickerButton->setDefaultAction(m_pActionToggleColorPicker);
 
@@ -230,7 +230,7 @@ void PreviewDialog::previewScript(const QString& a_script,
 	m_ui.frameNumberSlider->setFramesNumber(m_cpVideoInfo->numFrames);
 
     // emit signal for frameNumberSliderBig
-    emit m_ui.frameNumberSlider->signalFrameRangeChanged(0,lastFrameNumber);
+//    emit m_ui.frameNumberSlider->signalFrameRangeChanged(0,lastFrameNumber);
 
 	if(m_cpVideoInfo->fpsDen == 0)
 		m_ui.frameNumberSlider->setFPS(0.0);
@@ -2208,21 +2208,21 @@ void PreviewDialog::slotSaveBookmarkToFile()
 // END OF void PreviewDialog::saveBookmarkToFile()
 //==============================================================================
 
-void PreviewDialog::setUpFrameNumberSliderBig()
-{
+//void PreviewDialog::setUpFrameNumberSliderBig()
+//{
+////    connect(m_ui.frameNumberSliderBig, &QSlider::valueChanged,
+////            m_ui.lcdNumber, static_cast<void (QLCDNumber::*)(int)>(&QLCDNumber::display)); // for testing purpose
 //    connect(m_ui.frameNumberSliderBig, &QSlider::valueChanged,
-//            m_ui.lcdNumber, static_cast<void (QLCDNumber::*)(int)>(&QLCDNumber::display)); // for testing purpose
-    connect(m_ui.frameNumberSliderBig, &QSlider::valueChanged,
-            m_ui.frameNumberSlider, &TimeLineSlider::setFrame);
+//            m_ui.frameNumberSlider, &TimeLineSlider::setFrame);
 
-    // need this connection to keep both sliders in sync for
-    // mouse preseed+move big slider, and to prevent crash when moving too fast
-    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameChanged,
-            m_ui.frameNumberSliderBig, &QSlider::setValue);
+//    // need this connection to keep both sliders in sync for
+//    // mouse preseed+move big slider, and to prevent crash when moving too fast
+//    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameChanged,
+//            m_ui.frameNumberSliderBig, &QSlider::setValue);
 
-    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameRangeChanged,
-            m_ui.frameNumberSliderBig, &QSlider::setRange);
-}
+//    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameRangeChanged,
+//            m_ui.frameNumberSliderBig, &QSlider::setRange);
+//}
 
 // END OF void PreviewDialog::setUpFrameNumberSliderBig()
 //==============================================================================
