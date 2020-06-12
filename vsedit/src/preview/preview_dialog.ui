@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>933</width>
+    <width>1020</width>
     <height>652</height>
    </rect>
   </property>
@@ -14,23 +14,37 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <widget class="PreviewArea" name="previewArea" native="true"/>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="timeLineArea">
+     <item>
+      <widget class="TimeLineView" name="timeLineView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>1000</width>
+         <height>120</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>9999</width>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QWidget" name="toolBar" native="true">
@@ -712,6 +726,11 @@ QSlider::handle:horizontal {
    <class>ZoomRatioSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header>../../common-src/qt_widgets_subclasses/zoom_ratio_spinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TimeLineView</class>
+   <extends>QGraphicsView</extends>
+   <header>../../common-src/frame_timeline/timeline_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

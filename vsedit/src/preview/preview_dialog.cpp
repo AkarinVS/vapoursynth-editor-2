@@ -6,6 +6,7 @@
 #include "../settings/settings_dialog.h"
 #include "scroll_navigator.h"
 #include "../../../common-src/timeline_slider/timeline_slider.h"
+#include "../../../common-src/frame_timeline/timeline.h"
 #include "preview_advanced_settings_dialog.h"
 
 #include <vapoursynth/VapourSynth.h>
@@ -38,6 +39,9 @@
 #include <QFileInfo>
 #include <algorithm>
 #include <cmath>
+#include <QGraphicsRectItem>
+
+#include <QtDebug>
 
 //==============================================================================
 
@@ -134,6 +138,9 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	m_ui.frameNumberSlider->setDisplayMode(
 		m_pSettingsManager->getTimeLineMode());
 
+    // set for timeline
+    m_ui.timeLineView->setDisplayMode(TimeLine::DisplayMode(m_pSettingsManager->getTimeLineMode()));
+
 	m_ui.frameToClipboardButton->setDefaultAction(m_pActionFrameToClipboard);
 	m_ui.saveSnapshotButton->setDefaultAction(m_pActionSaveSnapshot);
 	m_ui.advancedSettingsButton->setDefaultAction(
@@ -142,8 +149,6 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	setUpZoomPanel();
 	setUpCropPanel();
 	setUpTimeLinePanel();
-
-//    setUpFrameNumberSliderBig(); // create bigger frame slider
 
 	m_ui.colorPickerButton->setDefaultAction(m_pActionToggleColorPicker);
 
@@ -174,6 +179,12 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 		this, SLOT(slotPreviewAreaMouseOverPoint(float, float)));
 	connect(m_pPlayTimer, SIGNAL(timeout()),
 		this, SLOT(slotProcessPlayQueue()));
+
+
+    // timelineview connect
+    connect(m_ui.timeLineView, &TimeLineView::signalFrameChanged,
+            this, &PreviewDialog::slotShowFrame);
+
 
 	slotSettingsChanged();
 
@@ -229,15 +240,21 @@ void PreviewDialog::previewScript(const QString& a_script,
 	m_ui.frameNumberSpinBox->setMaximum(lastFrameNumber);
 	m_ui.frameNumberSlider->setFramesNumber(m_cpVideoInfo->numFrames);
 
-    // emit signal for frameNumberSliderBig
-//    emit m_ui.frameNumberSlider->signalFrameRangeChanged(0,lastFrameNumber);
+    // new timeline setup
+    m_ui.timeLineView->setFramesNumber(m_cpVideoInfo->numFrames);
 
-	if(m_cpVideoInfo->fpsDen == 0)
+    if(m_cpVideoInfo->fpsDen == 0) {
 		m_ui.frameNumberSlider->setFPS(0.0);
+
+        m_ui.timeLineView->setFPS(0.0); // for zooming timeline
+    }
 	else
 	{
 		m_ui.frameNumberSlider->setFPS((double)m_cpVideoInfo->fpsNum /
 			(double)m_cpVideoInfo->fpsDen);
+
+        m_ui.timeLineView->setFPS(double(m_cpVideoInfo->fpsNum) /
+            double(m_cpVideoInfo->fpsDen));
 	}
 
 	bool scriptChanged = ((previousScript != a_script) &&
@@ -478,7 +495,10 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
 	requestingFrame = true;
 
 	m_ui.frameNumberSpinBox->setValue(a_frameNumber);
-	m_ui.frameNumberSlider->setFrame(a_frameNumber);
+    m_ui.frameNumberSlider->setFrame(a_frameNumber);
+
+    // timeline
+    m_ui.timeLineView->setFrame(a_frameNumber);
 
 	bool requested = requestShowFrame(a_frameNumber);
 	if(requested)
@@ -913,14 +933,14 @@ void PreviewDialog::slotToggleTimeLinePanelVisible(bool a_timeLinePanelVisible)
 void PreviewDialog::slotTimeLineModeChanged()
 {
 	static bool changingTimeLineMode = false;
-	if(changingTimeLineMode)
-		return;
+    if(changingTimeLineMode)
+        return;
 	changingTimeLineMode = true;
 
 	TimeLineSlider::DisplayMode timeLineMode = (TimeLineSlider::DisplayMode)
-		m_ui.timeLineModeComboBox->currentData().toInt();
+		m_ui.timeLineModeComboBox->currentData().toInt();  
 
-	QObject * pSender = sender();
+    QObject * pSender = sender();
 	if(pSender == m_ui.timeLineModeComboBox)
 	{
 		for(QAction * pAction : m_pActionGroupTimeLineModes->actions())
@@ -948,7 +968,15 @@ void PreviewDialog::slotTimeLineModeChanged()
 	m_ui.frameNumberSlider->setDisplayMode(timeLineMode);
 	m_pSettingsManager->setTimeLineMode(timeLineMode);
 
-	changingTimeLineMode = false;
+    changingTimeLineMode = false;
+}
+
+// for zooming timeline display mode
+void PreviewDialog::slotDisplayModeChanged(int a_displayMode)
+{
+    TimeLine::DisplayMode timeLineDisplayMode = TimeLine::DisplayMode(a_displayMode);
+    m_ui.timeLineView->setDisplayMode(timeLineDisplayMode);
+
 }
 
 // END OF void PreviewDialog::slotTimeLineModeChanged()
@@ -1785,6 +1813,9 @@ void PreviewDialog::setUpTimeLinePanel()
 		this, SLOT(slotSetPlayFPSLimit()));
 	connect(m_ui.playFpsLimitSpinBox, SIGNAL(valueChanged(double)),
 		this, SLOT(slotSetPlayFPSLimit()));
+
+    connect(m_ui.timeLineModeComboBox, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(slotDisplayModeChanged(int)));
 }
 
 // END OF void PreviewDialog::setUpTimeLinePanel()
@@ -2206,23 +2237,4 @@ void PreviewDialog::slotSaveBookmarkToFile()
 }
 
 // END OF void PreviewDialog::saveBookmarkToFile()
-//==============================================================================
-
-//void PreviewDialog::setUpFrameNumberSliderBig()
-//{
-////    connect(m_ui.frameNumberSliderBig, &QSlider::valueChanged,
-////            m_ui.lcdNumber, static_cast<void (QLCDNumber::*)(int)>(&QLCDNumber::display)); // for testing purpose
-//    connect(m_ui.frameNumberSliderBig, &QSlider::valueChanged,
-//            m_ui.frameNumberSlider, &TimeLineSlider::setFrame);
-
-//    // need this connection to keep both sliders in sync for
-//    // mouse preseed+move big slider, and to prevent crash when moving too fast
-//    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameChanged,
-//            m_ui.frameNumberSliderBig, &QSlider::setValue);
-
-//    connect(m_ui.frameNumberSlider, &TimeLineSlider::signalFrameRangeChanged,
-//            m_ui.frameNumberSliderBig, &QSlider::setRange);
-//}
-
-// END OF void PreviewDialog::setUpFrameNumberSliderBig()
 //==============================================================================

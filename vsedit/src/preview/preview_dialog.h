@@ -36,7 +36,7 @@ public:
 
 	PreviewDialog(SettingsManager * a_pSettingsManager,
 		VSScriptLibrary * a_pVSScriptLibrary, QWidget * a_pParent = nullptr);
-	virtual ~PreviewDialog();
+    virtual ~PreviewDialog() override;
 
 	virtual void setScriptName(const QString & a_scriptName) override;
 
@@ -95,6 +95,8 @@ protected slots:
 
 	void slotTimeLineModeChanged();
 
+    void slotDisplayModeChanged(int a_displayMode);
+
 	void slotTimeStepChanged(const QTime & a_time);
 
 	void slotTimeStepForward();
@@ -151,8 +153,6 @@ protected:
 	void keyPressEvent(QKeyEvent * a_pEvent) override;
 
 	void createActionsAndMenus();
-
-//    void setUpFrameNumberSliderBig();
 
 	void setUpZoomPanel();
 

@@ -18,13 +18,13 @@ class QTimer;
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
 
 	MainWindow();
 
-	virtual ~MainWindow();
+    virtual ~MainWindow() override;
 
 public slots:
 
