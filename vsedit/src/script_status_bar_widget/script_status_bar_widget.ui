@@ -68,8 +68,39 @@
       </item>
       <item>
        <widget class="QLabel" name="colorPickerLabel">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>colorPickerLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="mousePositionLabel">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>mousePositionLabel</string>
         </property>
        </widget>
       </item>
@@ -78,11 +109,8 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>486</width>
-          <height>20</height>
-         </size>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
         </property>
        </spacer>
       </item>

@@ -50,12 +50,20 @@ void ScriptStatusBarWidget::setColorPickerVisible(bool a_visible)
 
 void ScriptStatusBarWidget::setColorPickerString(const QString & a_string)
 {
-	m_ui.colorPickerLabel->setText(a_string);
+    m_ui.colorPickerLabel->setText(a_string);
 }
 
 // END OF void ScriptStatusBarWidget::setColorPickerString(
 //		const QString & a_string)
 //==============================================================================
+
+void ScriptStatusBarWidget::setMousePositionString(const QString & a_string)
+{
+    m_ui.mousePositionLabel->setText(a_string);
+}
+// END OF void ScriptStatusBarWidget::setMousePositionString(const QString &a_string)
+//==============================================================================
+
 
 void ScriptStatusBarWidget::setQueueState(size_t a_inQueue, size_t a_inProcess,
 	size_t a_maxThreads)

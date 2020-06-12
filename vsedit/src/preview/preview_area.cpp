@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QCoreApplication>
+#include <QDebug>
 
 //==============================================================================
 
@@ -80,6 +81,7 @@ void PreviewArea::checkMouseOverPreview(const QPoint & a_globalMousePos)
 	float normY = (float)imagePoint.y() / (float)pixmapHeight;
 
 	emit signalMouseOverPoint(normX, normY);
+    emit signalMousePosition(imagePoint);
 }
 
 // END OF void PreviewArea::checkMouseOverPreview(

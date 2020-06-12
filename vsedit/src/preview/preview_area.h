@@ -52,6 +52,7 @@ signals:
 	void signalMouseMiddleButtonReleased();
 	void signalMouseRightButtonReleased();
 	void signalMouseOverPoint(float a_normX, float a_normY);
+        void signalMousePosition(QPoint a_mousePos);
 
 private:
 

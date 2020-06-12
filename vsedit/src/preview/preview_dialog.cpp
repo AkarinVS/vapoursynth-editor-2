@@ -177,6 +177,8 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 		this, SLOT(slotPreviewAreaMouseRightButtonReleased()));
 	connect(m_ui.previewArea, SIGNAL(signalMouseOverPoint(float, float)),
 		this, SLOT(slotPreviewAreaMouseOverPoint(float, float)));
+    connect(m_ui.previewArea, SIGNAL(signalMousePosition(QPoint)),
+        this, SLOT(slotPreviewAreaShowMousePosition(QPoint)));
 	connect(m_pPlayTimer, SIGNAL(timeout()),
 		this, SLOT(slotProcessPlayQueue()));
 
@@ -1184,12 +1186,28 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 	if(colorFamily == cmGray)
 		colorString = QString("G:%1").arg(value1);
 
-	m_pStatusBarWidget->setColorPickerString(colorString);
+    m_pStatusBarWidget->setColorPickerString(colorString);
 }
 
 // END OF void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX,
 //		float a_normY)
 //==============================================================================
+
+void PreviewDialog::slotPreviewAreaShowMousePosition(QPoint a_mousePos)
+{
+    if(!m_cpFrameRef)
+        return;
+
+    if(!m_pStatusBarWidget->colorPickerVisible())
+        return;
+
+    QString mousePosString = QString("x:%1  y:%2").arg(a_mousePos.x()).arg(a_mousePos.y());
+    m_pStatusBarWidget->setMousePositionString(mousePosString);
+}
+// END OF void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_normY)
+//==============================================================================
+
+
 
 void PreviewDialog::slotFrameToClipboard()
 {

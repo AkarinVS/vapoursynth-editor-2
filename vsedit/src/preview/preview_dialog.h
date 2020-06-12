@@ -115,6 +115,8 @@ protected slots:
 
 	void slotPreviewAreaMouseOverPoint(float a_normX, float a_normY);
 
+    void slotPreviewAreaShowMousePosition(QPoint a_mousePos);
+
 	void slotFrameToClipboard();
 
 	void slotAdvancedSettingsChanged();

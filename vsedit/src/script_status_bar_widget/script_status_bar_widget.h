@@ -19,9 +19,11 @@ public:
 
 public slots:
 
-	virtual void setColorPickerVisible(bool a_visible = true);
+        virtual void setColorPickerVisible(bool a_visible = true); // this needs better naming
 
 	virtual void setColorPickerString(const QString & a_string);
+
+        virtual void setMousePositionString(const QString & a_string);
 
 	virtual void setQueueState(size_t a_inQueue, size_t a_inProcess,
 		size_t a_maxThreads);
