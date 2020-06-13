@@ -1,59 +1,98 @@
 #include "zoom_ratio_spinbox.h"
+#include <math.h>
+#include "spinbox_extended_lineedit.h"
+
+#include <QDebug>
+#include <QStyleOptionSpinBox>
 
 ZoomRatioSpinBox::ZoomRatioSpinBox(QWidget *parent): QDoubleSpinBox(parent)
 {
+    // use custom lineedit for single click to highlight all text
+    QLineEdit *lineEdit = new SpinboxExtendedLineEdit(this);
+    setLineEdit(lineEdit);
 
+    // other settings were set in the ui
 }
 
 // END OF ZoomRatioSpinBox::ZoomRatioSpinBox(QWidget *parent): QDoubleSpinBox(parent)
 //==============================================================================
 
 // set zoom ratio to +/-0.2x when ratio is under 1x
-void ZoomRatioSpinBox::wheelEvent(QWheelEvent * event)
+void ZoomRatioSpinBox::wheelEvent(QWheelEvent * a_pEvent)
 {
-    QDoubleSpinBox::wheelEvent(event);
+    QDoubleSpinBox::wheelEvent(a_pEvent);
 
-    double zoomRatio = value();
-    int delta = event->delta();
+    m_zoomRatio = value();
+    QPoint delta = a_pEvent->angleDelta();
 
-    if(zoomRatio > 1.0 && delta > 0)
-    {
-        zoomRatio = ceil(zoomRatio);
-        setValue(zoomRatio);
-    }
+    if(m_zoomRatio > 1.0 && delta.y() > 0)
+        stepUp();
 
-    if(zoomRatio > 1.0 && delta < 0)
-    {
-        zoomRatio = floor(zoomRatio);
-        setValue(zoomRatio);
-    }
-    event->ignore();
+    if(m_zoomRatio > 1.0 && delta.y() < 0)
+        stepDown();
+
+    a_pEvent->ignore();
 }
 
 // END OF ZoomRatioSpinBox::wheelEvent(QWheelEvent * event)
 //==============================================================================
 
-void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * event)
+void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * a_pEvent)
 {
-    QDoubleSpinBox::mousePressEvent(event);
+    QDoubleSpinBox::mousePressEvent(a_pEvent);
 
-    double zoomRatio = value();
-    int mousePositionY = event->y();
+    m_zoomRatio = value();
 
-    if(mousePositionY < this->height()/2 && zoomRatio > 1.0) // click up
-    {
-        zoomRatio = ceil(zoomRatio);
-        setValue(zoomRatio);
-    }
+    QStyleOptionSpinBox opt;
+    this->initStyleOption(&opt);
 
-    if(mousePositionY > this->height()/2 && zoomRatio > 1.0) // click down
-    {
-        zoomRatio = floor(zoomRatio);
-        setValue(zoomRatio);
-    }
+    // ARROW UP IS PRESSED
+    if(this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxUp).contains(a_pEvent->pos()) )
+        stepUp();
 
-    event->ignore();
+    // ARROW DOWN IS PRESSED
+    if( this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxDown).contains(a_pEvent->pos()) )
+        stepDown();
+
+    a_pEvent->ignore();
 }
 
 // END OF ZoomRatioSpinBox::mousePressEvent(QMouseEvent * event)
+//==============================================================================
+
+void ZoomRatioSpinBox::keyPressEvent(QKeyEvent * a_pEvent)
+{
+    QDoubleSpinBox::keyPressEvent(a_pEvent);
+
+    m_zoomRatio = value();
+
+    if (a_pEvent->key() == Qt::Key_Up) {
+        stepUp();
+    }
+
+    if (a_pEvent->key() == Qt::Key_Down)
+        stepDown();
+
+    a_pEvent->ignore();
+}
+
+// END OF void ZoomRatioSpinBox::keyPressEvent(QKeyEvent *a_pEvent)
+//==============================================================================
+
+void ZoomRatioSpinBox::stepUp()
+{
+    if (m_zoomRatio > 1.0)
+        setValue(ceil(m_zoomRatio));
+}
+
+// END OF void ZoomRatioSpinBox::stepUp)
+//==============================================================================
+
+void ZoomRatioSpinBox::stepDown()
+{
+    if (m_zoomRatio > 1.0)
+        setValue(floor(m_zoomRatio));
+}
+
+// END OF void ZoomRatioSpinBox::stepDown)
 //==============================================================================

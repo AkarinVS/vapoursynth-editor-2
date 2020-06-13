@@ -74,7 +74,7 @@ void ScriptStatusBarWidget::setQueueState(size_t a_inQueue, size_t a_inProcess,
 		m_ui.scriptProcessorQueueIconLabel->setPixmap(m_readyPixmap);
 
 	m_ui.scriptProcessorQueueLabel->setText(
-		trUtf8("Script processor queue: %1:%2(%3)")
+        trUtf8("Script processor queue: %1:%2 (%3 threads)")
 		.arg(a_inQueue).arg(a_inProcess).arg(a_maxThreads));
 }
 
