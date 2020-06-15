@@ -276,3 +276,11 @@ vsedit::FP32 vsedit::halfToSingle(vsedit::FP16 a_half)
 
 // END OF vsedit::FP32 vsedit::halfToSingle(vsedit::FP16 a_half)
 //==============================================================================
+
+double vsedit::round(double a_fps)
+{
+    return std::floor((a_fps * 100) + .5) / 100;
+}
+
+// END OF void vsedit::round(double a_fps)
+//==============================================================================

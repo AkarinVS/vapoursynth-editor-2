@@ -15,10 +15,92 @@
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <item>
-    <widget class="PreviewArea" name="previewArea" native="true"/>
+    <widget class="PreviewArea" name="previewArea" native="true">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="timeLineArea">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="GenericSpinBox" name="frameNumberSpinBox">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>180</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>180</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>18</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
+           <kerning>true</kerning>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+         <property name="keyboardTracking">
+          <bool>false</bool>
+         </property>
+         <property name="showGroupSeparator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Minimum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>60</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
      <item>
       <widget class="TimeLineView" name="timeLineView">
        <property name="sizePolicy">
@@ -83,22 +165,6 @@
         </property>
         <property name="checkable">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="frameNumberSpinBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="keyboardTracking">
-         <bool>false</bool>
-        </property>
-        <property name="maximum">
-         <number>999999999</number>
         </property>
        </widget>
       </item>
@@ -264,7 +330,6 @@ QSlider::handle:horizontal {
      <zorder>zoomCheckButton</zorder>
      <zorder>zoomPanel</zorder>
      <zorder>timeLineCheckButton</zorder>
-     <zorder>frameNumberSpinBox</zorder>
      <zorder>frameStatusLabel</zorder>
     </widget>
    </item>
@@ -316,15 +381,30 @@ QSlider::handle:horizontal {
        <widget class="QComboBox" name="playFpsLimitModeComboBox"/>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="playFpsLimitSpinBox">
-        <property name="decimals">
-         <number>5</number>
+       <widget class="QLineEdit" name="playFpsLimitLineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="maximum">
-         <double>100000.000000000000000</double>
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
         </property>
-        <property name="value">
-         <double>23.999990000000000</double>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="maxLength">
+         <number>6</number>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -708,6 +788,7 @@ QSlider::handle:horizontal {
   <zorder>previewArea</zorder>
   <zorder>cropPanel</zorder>
   <zorder>timeLinePanel</zorder>
+  <zorder></zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -731,6 +812,11 @@ QSlider::handle:horizontal {
    <class>TimeLineView</class>
    <extends>QGraphicsView</extends>
    <header>../../common-src/frame_timeline/timeline_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GenericSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>../../common-src/qt_widgets_subclasses/generic_spinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
