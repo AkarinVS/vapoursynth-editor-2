@@ -4,6 +4,8 @@
 #include <QDoubleSpinBox>
 #include <QWheelEvent>
 
+#include "spinbox_extended_lineedit.h"
+
 class ZoomRatioSpinBox : public QDoubleSpinBox
 {
     Q_OBJECT
@@ -18,6 +20,9 @@ protected:
     virtual void keyPressEvent(QKeyEvent * a_pEvent) override;
 
 private:
+
+    SpinboxExtendedLineEdit * a_pLineEdit;
+
     double m_zoomRatio;
 
 public slots:

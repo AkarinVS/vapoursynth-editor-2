@@ -41,6 +41,8 @@ public:
 
     void setFrameByPos(int a_pos);
 
+    int frameToPos(int a_frame) const;
+
     int currentFramePos();
 
     void increaseZoomFactor();
@@ -74,7 +76,6 @@ public:
 private:
 
     int posToFrame(int a_pos) const;
-    int frameToPos(int a_frame) const;
 
     int m_baseWidth;
     int m_viewWidth;

@@ -252,7 +252,7 @@ void TimeLine::setFrame(int a_frame)
 
     update();
 
-    emit signalFrameChanged(a_frame);
+    emit signalFrameChanged(m_currentFrame);
 }
 
 // END OF void TimeLine::setFrame(int a_frame)

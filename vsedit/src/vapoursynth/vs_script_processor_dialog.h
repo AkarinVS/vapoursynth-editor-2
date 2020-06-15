@@ -34,7 +34,7 @@ public:
 		| Qt::WindowMaximizeButtonHint
 		| Qt::WindowCloseButtonHint);
 
-	virtual ~VSScriptProcessorDialog();
+    virtual ~VSScriptProcessorDialog() override;
 
 	virtual bool initialize(const QString & a_script,
 		const QString & a_scriptName);

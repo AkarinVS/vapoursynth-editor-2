@@ -246,15 +246,16 @@ void VSScriptProcessorDialog::clearFramesCache()
 
 void VSScriptProcessorDialog::createStatusBar()
 {
-	QLayout * pLayout = layout();
+    QLayout * pLayout = layout();
 	Q_ASSERT(pLayout);
 	if(!pLayout)
 		return;
 
 	m_pStatusBar = new QStatusBar(this);
+    m_pStatusBar->setSizeGripEnabled(false);
 	pLayout->addWidget(m_pStatusBar);
 
-	m_pStatusBar->addPermanentWidget(m_pStatusBarWidget, 1);
+    m_pStatusBar->addPermanentWidget(m_pStatusBarWidget, 1);
 }
 
 // END OF void VSScriptProcessorDialog::createStatusBar()

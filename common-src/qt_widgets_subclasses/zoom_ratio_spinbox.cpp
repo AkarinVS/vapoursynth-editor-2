@@ -1,6 +1,5 @@
 #include "zoom_ratio_spinbox.h"
 #include <math.h>
-#include "spinbox_extended_lineedit.h"
 
 #include <QDebug>
 #include <QStyleOptionSpinBox>
@@ -8,8 +7,8 @@
 ZoomRatioSpinBox::ZoomRatioSpinBox(QWidget *parent): QDoubleSpinBox(parent)
 {
     // use custom lineedit for single click to highlight all text
-    QLineEdit *lineEdit = new SpinboxExtendedLineEdit(this);
-    setLineEdit(lineEdit);
+    a_pLineEdit = new SpinboxExtendedLineEdit(this);
+    setLineEdit(a_pLineEdit);
 
     // other settings were set in the ui
 }

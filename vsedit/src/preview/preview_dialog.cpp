@@ -7,6 +7,7 @@
 #include "scroll_navigator.h"
 #include "../../../common-src/timeline_slider/timeline_slider.h"
 #include "../../../common-src/frame_timeline/timeline.h"
+#include "../../../common-src/qt_widgets_subclasses/spinbox_extended_lineedit.h"
 #include "preview_advanced_settings_dialog.h"
 
 #include <vapoursynth/VapourSynth.h>
@@ -163,9 +164,9 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
 	connect(m_pAdvancedSettingsDialog, SIGNAL(signalSettingsChanged()),
 		this, SLOT(slotAdvancedSettingsChanged()));
-	connect(m_ui.frameNumberSlider, SIGNAL(signalFrameChanged(int)),
-		this, SLOT(slotShowFrame(int)));
-	connect(m_ui.frameNumberSpinBox, SIGNAL(valueChanged(int)),
+//    connect(m_ui.frameNumberSlider, SIGNAL(signalFrameChanged(int)),
+//        this, SLOT(slotShowFrame(int)));
+    connect(m_ui.frameNumberSpinBox, SIGNAL(valueChanged(int)),
 		this, SLOT(slotShowFrame(int)));
 	connect(m_ui.previewArea, SIGNAL(signalSizeChanged()),
 		this, SLOT(slotPreviewAreaSizeChanged()));
@@ -186,6 +187,9 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
     // timelineview connect
     connect(m_ui.timeLineView, &TimeLineView::signalFrameChanged,
             this, &PreviewDialog::slotShowFrame);
+
+    connect(m_ui.timeLineView, &TimeLineView::signalJumpToFrame,
+            this, &PreviewDialog::slotJumpPlay);
 
 
 	slotSettingsChanged();
@@ -238,8 +242,10 @@ void PreviewDialog::previewScript(const QString& a_script,
 
 	setTitle();
 
-	int lastFrameNumber = m_cpVideoInfo->numFrames - 1;
-	m_ui.frameNumberSpinBox->setMaximum(lastFrameNumber);
+	int lastFrameNumber = m_cpVideoInfo->numFrames - 1;    
+    m_ui.frameNumberSpinBox->setFont(QFont("Arial", 18));
+	m_ui.frameNumberSpinBox->setMaximum(lastFrameNumber); 
+
 	m_ui.frameNumberSlider->setFramesNumber(m_cpVideoInfo->numFrames);
 
     // new timeline setup
@@ -464,6 +470,7 @@ void PreviewDialog::slotFrameRequestDiscarded(int a_frameNumber,
 			{
 				// Nowhere to roll back
 				m_ui.frameNumberSlider->setFrame(0);
+                m_ui.timeLineView->setFrame(0);
 				m_ui.frameNumberSpinBox->setValue(0);
 				m_ui.frameStatusLabel->setPixmap(m_errorPixmap);
 			}
@@ -474,6 +481,7 @@ void PreviewDialog::slotFrameRequestDiscarded(int a_frameNumber,
 
 		m_frameExpected = m_frameShown;
 		m_ui.frameNumberSlider->setFrame(m_frameShown);
+        m_ui.timeLineView->setFrame(m_frameShown);
 		m_ui.frameNumberSpinBox->setValue(m_frameShown);
 		m_ui.frameStatusLabel->setPixmap(m_readyPixmap);
 	}
@@ -485,11 +493,11 @@ void PreviewDialog::slotFrameRequestDiscarded(int a_frameNumber,
 
 void PreviewDialog::slotShowFrame(int a_frameNumber)
 {
-	if((m_frameShown == a_frameNumber) && (!m_framePixmap.isNull()))
-		return;
+    if(m_playing)
+        return;
 
-	if(m_playing)
-		return;
+    if((m_frameShown == a_frameNumber) && (!m_framePixmap.isNull()))
+        return;
 
 	static bool requestingFrame = false;
 	if(requestingFrame)
@@ -497,7 +505,7 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
 	requestingFrame = true;
 
 	m_ui.frameNumberSpinBox->setValue(a_frameNumber);
-    m_ui.frameNumberSlider->setFrame(a_frameNumber);
+//    m_ui.frameNumberSlider->setFrame(a_frameNumber);
 
     // timeline
     m_ui.timeLineView->setFrame(a_frameNumber);
@@ -511,7 +519,8 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
 	else
 	{
 		m_ui.frameNumberSpinBox->setValue(m_frameExpected);
-		m_ui.frameNumberSlider->setFrame(m_frameExpected);
+//		m_ui.frameNumberSlider->setFrame(m_frameExpected);
+        m_ui.timeLineView->setFrame(m_frameExpected);
 	}
 
 	requestingFrame = false;
@@ -526,7 +535,7 @@ void PreviewDialog::slotSaveSnapshot()
 
 	std::map<QString, QString> extensionToFilterMap =
 	{
-		{"png", trUtf8("PNG image (*.png)")},
+        {"png", tr("PNG image (*.png)")},
 	};
 
 	QString fileExtension = m_pSettingsManager->getLastSnapshotExtension();
@@ -535,7 +544,7 @@ void PreviewDialog::slotSaveSnapshot()
 	bool webpSupported = (supportedFormats.indexOf("webp") > -1);
 
 	if(webpSupported)
-		extensionToFilterMap["webp"] = trUtf8("WebP image (*.webp)");
+        extensionToFilterMap["webp"] = tr("WebP image (*.webp)");
 
 	QString snapshotFilePath = scriptName();
 	if(snapshotFilePath.isEmpty())
@@ -555,7 +564,7 @@ void PreviewDialog::slotSaveSnapshot()
 	QString selectedFilter = extensionToFilterMap[fileExtension];
 
 	snapshotFilePath = QFileDialog::getSaveFileName(this,
-		trUtf8("Save frame as image"), snapshotFilePath,
+        tr("Save frame as image"), snapshotFilePath,
 		saveFormatsList.join(";;"), &selectedFilter);
 
 	QFileInfo fileInfo(snapshotFilePath);
@@ -572,8 +581,8 @@ void PreviewDialog::slotSaveSnapshot()
 			m_pSettingsManager->setLastSnapshotExtension(suffix);
 		else
 		{
-			QMessageBox::critical(this, trUtf8("Image save error"),
-				trUtf8("Error while saving image ") + snapshotFilePath);
+            QMessageBox::critical(this, tr("Image save error"),
+                tr("Error while saving image ") + snapshotFilePath);
 		}
 	}
 }
@@ -1242,31 +1251,53 @@ void PreviewDialog::slotToggleColorPicker(bool a_colorPickerVisible)
 
 void PreviewDialog::slotSetPlayFPSLimit()
 {
-	double limit = m_ui.playFpsLimitSpinBox->value();
+    if (!m_ui.playFpsLimitLineEdit->isReadOnly()) {
+        m_ui.playFpsLimitLineEdit->setReadOnly(true);
+    }
 
-	PlayFPSLimitMode mode =
-		(PlayFPSLimitMode)m_ui.playFpsLimitModeComboBox->currentData().toInt();
-	if(mode == PlayFPSLimitMode::NoLimit)
-		m_secondsBetweenFrames = 0.0;
-	else if(mode == PlayFPSLimitMode::Custom)
-		m_secondsBetweenFrames = 1.0 / limit;
-	else if(mode == PlayFPSLimitMode::FromVideo)
+    double limit = vsedit::round(QVariant(m_ui.playFpsLimitLineEdit->text()).toDouble());
+
+//    PlayFPSLimitMode mode =
+//            PlayFPSLimitMode(m_ui.playFpsLimitModeComboBox->currentData().toInt());
+
+    QVariant mode = m_ui.playFpsLimitModeComboBox->currentData();
+    QString outputText;
+
+    if(mode == "No Limit") {
+        m_secondsBetweenFrames = 0.0;
+        outputText = mode.toString();
+    }
+    else if(mode == "Custom") {
+        m_ui.playFpsLimitLineEdit->setReadOnly(false);
+        m_secondsBetweenFrames = 1.0 / limit;
+        outputText = QVariant(limit).toString();
+    }
+    else if(mode == "From Video")
 	{
-		if(!m_cpVideoInfo)
+        if(!m_cpVideoInfo) {
 			m_secondsBetweenFrames = 0.0;
-		else if(m_cpVideoInfo->fpsNum == 0ll)
-			m_secondsBetweenFrames = 0.0;
-		else
-		{
-			m_secondsBetweenFrames =
-				(double)m_cpVideoInfo->fpsDen / (double)m_cpVideoInfo->fpsNum;
-		}
-	}
-	else
-		Q_ASSERT(false);
+            outputText = "No video";        }
 
-	m_pSettingsManager->setPlayFPSLimitMode(mode);
-	m_pSettingsManager->setPlayFPSLimit(limit);
+        else if(m_cpVideoInfo->fpsNum == 0ll) {
+			m_secondsBetweenFrames = 0.0;
+            outputText = "Unknown FPS";
+        }
+		else
+		{            
+            m_secondsBetweenFrames = double(m_cpVideoInfo->fpsDen) / double(m_cpVideoInfo->fpsNum);
+            double fps = double(m_cpVideoInfo->fpsNum) / double(m_cpVideoInfo->fpsDen);
+            outputText = QVariant(vsedit::round(fps)).toString();
+		}        
+	}
+    else {
+        m_secondsBetweenFrames = 1.0 / mode.toDouble();
+        outputText = mode.toString();
+    }
+
+    m_ui.playFpsLimitLineEdit->setText(outputText);
+
+//	m_pSettingsManager->setPlayFPSLimitMode(selectedValue);
+//	m_pSettingsManager->setPlayFPSLimit(limit);
 }
 
 // END OF void PreviewDialog::void slotSetPlayFPSLimit()
@@ -1278,13 +1309,13 @@ void PreviewDialog::slotPlay(bool a_play)
 		return;
 
 	m_playing = a_play;
-	m_pActionPlay->setChecked(m_playing);
+    m_pActionPlay->setChecked(m_playing);
 
 	if(m_playing)
-	{
+    {
 		m_pActionPlay->setIcon(m_iconPause);
 		m_lastFrameRequestedForPlay = m_frameShown;
-		slotProcessPlayQueue();
+		slotProcessPlayQueue();        
 	}
 	else
 	{
@@ -1292,6 +1323,8 @@ void PreviewDialog::slotPlay(bool a_play)
 		m_pVapourSynthScriptProcessor->flushFrameTicketsQueue();
 		m_pActionPlay->setIcon(m_iconPlay);
 	}
+
+    m_ui.timeLineView->setPlay(m_playing); // passing the flag into timeline
 }
 
 // END OF void PreviewDialog::slotPlay(bool a_play)
@@ -1302,8 +1335,14 @@ void PreviewDialog::slotProcessPlayQueue()
 	if(!m_playing)
 		return;
 
-	if(m_processingPlayQueue)
+    if (m_frameShown == m_cpVideoInfo->numFrames - 1) {
+        slotPlay(false); // stop playing at the end
+        return;
+    }
+
+    if(m_processingPlayQueue)
 		return;
+
 	m_processingPlayQueue = true;
 
 	int nextFrame = (m_frameShown + 1) % m_cpVideoInfo->numFrames;
@@ -1333,8 +1372,11 @@ void PreviewDialog::slotProcessPlayQueue()
 
 		m_frameShown = nextFrame;
 		m_frameExpected = m_frameShown;
-		m_ui.frameNumberSpinBox->setValue(m_frameExpected);
-		m_ui.frameNumberSlider->setFrame(m_frameExpected);
+        m_ui.frameNumberSpinBox->setValue(m_frameExpected);
+        m_ui.timeLineView->slotSetSliderPosByFrame(m_frameExpected);
+//        m_ui.frameNumberSlider->setFrame(m_frameExpected); // to be remove?
+
+//        m_ui.timeLineView->setFrame(m_frameExpected);
 		m_framesCache.erase(it);
 		nextFrame = (m_frameShown + 1) % m_cpVideoInfo->numFrames;
 		referenceFrame.number = nextFrame;
@@ -1351,10 +1393,23 @@ void PreviewDialog::slotProcessPlayQueue()
 		nextFrame = (nextFrame + 1) % m_cpVideoInfo->numFrames;
 	}
 
-	m_processingPlayQueue = false;
+    m_processingPlayQueue = false;
 }
 
 // END OF void PreviewDialog::slotProcessPlayQueue()
+//==============================================================================
+
+void PreviewDialog::slotJumpPlay(int a_frame)
+{
+    if (!m_playing)
+        return;
+
+    m_frameShown = a_frame;
+    slotPlay(false);
+    slotPlay(true);
+}
+
+// END OF void PreviewDialog::slotJumpPlay(int a_frame)
 //==============================================================================
 
 void PreviewDialog::slotLoadChapters()
@@ -1364,8 +1419,8 @@ void PreviewDialog::slotLoadChapters()
 
 	const QString lastUsedPath = m_pSettingsManager->getLastUsedPath();
 	const QString filePath = QFileDialog::getOpenFileName(this,
-		trUtf8("Load chapters"), lastUsedPath,
-		trUtf8("Chapters file (*.txt;*.xml);;All files (*)"));
+        tr("Load chapters"), lastUsedPath,
+        tr("Chapters file (*.txt;*.xml);;All files (*)"));
 	QFile chaptersFile(filePath);
 	if(!chaptersFile.open(QIODevice::ReadOnly | QIODevice::Text))
 		return;
@@ -1403,7 +1458,7 @@ void PreviewDialog::slotClearBookmarks()
 		return;
 
 	QMessageBox::StandardButton result = QMessageBox::question(this,
-		trUtf8("Clear bookmards"), trUtf8("Do you really want to clear "
+        tr("Clear bookmards"), tr("Do you really want to clear "
 		"timeline bookmarks?"),
 		QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No),
 		QMessageBox::No);
@@ -1575,7 +1630,7 @@ void PreviewDialog::createActionsAndMenus()
 //------------------------------------------------------------------------------
 
 	m_pMenuZoomModes = new QMenu(m_pPreviewContextMenu);
-	m_pMenuZoomModes->setTitle(trUtf8("Zoom mode"));
+    m_pMenuZoomModes->setTitle(tr("Zoom mode"));
 	m_pPreviewContextMenu->addMenu(m_pMenuZoomModes);
 
 	m_pActionGroupZoomModes = new QActionGroup(this);
@@ -1609,7 +1664,7 @@ void PreviewDialog::createActionsAndMenus()
 //------------------------------------------------------------------------------
 
 	m_pMenuZoomScaleModes = new QMenu(m_pPreviewContextMenu);
-	m_pMenuZoomScaleModes->setTitle(trUtf8("Zoom scale mode"));
+    m_pMenuZoomScaleModes->setTitle(tr("Zoom scale mode"));
 	m_pPreviewContextMenu->addMenu(m_pMenuZoomScaleModes);
 
 	m_pActionGroupZoomScaleModes = new QActionGroup(this);
@@ -1652,7 +1707,7 @@ void PreviewDialog::createActionsAndMenus()
 //------------------------------------------------------------------------------
 
 	m_pMenuTimeLineModes= new QMenu(m_pPreviewContextMenu);
-	m_pMenuTimeLineModes->setTitle(trUtf8("Timeline display mode"));
+    m_pMenuTimeLineModes->setTitle(tr("Timeline display mode"));
 	m_pPreviewContextMenu->addMenu(m_pMenuTimeLineModes);
 
 	m_pActionGroupTimeLineModes = new QActionGroup(this);
@@ -1729,11 +1784,11 @@ void PreviewDialog::setUpZoomPanel()
 	m_ui.zoomCheckButton->setDefaultAction(m_pActionToggleZoomPanel);
 
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_no_zoom.png"),
-		trUtf8("No zoom"), (int)ZoomMode::NoZoom);
+        tr("No zoom"), (int)ZoomMode::NoZoom);
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_fixed_ratio.png"),
-		trUtf8("Fixed ratio"), (int)ZoomMode::FixedRatio);
+        tr("Fixed ratio"), (int)ZoomMode::FixedRatio);
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_fit_to_frame.png"),
-		trUtf8("Fit to frame"), (int)ZoomMode::FitToFrame);
+        tr("Fit to frame"), (int)ZoomMode::FitToFrame);
 
 	ZoomMode zoomMode = m_pSettingsManager->getZoomMode();
 	int comboIndex = m_ui.zoomModeComboBox->findData((int)zoomMode);
@@ -1745,9 +1800,9 @@ void PreviewDialog::setUpZoomPanel()
 	double zoomRatio = m_pSettingsManager->getZoomRatio();
 	m_ui.zoomRatioSpinBox->setValue(zoomRatio);
 
-	m_ui.scaleModeComboBox->addItem(trUtf8("Nearest"),
+    m_ui.scaleModeComboBox->addItem(tr("Nearest"),
 		(int)Qt::FastTransformation);
-	m_ui.scaleModeComboBox->addItem(trUtf8("Bilinear"),
+    m_ui.scaleModeComboBox->addItem(tr("Bilinear"),
 		(int)Qt::SmoothTransformation);
 	bool noZoom = (zoomMode == ZoomMode::NoZoom);
 	m_ui.scaleModeComboBox->setEnabled(!noZoom);
@@ -1778,23 +1833,27 @@ void PreviewDialog::setUpTimeLinePanel()
     m_ui.timeStepForwardButton->setDefaultAction(m_pActionTimeStepForward);
     m_ui.timeStepBackButton->setDefaultAction(m_pActionTimeStepBack);
 
-    m_ui.playFpsLimitModeComboBox->addItem(trUtf8("From video"),
-		(int)PlayFPSLimitMode::FromVideo);
-    m_ui.playFpsLimitModeComboBox->addItem(trUtf8("No limit"),
-		(int)PlayFPSLimitMode::NoLimit);
-    m_ui.playFpsLimitModeComboBox->addItem(trUtf8("Custom"),
-		(int)PlayFPSLimitMode::Custom);
+    QVector<QString> mode = {"From Video", "No Limit", "Custom", "23.976", "25", "29.97", "30",
+                             "50", "59.94", "60"};
 
-	PlayFPSLimitMode playFpsLimitMode =
-		m_pSettingsManager->getPlayFPSLimitMode();
-	int comboIndex = m_ui.playFpsLimitModeComboBox->findData(
-		(int)playFpsLimitMode);
-	if(comboIndex != -1)
-		m_ui.playFpsLimitModeComboBox->setCurrentIndex(comboIndex);
+    for (int i = 0; i < mode.size(); ++i) {
+        m_ui.playFpsLimitModeComboBox->addItem(mode.at(i), mode.at(i));
+    }
 
-	m_ui.playFpsLimitSpinBox->setLocale(QLocale("C"));
-	double customFPS = m_pSettingsManager->getPlayFPSLimit();
-	m_ui.playFpsLimitSpinBox->setValue(customFPS);
+//	PlayFPSLimitMode playFpsLimitMode =
+//		m_pSettingsManager->getPlayFPSLimitMode();
+//	int comboIndex = m_ui.playFpsLimitModeComboBox->findData(
+//		(int)playFpsLimitMode);
+//	if(comboIndex != -1)
+//		m_ui.playFpsLimitModeComboBox->setCurrentIndex(comboIndex);
+
+//	m_ui.playFpsLimitSpinBox->setLocale(QLocale("C"));
+//	double customFPS = m_pSettingsManager->getPlayFPSLimit();
+//    m_ui.playFpsLimitSpinBox->setValue(customFPS);
+
+    m_ui.playFpsLimitLineEdit->setLocale(QLocale("C"));
+    m_ui.playFpsLimitLineEdit->setValidator(
+        new QDoubleValidator(12, 120, 3, this)); // numbers only
 
 	slotSetPlayFPSLimit();
 
@@ -1812,25 +1871,26 @@ void PreviewDialog::setUpTimeLinePanel()
     double timeStep = m_pSettingsManager->getTimeStep();
     m_ui.timeStepEdit->setTime(vsedit::secondsToQTime(timeStep));
 
-    m_ui.timeLineModeComboBox->addItem(QIcon(":timeline.png"), trUtf8("Time"),
+    m_ui.timeLineModeComboBox->addItem(QIcon(":timeline.png"), tr("Time"),
 		(int)TimeLineSlider::DisplayMode::Time);
     m_ui.timeLineModeComboBox->addItem(QIcon(":timeline_frames.png"),
-		trUtf8("Frames"), (int)TimeLineSlider::DisplayMode::Frames);
+        tr("Frames"), (int)TimeLineSlider::DisplayMode::Frames);
 
-	TimeLineSlider::DisplayMode timeLineMode =
-		m_pSettingsManager->getTimeLineMode();
-	comboIndex = m_ui.timeLineModeComboBox->findData((int)timeLineMode);
-	if(comboIndex != -1)
-		m_ui.timeLineModeComboBox->setCurrentIndex(comboIndex);
+//	TimeLineSlider::DisplayMode timeLineMode =
+//		m_pSettingsManager->getTimeLineMode();
+//	comboIndex = m_ui.timeLineModeComboBox->findData((int)timeLineMode);
+//	if(comboIndex != -1)
+//		m_ui.timeLineModeComboBox->setCurrentIndex(comboIndex);
 
 	connect(m_ui.timeStepEdit, SIGNAL(timeChanged(const QTime &)),
 		this, SLOT(slotTimeStepChanged(const QTime &)));
 	connect(m_ui.timeLineModeComboBox, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(slotTimeLineModeChanged()));
-	connect(m_ui.playFpsLimitModeComboBox, SIGNAL(currentIndexChanged(int)),
+    connect(m_ui.playFpsLimitModeComboBox, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(slotSetPlayFPSLimit()));
-	connect(m_ui.playFpsLimitSpinBox, SIGNAL(valueChanged(double)),
-		this, SLOT(slotSetPlayFPSLimit()));
+
+    connect(m_ui.playFpsLimitLineEdit, &QLineEdit::editingFinished,
+        this, &PreviewDialog::slotSetPlayFPSLimit);
 
     connect(m_ui.timeLineModeComboBox, SIGNAL(currentIndexChanged(int)),
         this, SLOT(slotDisplayModeChanged(int)));
@@ -1843,10 +1903,10 @@ void PreviewDialog::setUpCropPanel()
 {
 	m_ui.cropCheckButton->setDefaultAction(m_pActionToggleCropPanel);
 
-	m_ui.cropModeComboBox->addItem(trUtf8("Absolute"), (int)CropMode::Absolute);
-	m_ui.cropModeComboBox->addItem(trUtf8("Relative"), (int)CropMode::Relative);
+    m_ui.cropModeComboBox->addItem(tr("Absolute"), int(CropMode::Absolute));
+    m_ui.cropModeComboBox->addItem(tr("Relative"), int(CropMode::Relative));
 	CropMode cropMode = m_pSettingsManager->getCropMode();
-	int cropModeIndex = m_ui.cropModeComboBox->findData((int)cropMode);
+    int cropModeIndex = m_ui.cropModeComboBox->findData(int(cropMode));
 	m_ui.cropModeComboBox->setCurrentIndex(cropModeIndex);
 	slotCropModeChanged();
 
@@ -1881,7 +1941,8 @@ void PreviewDialog::createMainStatusBar()
     mainStatusBar = new QStatusBar(this);
     mainStatusBar->setMinimumHeight(22);
     mainStatusBar->setMaximumHeight(30);
-    mainStatusBar->setStyleSheet("border-top: 1px dashed #959595");
+    mainStatusBar->setSizeGripEnabled(false);
+    mainStatusBar->setStyleSheet("border-top: 1px solid #959595");
 
 }
 
@@ -2096,7 +2157,7 @@ QPixmap PreviewDialog::pixmapFromCompatBGR32(
 
 	if(cpFormat->id != pfCompatBGR32)
 	{
-		QString errorString = trUtf8("Error forming pixmap from frame. "
+        QString errorString = tr("Error forming pixmap from frame. "
 			"Expected format CompatBGR32. Instead got \'%1\'.")
 			.arg(cpFormat->name);
 		emit signalWriteLogMessage(mtCritical, errorString);
@@ -2122,8 +2183,8 @@ void PreviewDialog::setTitle()
 {
 	QString l_scriptName = scriptName();
 	QString scriptNameTitle =
-		l_scriptName.isEmpty() ? trUtf8("(Untitled)") : l_scriptName;
-	QString title = trUtf8("Preview - ") + scriptNameTitle;
+        l_scriptName.isEmpty() ? tr("(Untitled)") : l_scriptName;
+    QString title = tr("Preview - ") + scriptNameTitle;
 	setWindowTitle(title);
 }
 
@@ -2175,7 +2236,7 @@ void PreviewDialog::loadTimelineBookmarks()
 		return;
 	}
 
-	QString bookmarksString = trUtf8(bookmarksFile.readAll().data());
+    QString bookmarksString = tr(bookmarksFile.readAll().data());
 	bookmarksFile.close();
 
 	QStringList bookmarksStringList = bookmarksString.split(",");

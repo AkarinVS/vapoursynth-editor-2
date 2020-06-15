@@ -129,6 +129,8 @@ protected slots:
 
 	void slotProcessPlayQueue();
 
+    void slotJumpPlay(int a_frame);
+
 	void slotLoadChapters();
 	void slotClearBookmarks();
 	void slotBookmarkCurrentFrame();

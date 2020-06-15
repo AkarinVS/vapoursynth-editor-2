@@ -39,7 +39,7 @@ public:
 
 	void setFrame(int a_frame);
 
-	void setFramesNumber(int a_framesNumber);
+    void setFramesNumber(int a_framesNumber);
 
 	void setFPS(double a_fps);
 
@@ -82,7 +82,7 @@ signals:
     void signalFrameRangeChanged(int a_min, int a_max);
 
 	void signalSliderPressed();
-	void signalSliderReleased();
+    void signalSliderReleased();
 
 protected:
 

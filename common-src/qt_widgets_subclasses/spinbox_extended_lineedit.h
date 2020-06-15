@@ -10,8 +10,8 @@ class SpinboxExtendedLineEdit : public QLineEdit
 public:
     explicit SpinboxExtendedLineEdit(QWidget *parent = nullptr);
 
-protected:
-    void mousePressEvent(QMouseEvent *a_pEvent);
+protected:    
+    virtual void mousePressEvent(QMouseEvent *a_pEvent);
 };
 
 #endif // SPINBOXEXTENDEDLINEEDIT_H

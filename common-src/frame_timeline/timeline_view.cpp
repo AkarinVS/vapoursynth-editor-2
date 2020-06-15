@@ -1,7 +1,5 @@
 #include "timeline_view.h"
 #include <QDebug>
-#include <QObject>
-
 
 TimeLineView::TimeLineView (QWidget * a_pParent )
 {
@@ -21,7 +19,9 @@ TimeLineView::TimeLineView (QWidget * a_pParent )
     connect(timeLine, &TimeLine::signalFrameChanged,
             this, &TimeLineView::signalFrameChanged); // forward signal to preview dialog
     connect(timeLine, &TimeLine::signalFrameChanged,
-            this, &TimeLineView::slotSetSliderPos);
+            this, &TimeLineView::slotSetSliderPosByFrame);
+//    connect(timeLine, &TimeLine::signalFrameChanged,
+//            this, &TimeLineView::slotSetSliderPosByFrame);
     connect(timeLine, &TimeLine::signalTimeLineWidthChanged,
             this, &TimeLineView::slotResizeSceneWidth);
     connect(timeLine, &TimeLine::signalTimeLineWidthChanged,
@@ -38,8 +38,7 @@ TimeLineView::~TimeLineView()
 }
 
 void TimeLineView::setFrame(int a_frame)
-{
-    // this is a passthrough function, it did nothing else
+{    
     timeLine->setFrame(a_frame);
 }
 
@@ -59,6 +58,11 @@ void TimeLineView::setDisplayMode(TimeLine::DisplayMode a_displayMode)
     timeLine->setDisplayMode(a_displayMode);
 }
 
+void TimeLineView::setPlay(bool a_playing)
+{
+    m_playing = a_playing;
+}
+
 void TimeLineView::slotFrameChanged(int a_frame)
 {
     emit signalFrameChanged(a_frame);
@@ -72,8 +76,14 @@ void TimeLineView::slotResizeSceneWidth()
 
 void TimeLineView::slotSetSliderPos()
 {
-    // get position from timeline and set it to slider
     int pos = timeLine->currentFramePos();
+    slider->setPos(pos, slider->pos().y());
+}
+
+void TimeLineView::slotSetSliderPosByFrame(int a_frame)
+{        
+    // get position from timeline and set it to slider
+    int pos = timeLine->frameToPos(a_frame);
     slider->setPos(pos, slider->pos().y());
 }
 
@@ -123,7 +133,7 @@ void TimeLineView::resizeEvent(QResizeEvent *a_pEvent)
 
 void TimeLineView::wheelEvent(QWheelEvent *a_pEvent)
 {
-    QGraphicsView::wheelEvent(a_pEvent);
+
     QPoint delta = a_pEvent->angleDelta();
 
     if(a_pEvent->modifiers() != Qt::NoModifier)
@@ -145,22 +155,26 @@ void TimeLineView::wheelEvent(QWheelEvent *a_pEvent)
         return;
     }
 
-    // this function doesn't work yet
-    if(delta.x() == 0)
-    {
-        if(delta.y() < 0)
-            timeLine->slotStepDown();
+    // disable scroll when video is playing
+    if (!m_playing) {
+        if(delta.x() == 0)
+        {
+            if(delta.y() < 0)
+                timeLine->slotStepDown();
+            else
+                timeLine->slotStepUp();
+        }
         else
-            timeLine->slotStepUp();
+        {
+            // for mouse with horizontal scroll
+            if(delta.x() < 0)
+                timeLine->slotStepDown();
+            else
+                timeLine->slotStepUp();
+        }
+    }
 
-    }
-    else
-    {
-        if(delta.x() < 0)
-            timeLine->slotStepDown();
-        else
-            timeLine->slotStepUp();
-    }
+    QGraphicsView::wheelEvent(a_pEvent);
     a_pEvent->accept();
 
 }
@@ -176,21 +190,27 @@ void TimeLineView::mousePressEvent(QMouseEvent * a_pEvent)
 
     int dest_pos = int(pos_in_item.x());
 
-        // get frame pos and move slider to frame position
-        // snap slider to start
-        if (pos_in_item.x() < 10) {
-            dest_pos = 0;
-        }
 
-        // snap slider to end
-        if (pos_in_item.x() > timeLine->viewWidth() - 10) {
-            dest_pos = timeLine->viewWidth();
-        }
+    // get frame pos and move slider to frame position
+    // snap slider to start
+    if (pos_in_item.x() < 10) {
+        dest_pos = 0;
+    }
 
-        // set frame in timeline to display
-        timeLine->setFrameByPos(dest_pos);
+    // snap slider to end
+    if (pos_in_item.x() > timeLine->viewWidth() - 10) {
+        dest_pos = timeLine->viewWidth();
+    }
 
-        // retrieve the frame position in timeline to set slider position
-        int timeLineFramePos = timeLine->currentFramePos();
-        slider->setPos(timeLineFramePos, slider->pos().y());
+    // set frame in timeline to display
+    timeLine->setFrameByPos(dest_pos);
+
+    // retrieve the frame position in timeline to set slider position
+    int timeLineFramePos = timeLine->currentFramePos();
+    slider->setPos(timeLineFramePos, slider->pos().y());
+
+    int destFrame = timeLine->frame();
+    if (m_playing) {
+        emit signalJumpToFrame(destFrame);
+    }
 }

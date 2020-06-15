@@ -28,10 +28,12 @@ public:
 
     void setDisplayMode(TimeLine::DisplayMode a_displayMode);
 
+    void setPlay(bool a_playing);
 
 signals:
 
     void signalFrameChanged(int a_frame);
+    void signalJumpToFrame(int a_frame);
 
 public slots:
 
@@ -40,6 +42,8 @@ public slots:
     void slotResizeSceneWidth();
 
     void slotSetSliderPos();
+
+    void slotSetSliderPosByFrame(int a_frame);
 
     // bookmarks
     void slotBookmarkCurrentFrame();
@@ -54,6 +58,8 @@ private:
     TimeLine *timeLine;
 
     int m_maxFrame;
+
+    bool m_playing;
 
 protected:
 
