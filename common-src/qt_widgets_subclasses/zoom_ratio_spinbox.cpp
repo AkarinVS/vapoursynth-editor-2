@@ -21,13 +21,12 @@ void ZoomRatioSpinBox::wheelEvent(QWheelEvent * a_pEvent)
 {
     QDoubleSpinBox::wheelEvent(a_pEvent);
 
-    m_zoomRatio = value();
     QPoint delta = a_pEvent->angleDelta();
 
-    if(m_zoomRatio > 1.0 && delta.y() > 0)
+    if(value() > 1.0 && delta.y() > 0)
         stepUp();
 
-    if(m_zoomRatio > 1.0 && delta.y() < 0)
+    if(value() > 1.0 && delta.y() < 0)
         stepDown();
 
     a_pEvent->ignore();
@@ -39,8 +38,6 @@ void ZoomRatioSpinBox::wheelEvent(QWheelEvent * a_pEvent)
 void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * a_pEvent)
 {
     QDoubleSpinBox::mousePressEvent(a_pEvent);
-
-    m_zoomRatio = value();
 
     QStyleOptionSpinBox opt;
     this->initStyleOption(&opt);
@@ -63,8 +60,6 @@ void ZoomRatioSpinBox::keyPressEvent(QKeyEvent * a_pEvent)
 {
     QDoubleSpinBox::keyPressEvent(a_pEvent);
 
-    m_zoomRatio = value();
-
     if (a_pEvent->key() == Qt::Key_Up) {
         stepUp();
     }
@@ -80,8 +75,12 @@ void ZoomRatioSpinBox::keyPressEvent(QKeyEvent * a_pEvent)
 
 void ZoomRatioSpinBox::stepUp()
 {
-    if (m_zoomRatio > 1.0)
-        setValue(ceil(m_zoomRatio));
+    // +-1 when value > 1, +-0.2 when value < 1
+    // the +0.2, -0.2 is here to make zooming from preview area work
+    if (value() >= 1.0)
+        setValue(ceil(value()+0.2));
+    else
+        setValue(value()+0.2);
 }
 
 // END OF void ZoomRatioSpinBox::stepUp)
@@ -89,8 +88,11 @@ void ZoomRatioSpinBox::stepUp()
 
 void ZoomRatioSpinBox::stepDown()
 {
-    if (m_zoomRatio > 1.0)
-        setValue(floor(m_zoomRatio));
+    if (value() > 1.0)
+        setValue(floor(value()-0.2));
+    else {
+        setValue(value()-0.2);
+    }
 }
 
 // END OF void ZoomRatioSpinBox::stepDown)

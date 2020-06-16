@@ -10,7 +10,6 @@ TimeLine::TimeLine(QWidget * a_pParent)
     m_baseWidth = 1000;
     m_zoomFactor = 1;
     m_accuScaleMultiplier = 1.0;
-    m_widthChanged = true;
     m_widthPerSegment = 192;
 
     setPos(mapToParent(0,0));
@@ -50,17 +49,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     // don't run on initial paint when max frame has not been set yet
     if (m_maxFrame > 0) {
 
-        // only run when timeline width changed
-        if (m_widthChanged) {
-            setupRuler();
-        }
-
         DisplayMode l_displayMode = Time;
         if((m_displayMode == Frames) || (m_fps == 0.0))
             l_displayMode = Frames;
 
         // drawing ruler
-
         int longTickWidth = m_widthPerSegment;
         int mediumTickWidth = int(double(longTickWidth) / double(2));
         int shortTickWidth = (longTickWidth - mediumTickWidth) / 4;
@@ -69,9 +62,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         int accumMediumTickWidth = 0;
         int accumShortTickWidth = 0;
 
-        for (int i = 0; i < m_maxFrame; i++) {
-            // draw long tick and frame/time string and spacing line
-            if (i % longTickWidth == 0) {
+        for (int i = 0; i < m_viewWidth; i++) {
+            if ( i % longTickWidth== 0 ) {
                 painter->drawLine(i, 17, i, 39);
                 accumLongTickWidth += longTickWidth;
 
@@ -102,8 +94,6 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 accumShortTickWidth += shortTickWidth;
             }
         }
-
-        m_widthChanged = false;        
     }
 }
 
@@ -130,15 +120,6 @@ void TimeLine::reloadZoomFactor() // use when graphicsview was resized
 // END OF void TimeLine::reloadZoomFactor()
 //==============================================================================
 
-void TimeLine::setupRuler()
-{
-    m_totalSegments = int(double(m_viewWidth) / double(m_widthPerSegment));
-    m_framesPerSegment = m_maxFrame / m_totalSegments;
-}
-
-// END OF void TimeLine::setupRuler()
-//==============================================================================
-
 void TimeLine::setViewWidth(int a_viewWidth)
 {    
     if (m_viewWidth == a_viewWidth)
@@ -147,7 +128,6 @@ void TimeLine::setViewWidth(int a_viewWidth)
     m_viewWidth = a_viewWidth;
     prepareGeometryChange();
 
-    m_widthChanged = true;
     emit signalTimeLineWidthChanged();
 }
 

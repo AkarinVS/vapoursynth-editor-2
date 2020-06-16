@@ -19,7 +19,7 @@ public:
 
 	PreviewArea(QWidget * a_pParent = nullptr);
 
-	virtual ~PreviewArea();
+    virtual ~PreviewArea() override;
 
 	void setWidget(QWidget * a_pWidget) = delete;
 
@@ -51,8 +51,8 @@ signals:
 	void signalCtrlWheel(QPoint a_angleDelta);
 	void signalMouseMiddleButtonReleased();
 	void signalMouseRightButtonReleased();
-	void signalMouseOverPoint(float a_normX, float a_normY);
-        void signalMousePosition(QPoint a_mousePos);
+    void signalMouseOverPoint(float a_normX, float a_normY);
+    void signalMousePosition(float a_normX, float a_normY);
 
 private:
 

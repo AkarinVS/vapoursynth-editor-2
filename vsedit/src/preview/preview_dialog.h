@@ -115,7 +115,7 @@ protected slots:
 
 	void slotPreviewAreaMouseOverPoint(float a_normX, float a_normY);
 
-    void slotPreviewAreaShowMousePosition(QPoint a_mousePos);
+    void slotPreviewAreaShowMousePosition(float a_normX, float a_normY);
 
 	void slotFrameToClipboard();
 
@@ -164,7 +164,7 @@ protected:
 
 	void setUpCropPanel();
 
-    void createMainStatusBar();
+    void createFeedbackStatusBar();
 
 	bool requestShowFrame(int a_frameNumber);
 
@@ -191,7 +191,7 @@ protected:
 	Ui::PreviewDialog m_ui;
 
     QStatusBar *scriptStatusBar;
-    QStatusBar *mainStatusBar;
+    QStatusBar *feedbackStatusBar;
 
 	PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
 

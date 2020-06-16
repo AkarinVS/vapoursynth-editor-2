@@ -118,10 +118,10 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
     // create scriptStatusBar and mainStatusBar in ui
     createStatusBar();
-    createMainStatusBar();
+    createFeedbackStatusBar();
 
     m_ui.mainLayout->addWidget(m_pStatusBar); // created from createStatusBar()
-    m_ui.mainLayout->addWidget(mainStatusBar); // created from createMainStatusBar()
+    m_ui.mainLayout->addWidget(feedbackStatusBar); // created from createMainStatusBar()
 
 	m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
 		m_pSettingsManager, this);
@@ -178,8 +178,8 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 		this, SLOT(slotPreviewAreaMouseRightButtonReleased()));
 	connect(m_ui.previewArea, SIGNAL(signalMouseOverPoint(float, float)),
 		this, SLOT(slotPreviewAreaMouseOverPoint(float, float)));
-    connect(m_ui.previewArea, SIGNAL(signalMousePosition(QPoint)),
-        this, SLOT(slotPreviewAreaShowMousePosition(QPoint)));
+    connect(m_ui.previewArea, SIGNAL(signalMousePosition(float, float)),
+        this, SLOT(slotPreviewAreaShowMousePosition(float, float)));
 	connect(m_pPlayTimer, SIGNAL(timeout()),
 		this, SLOT(slotProcessPlayQueue()));
 
@@ -196,7 +196,7 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
 	bool rememberLastPreviewFrame =
 		m_pSettingsManager->getRememberLastPreviewFrame();
-	if(rememberLastPreviewFrame)
+    if(rememberLastPreviewFrame)
 	{
 		m_frameExpected = m_pSettingsManager->getLastPreviewFrame();
 		setScriptName(m_pSettingsManager->getLastUsedPath());
@@ -469,7 +469,7 @@ void PreviewDialog::slotFrameRequestDiscarded(int a_frameNumber,
 			if(m_frameExpected == 0)
 			{
 				// Nowhere to roll back
-				m_ui.frameNumberSlider->setFrame(0);
+//				m_ui.frameNumberSlider->setFrame(0);
                 m_ui.timeLineView->setFrame(0);
 				m_ui.frameNumberSpinBox->setValue(0);
 				m_ui.frameStatusLabel->setPixmap(m_errorPixmap);
@@ -1058,23 +1058,25 @@ void PreviewDialog::slotPreviewAreaSizeChanged()
 
 void PreviewDialog::slotPreviewAreaCtrlWheel(QPoint a_angleDelta)
 {
-	ZoomMode zoomMode = (ZoomMode)m_ui.zoomModeComboBox->currentData().toInt();
+    ZoomMode zoomMode = ZoomMode(m_ui.zoomModeComboBox->currentData().toInt());
 	int deltaY = a_angleDelta.y();
 
-	if(m_ui.cropCheckButton->isChecked())
-	{
-		if(deltaY > 0)
-			m_ui.cropZoomRatioSpinBox->stepBy(1);
-		else if(deltaY < 0)
-			m_ui.cropZoomRatioSpinBox->stepBy(-1);
-	}
-	else if(zoomMode == ZoomMode::FixedRatio)
-	{
-		if(deltaY > 0)
-			m_ui.zoomRatioSpinBox->stepBy(1);
-		else if(deltaY < 0)
-			m_ui.zoomRatioSpinBox->stepBy(-1);
-	}
+    if(m_ui.cropCheckButton->isChecked())
+    {
+        if(deltaY > 0)
+            m_ui.cropZoomRatioSpinBox->stepBy(1);
+        else if(deltaY < 0)
+            m_ui.cropZoomRatioSpinBox->stepBy(-1);
+    }
+    else if(zoomMode == ZoomMode::FixedRatio)
+    {
+        if( deltaY > 0) {
+            m_ui.zoomRatioSpinBox->stepUp();
+        }
+        else if ( deltaY < 0) {
+            m_ui.zoomRatioSpinBox->stepDown();
+        }
+    }
 }
 
 // END OF void PreviewDialog::slotPreviewAreaCtrlWheel(QPoint a_angleDelta)
@@ -1118,14 +1120,14 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 	size_t frameX = 0;
 	size_t frameY = 0;
 
-	frameX = (size_t)((float)m_framePixmap.width() * a_normX);
-	frameY = (size_t)((float)m_framePixmap.height() * a_normY);
+    frameX = size_t(float(m_framePixmap.width()) * a_normX);
+    frameY = size_t(float(m_framePixmap.height()) * a_normY);
 
 	int width = m_cpVSAPI->getFrameWidth(m_cpFrameRef, 0);
 	int height = m_cpVSAPI->getFrameHeight(m_cpFrameRef, 0);
 	const VSFormat * cpFormat = m_cpVSAPI->getFrameFormat(m_cpFrameRef);
 
-	if((frameX >= (size_t)width) || (frameY >= (size_t)height))
+    if((frameX >= size_t(width)) || (frameY >= size_t(height)))
 		return;
 
 	if(cpFormat->id == pfCompatBGR32)
@@ -1134,9 +1136,9 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 		int stride = m_cpVSAPI->getStride(m_cpFrameRef, 0);
 		const uint32_t * cpLine = (const uint32_t *)(cpData + frameY * stride);
 		uint32_t packedValue = cpLine[frameX];
-		value3 = (double)(packedValue & 0xFF);
-		value2 = (double)((packedValue >> 8) & 0xFF);
-		value1 = (double)((packedValue >> 16) & 0xFF);
+        value3 = double(packedValue & 0xFF);
+        value2 = double((packedValue >> 8) & 0xFF);
+        value1 = double((packedValue >> 16) & 0xFF);
 	}
 	else if(cpFormat->id == pfCompatYUY2)
 	{
@@ -1148,11 +1150,11 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 		uint32_t packedValue = cpLine[x];
 
 		if(rem == 0)
-			value1 = (double)(packedValue & 0xFF);
+            value1 = double(packedValue & 0xFF);
 		else
-			value1 = (double)((packedValue >> 16) & 0xFF);
-		value2 = (double)((packedValue >> 8) & 0xFF);
-		value3 = (double)((packedValue >> 24) & 0xFF);
+            value1 = double((packedValue >> 16) & 0xFF);
+        value2 = double((packedValue >> 8) & 0xFF);
+        value3 = double((packedValue >> 24) & 0xFF);
 	}
 	else
 	{
@@ -1202,7 +1204,7 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 //		float a_normY)
 //==============================================================================
 
-void PreviewDialog::slotPreviewAreaShowMousePosition(QPoint a_mousePos)
+void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_normY)
 {
     if(!m_cpFrameRef)
         return;
@@ -1210,7 +1212,13 @@ void PreviewDialog::slotPreviewAreaShowMousePosition(QPoint a_mousePos)
     if(!m_pStatusBarWidget->colorPickerVisible())
         return;
 
-    QString mousePosString = QString("x:%1  y:%2").arg(a_mousePos.x()).arg(a_mousePos.y());
+    size_t frameX = 0;
+    size_t frameY = 0;
+
+    frameX = size_t(float(m_framePixmap.width()) * a_normX);
+    frameY = size_t(float(m_framePixmap.height()) * a_normY);
+
+    QString mousePosString = QString("x:%1  y:%2").arg(frameX).arg(frameY);
     m_pStatusBarWidget->setMousePositionString(mousePosString);
 }
 // END OF void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_normY)
@@ -1427,8 +1435,8 @@ void PreviewDialog::slotLoadChapters()
 
 	const VSVideoInfo * cpVideoInfo =
 		m_pVapourSynthScriptProcessor->videoInfo();
-	const double fps = (double)cpVideoInfo->fpsNum /
-		(double)cpVideoInfo->fpsDen;
+    const double fps = double(cpVideoInfo->fpsNum) /
+        double(cpVideoInfo->fpsDen);
 
 	static const QRegExp regExp(R"((\d{2}):(\d{2}):(\d{2})[\.:](\d{3})?)");
 	while(!chaptersFile.atEnd())
@@ -1784,14 +1792,14 @@ void PreviewDialog::setUpZoomPanel()
 	m_ui.zoomCheckButton->setDefaultAction(m_pActionToggleZoomPanel);
 
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_no_zoom.png"),
-        tr("No zoom"), (int)ZoomMode::NoZoom);
+        tr("No zoom"), int(ZoomMode::NoZoom));
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_fixed_ratio.png"),
-        tr("Fixed ratio"), (int)ZoomMode::FixedRatio);
+        tr("Fixed ratio"), int(ZoomMode::FixedRatio));
 	m_ui.zoomModeComboBox->addItem(QIcon(":zoom_fit_to_frame.png"),
-        tr("Fit to frame"), (int)ZoomMode::FitToFrame);
+        tr("Fit to frame"), int(ZoomMode::FitToFrame));
 
 	ZoomMode zoomMode = m_pSettingsManager->getZoomMode();
-	int comboIndex = m_ui.zoomModeComboBox->findData((int)zoomMode);
+    int comboIndex = m_ui.zoomModeComboBox->findData(int(zoomMode));
 	if(comboIndex != -1)
 		m_ui.zoomModeComboBox->setCurrentIndex(comboIndex);
 	bool fixedRatio(zoomMode == ZoomMode::FixedRatio);
@@ -1801,14 +1809,14 @@ void PreviewDialog::setUpZoomPanel()
 	m_ui.zoomRatioSpinBox->setValue(zoomRatio);
 
     m_ui.scaleModeComboBox->addItem(tr("Nearest"),
-		(int)Qt::FastTransformation);
+        int(Qt::FastTransformation));
     m_ui.scaleModeComboBox->addItem(tr("Bilinear"),
-		(int)Qt::SmoothTransformation);
+        int(Qt::SmoothTransformation));
 	bool noZoom = (zoomMode == ZoomMode::NoZoom);
 	m_ui.scaleModeComboBox->setEnabled(!noZoom);
 
 	Qt::TransformationMode scaleMode = m_pSettingsManager->getScaleMode();
-	comboIndex = m_ui.scaleModeComboBox->findData((int)scaleMode);
+    comboIndex = m_ui.scaleModeComboBox->findData(int(scaleMode));
 	if(comboIndex != -1)
 		m_ui.scaleModeComboBox->setCurrentIndex(comboIndex);
 
@@ -1872,9 +1880,9 @@ void PreviewDialog::setUpTimeLinePanel()
     m_ui.timeStepEdit->setTime(vsedit::secondsToQTime(timeStep));
 
     m_ui.timeLineModeComboBox->addItem(QIcon(":timeline.png"), tr("Time"),
-		(int)TimeLineSlider::DisplayMode::Time);
+        int(TimeLineSlider::DisplayMode::Time));
     m_ui.timeLineModeComboBox->addItem(QIcon(":timeline_frames.png"),
-        tr("Frames"), (int)TimeLineSlider::DisplayMode::Frames);
+        tr("Frames"), int(TimeLineSlider::DisplayMode::Frames));
 
 //	TimeLineSlider::DisplayMode timeLineMode =
 //		m_pSettingsManager->getTimeLineMode();
@@ -1936,17 +1944,16 @@ void PreviewDialog::setUpCropPanel()
 // END OF void PreviewDialog::setUpCropPanel()
 //==============================================================================
 
-void PreviewDialog::createMainStatusBar()
+void PreviewDialog::createFeedbackStatusBar()
 {
-    mainStatusBar = new QStatusBar(this);
-    mainStatusBar->setMinimumHeight(22);
-    mainStatusBar->setMaximumHeight(30);
-    mainStatusBar->setSizeGripEnabled(false);
-    mainStatusBar->setStyleSheet("border-top: 1px solid #959595");
-
+    feedbackStatusBar = new QStatusBar(this);
+    feedbackStatusBar->setMinimumHeight(22);
+    feedbackStatusBar->setMaximumHeight(22);
+    feedbackStatusBar->setSizeGripEnabled(false); // remove the triangle at bottom right
+    feedbackStatusBar->setStyleSheet("border-top: 1px solid #959595");
 }
 
-// END OF void createMainStatusBar()
+// END OF void createFeedbackStatusBar()
 //==============================================================================
 
 bool PreviewDialog::requestShowFrame(int a_frameNumber)
@@ -1989,7 +1996,7 @@ void PreviewDialog::setPreviewPixmap()
 		return;
 	}
 
-	ZoomMode zoomMode = (ZoomMode)m_ui.zoomModeComboBox->currentData().toInt();
+    ZoomMode zoomMode = ZoomMode(m_ui.zoomModeComboBox->currentData().toInt());
 	if(zoomMode == ZoomMode::NoZoom)
 	{
 		m_ui.previewArea->setPixmap(m_framePixmap);
@@ -2306,10 +2313,8 @@ void PreviewDialog::slotSaveBookmarkToFile()
             QTextStream out(&file);
             out << bookmarksString;
 
-            this->mainStatusBar->showMessage("bookmark saved to "+ fileName, 3000);
+            this->feedbackStatusBar->showMessage("bookmark saved to "+ fileName, 3000);
         }
-
-
     }
     return;
 

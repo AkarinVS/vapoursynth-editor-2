@@ -84,11 +84,9 @@ private:
     int m_step;
 
     // ruler
-    void setupRuler();
     int m_totalSegments;
     int m_framesPerSegment;
     int m_widthPerSegment;
-    bool m_widthChanged; // a flag to trigger ruler setup in paint event
 
     // zooming
     int m_zoomFactor;

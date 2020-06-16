@@ -23,8 +23,6 @@ private:
 
     SpinboxExtendedLineEdit * a_pLineEdit;
 
-    double m_zoomRatio;
-
 public slots:
     void stepUp();
     void stepDown();
