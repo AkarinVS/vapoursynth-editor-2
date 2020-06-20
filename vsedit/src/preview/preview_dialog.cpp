@@ -1392,11 +1392,11 @@ void PreviewDialog::slotProcessPlayQueue()
 
 		m_frameShown = nextFrame;
 		m_frameExpected = m_frameShown;
+
         m_ui.frameNumberSpinBox->setValue(m_frameExpected);
         m_ui.timeLineView->slotSetSliderPosByFrame(m_frameExpected);
-//        m_ui.frameNumberSlider->setFrame(m_frameExpected); // to be remove?
+        m_ui.timeLineView->setFrame(m_frameExpected);
 
-//        m_ui.timeLineView->setFrame(m_frameExpected);
 		m_framesCache.erase(it);
 		nextFrame = (m_frameShown + 1) % m_cpVideoInfo->numFrames;
 		referenceFrame.number = nextFrame;
