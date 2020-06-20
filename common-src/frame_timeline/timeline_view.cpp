@@ -14,7 +14,7 @@ TimeLineView::TimeLineView (QWidget * a_pParent )
     scene->addItem(slider);
 
     this->setScene(scene);
-    scene->setBackgroundBrush(Qt::yellow);
+    scene->setBackgroundBrush(QColor("#e7f1f3"));
 
     connect(timeLine, &TimeLine::signalFrameChanged,
             this, &TimeLineView::signalFrameChanged); // forward signal to preview dialog

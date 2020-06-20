@@ -179,6 +179,7 @@ FORMS += $${PROJECT_DIRECTORY}/src/preview/preview_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/frame_consumers/benchmark_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/frame_consumers/encode_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.ui
+FORMS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/main_window.ui
 
 HEADERS += $${COMMON_DIRECTORY}/common-src/helpers.h
@@ -234,6 +235,8 @@ HEADERS += $${PROJECT_DIRECTORY}/src/frame_consumers/benchmark_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/frame_consumers/encode_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/drop_file_category_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.h
+HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.h
+HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/main_window.h
 
 SOURCES += $${COMMON_DIRECTORY}/common-src/helpers.cpp
@@ -287,6 +290,8 @@ SOURCES += $${PROJECT_DIRECTORY}/src/frame_consumers/benchmark_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/frame_consumers/encode_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/drop_file_category_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main.cpp
 

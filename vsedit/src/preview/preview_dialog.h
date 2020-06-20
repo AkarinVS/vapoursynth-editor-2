@@ -6,6 +6,7 @@
 #include "../vapoursynth/vs_script_processor_dialog.h"
 #include "../../../common-src/settings/settings_definitions.h"
 #include "../../../common-src/chrono.h"
+#include "../../vsedit/src/bookmark_manager/bookmark_manager_dialog.h"
 
 #include <QPixmap>
 #include <QIcon>
@@ -47,6 +48,7 @@ signals:
 
 	void signalPasteIntoScriptAtNewLine(const QString& a_line);
 	void signalPasteIntoScriptAtCursor(const QString& a_line);
+    void signalBookmarkCurrentFrame(int a_frameIndex); // send to bookmark manager
 
 protected slots:
 
@@ -131,18 +133,21 @@ protected slots:
 
     void slotJumpPlay(int a_frame);
 
+    void slotShowBookmarkManager();
 	void slotLoadChapters();
 	void slotClearBookmarks();
 	void slotBookmarkCurrentFrame();
 	void slotUnbookmarkCurrentFrame();
 	void slotGoToPreviousBookmark();
 	void slotGoToNextBookmark();
+    void slotGoToBookmark(int a_frameIndex);
+    void slotResponseAddBookmark();
 
 	void slotPasteShownFrameNumberIntoScript();
 
 	void slotSaveGeometry();
 
-    void slotSaveBookmarkToFile();
+//    void slotBookmarkSavedToFile(QString a_fileName);
 
 protected:
 
@@ -185,6 +190,7 @@ protected:
 
 	void saveTimelineBookmarks();
 	void loadTimelineBookmarks();
+    void setupBookmarkManager();
 
 	void saveGeometryDelayed();
 
@@ -194,6 +200,7 @@ protected:
     QStatusBar *feedbackStatusBar;
 
 	PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
+    BookMarkManagerDialog * m_pBookmarkManagerDialog;
 
 	int m_frameExpected;
 	int m_frameShown;

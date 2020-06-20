@@ -37,14 +37,14 @@ QRectF TimeLine::boundingRect() const
 
 void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QBrush redBrush(Qt::red);
+    QBrush rulerBrush(QColor("#abcdd7"));
 
     QFont defaultFont = painter->font();
     QFont rulerTextFont("Arial", 10);
 
     QRectF rec = boundingRect();
 
-    painter->fillRect(rec, redBrush);
+    painter->fillRect(rec, rulerBrush);
 
     // don't run on initial paint when max frame has not been set yet
     if (m_maxFrame > 0) {

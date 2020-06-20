@@ -216,6 +216,16 @@ public:
 
 	bool setLastSnapshotExtension(const QString & a_extension);
 
+        BookmarkSavingFormat getBookmarkSavingFormat() const;
+
+        bool setBookmarkSavingFormat(const BookmarkSavingFormat & a_format);
+
+        QString getBookmarkDelimiter() const;
+
+        bool setBookmarkDelimiter(const QString & a_delimiter);
+
+
+
 private:
 
 	void initializeStandardActions();

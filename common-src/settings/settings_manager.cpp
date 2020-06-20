@@ -47,7 +47,8 @@ const char HIGHLIGHT_SELECTION_MATCHES_MIN_LENGTH_KEY[] =
 const char TIMELINE_PANEL_VISIBLE_KEY[] = "timeline_panel_visible";
 const char ALWAYS_KEEP_CURRENT_FRAME_KEY[] = "always_keep_current_frame";
 const char LAST_SNAPSHOT_EXTENSION_KEY[] = "last_snapshot_extension";
-
+const char BOOKMARK_SAVING_FORMAT_KEY[] = "bookmark_saving_format";
+const char BOOKMARK_DELIMITER_KEY[] = "bookmark_delimiter";
 //==============================================================================
 
 const char HOTKEYS_GROUP[] = "hotkeys";
@@ -1085,7 +1086,33 @@ QString SettingsManager::getLastSnapshotExtension() const
 
 bool SettingsManager::setLastSnapshotExtension(const QString & a_extension)
 {
-	return setValue(LAST_SNAPSHOT_EXTENSION_KEY, a_extension);
+    return setValue(LAST_SNAPSHOT_EXTENSION_KEY, a_extension);
+}
+
+//==============================================================================
+
+BookmarkSavingFormat SettingsManager::getBookmarkSavingFormat() const
+{
+    return BookmarkSavingFormat(value(BOOKMARK_SAVING_FORMAT_KEY,
+        int(DEFAULT_BOOKMARK_SAVING_FORMAT)).toInt());
+}
+
+bool SettingsManager::setBookmarkSavingFormat(const BookmarkSavingFormat &a_format)
+{
+    return setValue(BOOKMARK_SAVING_FORMAT_KEY, int(a_format));
+}
+
+//==============================================================================
+
+QString SettingsManager::getBookmarkDelimiter() const
+{
+    return value(BOOKMARK_DELIMITER_KEY,
+                 DEFAULT_BOOKMARK_DELIMITER).toString();
+}
+
+bool SettingsManager::setBookmarkDelimiter(const QString &a_delimiter)
+{
+    return setValue(BOOKMARK_DELIMITER_KEY, a_delimiter);
 }
 
 //==============================================================================

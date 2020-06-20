@@ -21,15 +21,16 @@ PreviewArea::PreviewArea(QWidget * a_pParent) : QScrollArea(a_pParent)
 {
 	m_pPreviewLabel = new QLabel(this);
 	m_pPreviewLabel->setPixmap(QPixmap());
-	m_pPreviewLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	QScrollArea::setWidget(m_pPreviewLabel);
+    m_pPreviewLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    QScrollArea::setWidget(m_pPreviewLabel);
+
 	setWidgetResizable(true);
 
-	m_pScrollNavigator = new ScrollNavigator(this);
-	int scrollFrameWidth = frameWidth();
-	m_pScrollNavigator->move(pos() +
-		QPoint(scrollFrameWidth, scrollFrameWidth));
-	m_pScrollNavigator->setVisible(false);
+    m_pScrollNavigator = new ScrollNavigator(this);
+    int scrollFrameWidth = frameWidth();
+    m_pScrollNavigator->move(pos() +
+        QPoint(scrollFrameWidth, scrollFrameWidth));
+    m_pScrollNavigator->setVisible(false);
 
 	setMouseTracking(true);
 	m_pPreviewLabel->setMouseTracking(true);
@@ -64,24 +65,24 @@ void PreviewArea::setPixmap(const QPixmap & a_pixmap)
 
 void PreviewArea::checkMouseOverPreview(const QPoint & a_globalMousePos)
 {
-	if(!m_pPreviewLabel->underMouse())
-		return;
+    if(!m_pPreviewLabel->underMouse())
+        return;
 
-	QPoint imagePoint = m_pPreviewLabel->mapFromGlobal(a_globalMousePos);
+    QPoint imagePoint = m_pPreviewLabel->mapFromGlobal(a_globalMousePos);
 
-	const QPixmap * pPreviewPixmap = m_pPreviewLabel->pixmap();
-	int pixmapWidth = pPreviewPixmap->width();
-	int pixmapHeight = pPreviewPixmap->height();
+    QPixmap pPreviewPixmap = m_pPreviewLabel->pixmap(Qt::ReturnByValue);
+    int pixmapWidth = pPreviewPixmap.width();
+    int pixmapHeight = pPreviewPixmap.height();
 
-	if((imagePoint.x() < 0) || (imagePoint.y() < 0) ||
-		(imagePoint.x() >= pixmapWidth) || (imagePoint.y() >= pixmapHeight))
-		return;
+    if((imagePoint.x() < 0) || (imagePoint.y() < 0) ||
+        (imagePoint.x() >= pixmapWidth) || (imagePoint.y() >= pixmapHeight))
+        return;
 
-	float normX = (float)imagePoint.x() / (float)pixmapWidth;
-	float normY = (float)imagePoint.y() / (float)pixmapHeight;
+    float normX = (float)imagePoint.x() / (float)pixmapWidth;
+    float normY = (float)imagePoint.y() / (float)pixmapHeight;
 
-	emit signalMouseOverPoint(normX, normY);
-    emit signalMousePosition(imagePoint);
+    emit signalMouseOverPoint(normX, normY);
+    emit signalMousePosition(normX, normY);
 }
 
 // END OF void PreviewArea::checkMouseOverPreview(
@@ -208,8 +209,8 @@ void PreviewArea::mouseMoveEvent(QMouseEvent * a_pEvent)
 		return;
 	}
 
-	QPoint globalPoint = a_pEvent->globalPos();
-	checkMouseOverPreview(globalPoint);
+    QPoint globalPoint = a_pEvent->globalPos();
+    checkMouseOverPreview(globalPoint);
 
 	QScrollArea::mouseMoveEvent(a_pEvent);
 }
@@ -232,7 +233,7 @@ void PreviewArea::mouseReleaseEvent(QMouseEvent * a_pEvent)
 	else if(releasedButton == Qt::RightButton)
 		emit signalMouseRightButtonReleased();
 
-	QScrollArea::mouseReleaseEvent(a_pEvent);
+    QScrollArea::mouseReleaseEvent(a_pEvent);
 }
 
 // END OF void PreviewArea::mouseReleaseEvent(QMouseEvent * a_pEvent)

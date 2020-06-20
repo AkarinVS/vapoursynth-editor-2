@@ -2,11 +2,14 @@
 <ui version="4.0">
  <class>PreviewDialog</class>
  <widget class="QDialog" name="PreviewDialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
+    <width>1208</width>
     <height>652</height>
    </rect>
   </property>
@@ -84,20 +87,27 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string/>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>60</height>
-          </size>
-         </property>
-        </spacer>
+         <widget class="QToolButton" name="playButton">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>10</y>
+            <width>72</width>
+            <height>36</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </widget>
        </item>
       </layout>
      </item>
@@ -347,7 +357,7 @@ QSlider::handle:horizontal {
        <height>60</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0">
       <property name="spacing">
        <number>2</number>
       </property>
@@ -363,13 +373,6 @@ QSlider::handle:horizontal {
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QToolButton" name="playButton">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -446,6 +449,34 @@ QSlider::handle:horizontal {
       </item>
       <item>
        <widget class="QToolButton" name="goToNextBookmarkButton"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="openBookmarkManagerButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>10</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="text">
+         <string>Bookmark Manager</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer_3">
@@ -770,6 +801,9 @@ QSlider::handle:horizontal {
         </property>
         <property name="minimum">
          <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>8</number>
         </property>
        </widget>
       </item>

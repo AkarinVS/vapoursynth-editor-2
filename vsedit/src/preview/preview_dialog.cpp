@@ -126,6 +126,8 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 	m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
 		m_pSettingsManager, this);
 
+
+
 	m_pPlayTimer = new QTimer(this);
 	m_pPlayTimer->setTimerType(Qt::PreciseTimer);
 	m_pPlayTimer->setSingleShot(true);
@@ -141,6 +143,7 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
     // set for timeline
     m_ui.timeLineView->setDisplayMode(TimeLine::DisplayMode(m_pSettingsManager->getTimeLineMode()));
+
 
 	m_ui.frameToClipboardButton->setDefaultAction(m_pActionFrameToClipboard);
 	m_ui.saveSnapshotButton->setDefaultAction(m_pActionSaveSnapshot);
@@ -191,8 +194,7 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
     connect(m_ui.timeLineView, &TimeLineView::signalJumpToFrame,
             this, &PreviewDialog::slotJumpPlay);
 
-
-	slotSettingsChanged();
+    slotSettingsChanged();
 
 	bool rememberLastPreviewFrame =
 		m_pSettingsManager->getRememberLastPreviewFrame();
@@ -282,6 +284,11 @@ void PreviewDialog::previewScript(const QString& a_script,
 	slotSetPlayFPSLimit();
 
 	setScriptName(a_scriptName);
+
+
+    // test
+    setupBookmarkManager();
+
 
 	loadTimelineBookmarks();
 
@@ -499,6 +506,9 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
     if((m_frameShown == a_frameNumber) && (!m_framePixmap.isNull()))
         return;
 
+    if (a_frameNumber > m_cpVideoInfo->numFrames)
+        return;
+
 	static bool requestingFrame = false;
 	if(requestingFrame)
 		return;
@@ -576,9 +586,11 @@ void PreviewDialog::slotSaveSnapshot()
 
 	if(!snapshotFilePath.isEmpty())
 	{
-		bool success = m_framePixmap.save(snapshotFilePath, format, 100);
-		if(success)
+        bool success = m_framePixmap.save(snapshotFilePath, format, 50);
+        if(success) {
 			m_pSettingsManager->setLastSnapshotExtension(suffix);
+            this->feedbackStatusBar->showMessage("Snapshot saved to "+ snapshotFilePath, 3000);
+        }
 		else
 		{
             QMessageBox::critical(this, tr("Image save error"),
@@ -1417,6 +1429,11 @@ void PreviewDialog::slotJumpPlay(int a_frame)
     slotPlay(true);
 }
 
+void PreviewDialog::slotShowBookmarkManager()
+{
+    m_pBookmarkManagerDialog->show();
+}
+
 // END OF void PreviewDialog::slotJumpPlay(int a_frame)
 //==============================================================================
 
@@ -1451,7 +1468,8 @@ void PreviewDialog::slotLoadChapters()
 			timecodes.at(2).toDouble() * 60.0 + timecodes.at(3).toDouble() +
 			timecodes.at(4).toDouble() / 1000;
 		const int frameIndex  = ceil(timecode * fps);
-		m_ui.frameNumberSlider->addBookmark(frameIndex);
+
+        m_ui.frameNumberSlider->addBookmark(frameIndex);
 	}
 
 	saveTimelineBookmarks();
@@ -1520,10 +1538,25 @@ void PreviewDialog::slotGoToNextBookmark()
 	if(m_playing)
 		return;
 
-	m_ui.frameNumberSlider->slotGoToNextBookmark();
+    m_ui.frameNumberSlider->slotGoToNextBookmark();
+}
+
+void PreviewDialog::slotGoToBookmark(int a_frameIndex)
+{
+//    qDebug() << "arrive to bookmark " << a_frameIndex;
+    slotShowFrame(a_frameIndex);
 }
 
 // END OF void PreviewDialog::slotGoToNextBookmark()
+//==============================================================================
+void PreviewDialog::slotResponseAddBookmark()
+{
+    if (m_playing)
+        return;
+    emit signalBookmarkCurrentFrame(m_frameShown);
+}
+
+// END OF void PreviewDialog::slotResponseAddBookmark()
 //==============================================================================
 
 void PreviewDialog::slotPasteShownFrameNumberIntoScript()
@@ -1612,9 +1645,9 @@ void PreviewDialog::createActionsAndMenus()
 		{&m_pActionPasteShownFrameNumberIntoScript,
 			ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT,
 			false, SLOT(slotPasteShownFrameNumberIntoScript())},                
-        {&m_pActionSaveBookmarkToFile,
-            ACTION_ID_SAVE_BOOKMARK_TO_FILE,
-            false, SLOT(slotSaveBookmarkToFile())},
+//        {&m_pActionSaveBookmarkToFile,
+//            ACTION_ID_SAVE_BOOKMARK_TO_FILE,
+//            false, SLOT(slotSaveBookmarkToFile())},
 	};
 
 	for(ActionToCreate & item : actionsToCreate)
@@ -1768,7 +1801,7 @@ void PreviewDialog::createActionsAndMenus()
 	addAction(m_pActionPasteShownFrameNumberIntoScript);
 	m_pPreviewContextMenu->addAction(m_pActionPasteShownFrameNumberIntoScript);
 
-        m_pPreviewContextMenu->addAction(m_pActionSaveBookmarkToFile);
+//        m_pPreviewContextMenu->addAction(m_pActionSaveBookmarkToFile);
 
 //------------------------------------------------------------------------------
 
@@ -2255,10 +2288,38 @@ void PreviewDialog::loadTimelineBookmarks()
 			bookmarks.insert(i);
 	}
 
-	m_ui.frameNumberSlider->setBookmarks(bookmarks);
+    m_ui.frameNumberSlider->setBookmarks(bookmarks);
 }
 
 // END OF void PreviewDialog::loadTimelineBookmarks()
+//==============================================================================
+
+void PreviewDialog::setupBookmarkManager()
+{
+    QFileInfo fileInfo(scriptName());
+
+    const VSVideoInfo * cpVideoInfo = m_pVapourSynthScriptProcessor->videoInfo();
+    QString lastUsedFilePath = m_pSettingsManager->getLastUsedPath();
+
+    m_pBookmarkManagerDialog = new BookMarkManagerDialog(m_pSettingsManager, cpVideoInfo,
+                                       scriptName(), lastUsedFilePath, this);
+
+    // connect
+    connect(m_ui.openBookmarkManagerButton, &QPushButton::clicked,
+            this, &PreviewDialog::slotShowBookmarkManager);
+    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalGotoBookmark,
+            this, &PreviewDialog::slotGoToBookmark);
+    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalAddButtonPressed,
+            this, &PreviewDialog::slotResponseAddBookmark);
+    connect(this, &PreviewDialog::signalBookmarkCurrentFrame,
+            m_pBookmarkManagerDialog, &BookMarkManagerDialog::slotAddBookmark);
+
+
+//    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalBookmarkSavedToFile,
+//            this, &PreviewDialog::slotBookmarkSavedToFile);
+}
+
+// END OF void PreviewDialog::setupBookmarkManager()
 //==============================================================================
 
 void PreviewDialog::saveGeometryDelayed()
@@ -2274,51 +2335,15 @@ void PreviewDialog::saveGeometryDelayed()
 // END OF void PreviewDialog::saveGeometryDelayed()
 //==============================================================================
 
-void PreviewDialog::slotSaveBookmarkToFile()
-{
-    if(m_playing)
-            return;
+//void PreviewDialog::slotBookmarkSavedToFile(QString a_fileName)
+//{
+//    if(m_playing)
+//            return;
 
-    std::set<int> bookmarks = m_ui.frameNumberSlider->bookmarks();
+//            this->feedbackStatusBar->showMessage("bookmark saved to "+ a_fileName, 3000);
 
-    if(bookmarks.size() > 0)
-    {
-        // get file path and fileName without extension
-        QFileInfo fileInfo(scriptName());
-        QString filePath = fileInfo.absolutePath();
-        QString scriptFileName = fileInfo.baseName();
 
-        QString fileName = QFileDialog::getSaveFileName(this,
-                            tr("Save bookmark"), filePath + QDir::separator() + scriptFileName,
-                            tr("Text file (*.txt)"));
-
-        if (fileName.isEmpty())
-            return;
-        else
-        {
-            QFile file(fileName);
-            if (!file.open(QIODevice::WriteOnly))
-            {
-                QMessageBox::information(this, tr("Unable to open file"),
-                             file.errorString());
-                return;
-            }
-
-            QStringList bookmarksStringList;
-            for(int i : bookmarks)
-                    bookmarksStringList += QString::number(i);
-
-            QString bookmarksString = bookmarksStringList.join(", ");
-
-            QTextStream out(&file);
-            out << bookmarksString;
-
-            this->feedbackStatusBar->showMessage("bookmark saved to "+ fileName, 3000);
-        }
-    }
-    return;
-
-}
+//}
 
 // END OF void PreviewDialog::saveBookmarkToFile()
 //==============================================================================

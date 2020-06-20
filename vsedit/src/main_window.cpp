@@ -411,7 +411,7 @@ void MainWindow::slotPreview()
 {
 	if(m_pPreviewDialog->busy())
 	{
-		QString message = trUtf8("Preview dialog appears busy processing "
+        QString message = tr("Preview dialog appears busy processing "
 			"frames. Please stop any active actions in the dialog and wait "
 			"for script processor to finish processing.");
 		m_ui.logView->addEntry(message, LOG_STYLE_WARNING);
@@ -450,7 +450,7 @@ void MainWindow::slotBenchmark()
 {
 	if(m_pBenchmarkDialog->busy())
 	{
-		QString message = trUtf8("Benchmark dialog appears busy processing "
+        QString message = tr("Benchmark dialog appears busy processing "
 			"frames. Please stop any active actions in the dialog and wait "
 			"for script processor to finish processing.");
 		m_ui.logView->addEntry(message, LOG_STYLE_WARNING);

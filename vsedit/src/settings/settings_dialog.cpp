@@ -119,6 +119,22 @@ void SettingsDialog::slotCall()
 	m_ui.alwaysKeepCurrentFrameCheckBox->setChecked(
 		m_pSettingsManager->getAlwaysKeepCurrentFrame());
 
+
+    BookmarkSavingFormat savedFormat = m_pSettingsManager->getBookmarkSavingFormat();
+    switch (savedFormat) {
+    case BookmarkSavingFormat::ChapterFormat:
+        m_ui.bookmarkSavingRadioButton_bookmark->setChecked(false);
+        m_ui.bookmarkSavingRadioButton_chapter->setChecked(true);
+        break;
+    case BookmarkSavingFormat::BookmarkFormat:
+        m_ui.bookmarkSavingRadioButton_chapter->setChecked(false);
+        m_ui.bookmarkSavingRadioButton_bookmark->setChecked(true);
+        break;
+    }
+
+    m_ui.bookmarkDelimiterLineEdit->setText(
+        m_pSettingsManager->getBookmarkDelimiter());
+
 	m_ui.vsLibraryPathsListWidget->clear();
 	m_ui.vsLibraryPathsListWidget->addItems(
 		m_pSettingsManager->getVapourSynthLibraryPaths());
@@ -219,6 +235,16 @@ void SettingsDialog::slotApply()
 		m_ui.rememberLastPreviewFrameCheckBox->isChecked());
 	m_pSettingsManager->setAlwaysKeepCurrentFrame(
 		m_ui.alwaysKeepCurrentFrameCheckBox->isChecked());
+
+    // bookmark format setting
+    if (m_ui.bookmarkSavingRadioButton_chapter->isChecked()) {
+        m_pSettingsManager->setBookmarkSavingFormat(BookmarkSavingFormat::ChapterFormat);
+    } else {
+        m_pSettingsManager->setBookmarkSavingFormat(BookmarkSavingFormat::BookmarkFormat);
+    }
+
+    m_pSettingsManager->setBookmarkDelimiter(
+        m_ui.bookmarkDelimiterLineEdit->text());
 
 	QStringList vapourSynthLibraryPaths;
 	int vsLibraryPathsNumber = m_ui.vsLibraryPathsListWidget->count();

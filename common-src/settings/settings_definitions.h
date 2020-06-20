@@ -28,9 +28,15 @@ enum class CropMode
 
 enum class PlayFPSLimitMode
 {
-	FromVideo,
+    FromVideo,
 	NoLimit,
-	Custom,
+    Custom,
+};
+
+enum class BookmarkSavingFormat
+{
+    BookmarkFormat,
+    ChapterFormat,
 };
 
 struct StandardAction
@@ -61,6 +67,13 @@ struct DropFileCategory
 	QString name;
 	QStringList maskList;
 	QString sourceTemplate;
+};
+
+struct BookmarkData
+{
+        QString title;
+        int frame;
+        int timeInMilli;
 };
 
 //==============================================================================
@@ -98,6 +111,8 @@ extern const int DEFAULT_FPS_DISPLAY_PRECISION;
 extern const double DEFAULT_TIMELINE_LABELS_HEIGHT;
 extern const char DEFAULT_DROP_FILE_TEMPLATE[];
 extern const int DEFAULT_MAX_WATCHER_CONNECTION_ATTEMPTS;
+extern const BookmarkSavingFormat DEFAULT_BOOKMARK_SAVING_FORMAT;
+extern const QString DEFAULT_BOOKMARK_DELIMITER;
 
 //==============================================================================
 
