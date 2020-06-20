@@ -61,11 +61,15 @@ private:
 
     bool m_playing;
 
+    bool m_mousePressed;
+
 protected:
 
     void mousePressEvent(QMouseEvent * a_event) override;
 
     void mouseReleaseEvent (QMouseEvent * a_pEvent) override;
+
+    void mouseMoveEvent(QMouseEvent * a_pEvent) override;
 
     void resizeEvent(QResizeEvent *a_pEvent) override;
 

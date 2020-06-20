@@ -29,7 +29,6 @@ TimeLineView::TimeLineView (QWidget * a_pParent )
 
     // setup navagation step, can be improve with more predefine values
     timeLine->setStep(1);
-
 }
 
 TimeLineView::~TimeLineView()
@@ -107,9 +106,69 @@ void TimeLineView::slotGoToNextBookmark()
     timeLine->slotGoToNextBookmark();
 }
 
+void TimeLineView::mousePressEvent(QMouseEvent * a_pEvent)
+{
+    m_mousePressed = true;
+
+    QGraphicsView::mousePressEvent(a_pEvent);
+    QPoint mouse_pos = a_pEvent->pos();
+
+    // map qpoint position in timeLineView to position relative to timeline item, important for zooming
+    QPointF pos_in_scene = this->mapToScene(mouse_pos);
+    QPointF pos_in_item = timeLine->mapFromScene(pos_in_scene);
+
+    int dest_pos = int(pos_in_item.x());
+
+    // get frame pos and move slider to frame position
+    // snap slider to start
+    if (pos_in_item.x() < 10) {
+        dest_pos = 0;
+    }
+
+    // snap slider to end
+    if (pos_in_item.x() > timeLine->viewWidth() - 10) {
+        dest_pos = timeLine->viewWidth();
+    }
+
+    // set frame in timeline to display
+    timeLine->setFrameByPos(dest_pos);
+
+    // retrieve the frame position in timeline to set slider position
+    int timeLineFramePos = timeLine->currentFramePos();
+    slider->setPos(timeLineFramePos, slider->pos().y());
+
+    int destFrame = timeLine->frame();
+    if (m_playing) {
+        emit signalJumpToFrame(destFrame);
+    }
+}
+
 void TimeLineView::mouseReleaseEvent(QMouseEvent * a_pEvent)
 {
+    m_mousePressed = false;
     QGraphicsView::mouseReleaseEvent(a_pEvent);
+}
+
+void TimeLineView::mouseMoveEvent(QMouseEvent *a_pEvent)
+{
+    if (m_mousePressed) {
+        QPoint mouse_pos = a_pEvent->pos();
+
+        // map qpoint position in timeLineView to position relative to timeline item, important for zooming
+        QPointF pos_in_scene = this->mapToScene(mouse_pos);
+        QPointF pos_in_item = timeLine->mapFromScene(pos_in_scene);
+
+        int dest_pos = int(pos_in_item.x());
+        // set frame in timeline to display
+        timeLine->setFrameByPos(dest_pos);
+
+        // retrieve the frame position in timeline to set slider position
+        int timeLineFramePos = timeLine->currentFramePos();
+
+        slider->setPos(timeLineFramePos, slider->pos().y());
+    }
+
+    QGraphicsView::mouseMoveEvent(a_pEvent);
 }
 
 void TimeLineView::resizeEvent(QResizeEvent *a_pEvent)
@@ -179,38 +238,3 @@ void TimeLineView::wheelEvent(QWheelEvent *a_pEvent)
 
 }
 
-void TimeLineView::mousePressEvent(QMouseEvent * a_pEvent)
-{
-    QGraphicsView::mousePressEvent(a_pEvent);
-    QPoint mouse_pos = a_pEvent->pos();
-
-    // map qpoint position in timeLineView to position relative to timeline item, important for zooming
-    QPointF pos_in_scene = this->mapToScene(mouse_pos);
-    QPointF pos_in_item = timeLine->mapFromScene(pos_in_scene);
-
-    int dest_pos = int(pos_in_item.x());
-
-
-    // get frame pos and move slider to frame position
-    // snap slider to start
-    if (pos_in_item.x() < 10) {
-        dest_pos = 0;
-    }
-
-    // snap slider to end
-    if (pos_in_item.x() > timeLine->viewWidth() - 10) {
-        dest_pos = timeLine->viewWidth();
-    }
-
-    // set frame in timeline to display
-    timeLine->setFrameByPos(dest_pos);
-
-    // retrieve the frame position in timeline to set slider position
-    int timeLineFramePos = timeLine->currentFramePos();
-    slider->setPos(timeLineFramePos, slider->pos().y());
-
-    int destFrame = timeLine->frame();
-    if (m_playing) {
-        emit signalJumpToFrame(destFrame);
-    }
-}

@@ -506,7 +506,7 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
     if((m_frameShown == a_frameNumber) && (!m_framePixmap.isNull()))
         return;
 
-    if (a_frameNumber > m_cpVideoInfo->numFrames)
+    if ((a_frameNumber > m_cpVideoInfo->numFrames) || (a_frameNumber < 0))
         return;
 
 	static bool requestingFrame = false;
@@ -514,7 +514,7 @@ void PreviewDialog::slotShowFrame(int a_frameNumber)
 		return;
 	requestingFrame = true;
 
-	m_ui.frameNumberSpinBox->setValue(a_frameNumber);
+    m_ui.frameNumberSpinBox->setValue(a_frameNumber);
 //    m_ui.frameNumberSlider->setFrame(a_frameNumber);
 
     // timeline

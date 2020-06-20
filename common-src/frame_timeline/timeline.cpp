@@ -171,6 +171,9 @@ int TimeLine::frame() const
 void TimeLine::setFrameByPos(int a_pos)
 {
     int frame = posToFrame(a_pos);
+    if (frame < 0)
+        frame = 0;
+
     setFrame(frame);
 }
 // END OF void TimeLine::setFrameByPos(int a_pos)
