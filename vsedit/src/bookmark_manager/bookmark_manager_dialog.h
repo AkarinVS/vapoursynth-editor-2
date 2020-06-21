@@ -23,7 +23,7 @@ class BookMarkManagerDialog : public QDialog
 
 public:
     explicit BookMarkManagerDialog(SettingsManager *a_pSettingsManager,  const VSVideoInfo *a_pVideoInfo,
-                 QString a_scriptName, QString a_lastUsedFilePath, QWidget *a_pParent = nullptr);
+                 QString a_scriptName, QWidget *a_pParent = nullptr);
 
     ~BookMarkManagerDialog();
 
@@ -31,9 +31,8 @@ signals:
 
     void signalAddButtonPressed();
     void signalGotoBookmark(int a_frameIndex);
-    void signalBookmarkSavedToFile(QString fileName);
-
-
+    void signalBookmarkSavedToFile(QString a_fileName);
+    void signalBookmarkFileLoaded(QString a_fileName);
 
 private:
     Ui::BookMarkManagerDialog *ui;
@@ -54,14 +53,12 @@ public slots:
 
     void slotAddBookmark(int a_frameIndex);
 
-
 private slots:
 
-
     void slotRemoveBookmark();
-    void slotLoadBookmarks();
-    void slotLoadChapters();
-    void slotLoadVariousFormat();
+    void slotLoadBookmarkFile(QString a_fileName);
+    void slotLoadChapterFile(QString a_fileName);
+    void slotLoadFile();
     void slotRemoveAll();
     void slotSaveBookmarksToFile();
     void slotGotoBookmark();

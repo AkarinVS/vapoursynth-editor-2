@@ -8,6 +8,12 @@
 const int COLS = 3;
 const int ROWS = 1;
 
+enum {
+    TITLE_COL,
+    FRAME_COL,
+    TIME_COL,
+};
+
 using namespace std;
 
 class BookmarkModel : public QAbstractTableModel

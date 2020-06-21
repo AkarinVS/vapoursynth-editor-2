@@ -9,8 +9,7 @@
 #include <QTime>
 
 BookMarkManagerDialog::BookMarkManagerDialog(SettingsManager *a_pSettingsManager,
-    const VSVideoInfo *a_pVideoInfo,
-    QString a_scriptName, QString a_lastUsedFilePath, QWidget * a_pParent) :
+    const VSVideoInfo *a_pVideoInfo, QString a_scriptName, QWidget * a_pParent) :
     QDialog(a_pParent),
     ui(new Ui::BookMarkManagerDialog),
     m_pSettingsManager(a_pSettingsManager)
@@ -20,21 +19,18 @@ BookMarkManagerDialog::BookMarkManagerDialog(SettingsManager *a_pSettingsManager
     // set fileInfo and fps
     m_scriptName = a_scriptName;
     m_fps = double(a_pVideoInfo->fpsNum) / double(a_pVideoInfo->fpsDen);
-    m_lastUsedFilePath = a_lastUsedFilePath;
+    m_lastUsedFilePath = a_pSettingsManager->getLastUsedPath();
 
-    m_bookmarkModel = new BookmarkModel(this);
-    ui->bookmarkTableView->setModel(m_bookmarkModel);
+    m_bookmarkModel = new BookmarkModel(this);       
+    ui->bookmarkTableView->setModel(m_bookmarkModel);    
 
     connect(ui->addButton, &QPushButton::clicked, this, &BookMarkManagerDialog::signalAddButtonPressed);
     connect(ui->removeButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotRemoveBookmark);
-    connect(ui->loadButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotLoadBookmarks);
-    connect(ui->loadChapterButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotLoadChapters);
+    connect(ui->loadButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotLoadFile);
     connect(ui->saveButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotSaveBookmarksToFile);
     connect(ui->clearButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotRemoveAll);
     connect(ui->gotoButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotGotoBookmark);
     connect(ui->bookmarkTableView, &QTableView::doubleClicked, this, &BookMarkManagerDialog::slotGotoBookmarkFromIndex);
-//    connect(ui->closeButton, &QPushButton::clicked), this, &);
-
 }
 
 BookMarkManagerDialog::~BookMarkManagerDialog()
@@ -67,20 +63,20 @@ void BookMarkManagerDialog::slotRemoveBookmark()
                 QItemSelectionModel::Deselect);
 }
 
-void BookMarkManagerDialog::slotLoadBookmarks()
+void BookMarkManagerDialog::slotLoadBookmarkFile(QString fileName)
 {
-    const QString filePath = QFileDialog::getOpenFileName(this,
-        tr("Load bookmarks"), m_lastUsedFilePath,
-        tr("Bookmark file (*.txt;);;All files (*)"));
-    QFile chaptersFile(filePath);
-    if(!chaptersFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::information(this, tr("Unable to open file"),
+                                 file.errorString());
         return;
+    }
 
     QRegularExpression reBookmark("(\\d+)");
 
-    while(!chaptersFile.atEnd())
+    while(!file.atEnd())
     {
-        const QByteArray line = chaptersFile.readLine();
+        const QByteArray line = file.readLine();
         QRegularExpressionMatchIterator i = reBookmark.globalMatch(line);
 
         while (i.hasNext()) {
@@ -92,71 +88,129 @@ void BookMarkManagerDialog::slotLoadBookmarks()
             m_bookmarkModel->addBookmark(frameIndex, timeInMilli);
         }
     }
-
+    emit signalBookmarkFileLoaded(fileName);
     // auto save
 //	saveTimelineBookmarks();
+}
 
+void BookMarkManagerDialog::slotLoadChapterFile(QString a_fileName)
+{
+    QFile file(a_fileName);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::information(this, tr("Unable to open file"),
+                                 file.errorString());
+        return;
+    }
+
+    QRegularExpression reChapter(R"((\d{2}):(\d{2}):(\d{2})[\.:](\d{3})?)");
+    QRegularExpression reTitle("CHAPTER\\d{2,3}NAME=(.*)");
+
+    if(!reTitle.isValid()) {
+        qDebug() << reTitle.errorString();
+        return;
+    }
+
+    QString dummyDate = QString("2020-01-01T"); // add this to make Datetime to milliseconds work
+
+    QStringList titleList;
+    QList<int> timeStampList;
+
+    while(!file.atEnd())
+    {
+        const QByteArray line = file.readLine();
+        QRegularExpressionMatch matchChapter = reChapter.match(line);
+        QRegularExpressionMatch matchTitle = reTitle.match(line);
+
+        QString timestamp("");
+        int timeInMilli = 0;
+        QString title;
+
+        if (matchChapter.hasMatch()) {
+            timestamp = matchChapter.captured(0);
+            timeInMilli = QDateTime::fromString(dummyDate+timestamp, Qt::ISODateWithMs)
+                    .time().msecsSinceStartOfDay(); // convert to milliseconds
+
+            timeStampList.append(timeInMilli);
+        }
+        if (matchTitle.hasMatch()) {
+            title = matchTitle.captured(1);
+            titleList.append(title);
+        }
+    }
+
+    // loop through both list
+    auto t = titleList.begin();
+    auto ts = timeStampList.begin();
+    while (t != titleList.end() and ts != timeStampList.end())
+    {
+      auto  x = *t++;
+      auto& y = *ts++;
+
+      m_bookmarkModel->addChapter(x, y, m_fps);
+    }
+
+    // use this instead when upgraded to C++17
+//    for (auto& [t, ts] : zip(titleList, timeStampList)) {
+//        m_bookmarkModel->addChapter(t, ts, m_fps);
+//    }
 
 }
 
-void BookMarkManagerDialog::slotLoadChapters()
+void BookMarkManagerDialog::slotLoadFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Load chapters"), m_lastUsedFilePath,
-        tr("Chapters file (*.txt;*.xml);;All files (*)"));
+    const QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Load chapter/bookmark file"), m_lastUsedFilePath,
+        tr("Chapter/bookmark file (*.txt *.xml)"));
 
     if (fileName.isEmpty())
         return;
     else {
-        QFile chaptersFile(fileName);
-        if(!chaptersFile.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
 
-        QRegularExpression reChapter(R"((\d{2}):(\d{2}):(\d{2})[\.:](\d{3})?)");
-        QRegularExpression reTitle("CHAPTER\\d{2,3}NAME=(.*)");
+        QString bookmarkPattern = "^\\d+(\\D+)\\d+(?:\\1\\d+)*$";
 
-
-        if(!reTitle.isValid()) {
-            qDebug() << reTitle.errorString();
+        // check the file for format
+        QFile file(fileName);
+        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::information(this, tr("Unable to open file"),
+                                     file.errorString());
             return;
         }
 
-        QString dummyDate = QString("2020-01-01T"); // add this to make Datetime to milliseconds work
+        // using regex to check if file is chapter file or bookmark file
+        QRegularExpression regExChapterCheck("CHAPTER\\d{2}=(\\d{2}:\\d{2}:\\d{2}[\\.]\\d{3}?)");
+        QRegularExpression regExBookmarkCheck("^\\d+(\\D+)\\d+(?:\\1\\d+)*$");
+        QString detectedFormat = "";
 
-        while(!chaptersFile.atEnd())
-        {
-            const QByteArray line = chaptersFile.readLine();
-            QRegularExpressionMatch matchChapter = reChapter.match(line);
-            QRegularExpressionMatch matchTitle = reTitle.match(line);
+        QRegularExpressionMatch bookmarkCheckMatch;
+        QRegularExpressionMatch chapterCheckMatch;
 
-            QString timestamp("");
-            int timeInMilli = 0;
-            QString title;
+        while(!file.atEnd()) {
+            const QByteArray line = file.readLine();
+            bookmarkCheckMatch = regExBookmarkCheck.match(line);
+            chapterCheckMatch = regExChapterCheck.match(line);
 
-            if (matchChapter.hasMatch()) {
-                timestamp = matchChapter.captured(0);
+            if (bookmarkCheckMatch.hasMatch()) {
+                detectedFormat = "bookmarkFormat";
+                break;
+            } else
+            if (chapterCheckMatch.hasMatch()) {
+                detectedFormat = "chapterFormat";
+                break;
+            } else {
+                QMessageBox::information(this, "Error", "Not a chapter file");
+                return;
             }
-            if (matchTitle.hasMatch()) {
-                title = matchTitle.captured(1);
-            }
+        }
 
-            timeInMilli = QDateTime::fromString(dummyDate+timestamp, Qt::ISODateWithMs)
-                    .time().msecsSinceStartOfDay();
-
-            m_bookmarkModel->addChapter(title, timeInMilli, m_fps);
+        // check passed, assigning to their loading functions
+        if (detectedFormat == "bookmarkFormat") {
+            slotRemoveAll();
+            slotLoadBookmarkFile(fileName);
+        } else if (detectedFormat == "chapterFormat") {
+            slotRemoveAll();
+            slotLoadChapterFile(fileName);
         }
     }
-}
-
-void BookMarkManagerDialog::slotLoadVariousFormat()
-{
-    const QString filePath = QFileDialog::getOpenFileName(this,
-        tr("Load chapters"), m_lastUsedFilePath,
-        tr("Chapters file (*.txt;*.xml);;All files (*)"));
-    QFile InputFile(filePath);
-    if(!InputFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
 }
 
 void BookMarkManagerDialog::slotRemoveAll()
@@ -167,7 +221,6 @@ void BookMarkManagerDialog::slotRemoveAll()
 void BookMarkManagerDialog::slotSaveBookmarksToFile()
 {
     QVector<BookmarkData> bookmarks = m_bookmarkModel->bookmarks();
-
     QString delimiter = m_pSettingsManager->getBookmarkDelimiter();
 
     if(bookmarks.count() > 0)
@@ -202,29 +255,31 @@ void BookMarkManagerDialog::slotSaveBookmarksToFile()
             case BookmarkSavingFormat::ChapterFormat:
                 // looks for timestamp, and title later
                 for (auto it = bookmarks.begin(); it != bookmarks.end(); ++it) {
-                    int index = std::distance(bookmarks.begin(), it) + 1; // +1 to start index at 1
+                    int index = std::distance(bookmarks.begin(), it);
+                    int chapterCounterIndex = index + 1; // +1 to start counter at 1
                     QTime time = QTime::fromMSecsSinceStartOfDay(it->timeInMilli);
                     int fieldWidth = 2;
 
-                    if (index > 99) // 2 digit for < 100, 3 digit for > 100
+                    if (chapterCounterIndex > 99) // 2 digit for < 100, 3 digit for > 100
                         fieldWidth = 3;
 
                     // format: CHAPTER01=00:00:00.000
                     QString chapterTime = QString("CHAPTER%1=%2")
-                            .arg(index, fieldWidth, 10, QLatin1Char('0'))
+                            .arg(chapterCounterIndex, fieldWidth, 10, QLatin1Char('0'))
                             .arg(time.toString("hh:mm:ss.zzz"));
 
                     bookmarksStringList.append(chapterTime);
 
                     // format: CHAPTER01NAME=abcde
-                    QString chapterName = QString("CHAPTER%1NAME=")
-                            .arg(index, fieldWidth, 10, QLatin1Char('0'));
+                    QString chapterName = QString("CHAPTER%1NAME=%2")
+                            .arg(chapterCounterIndex, fieldWidth, 10, QLatin1Char('0'))
+                            .arg(bookmarks[index].title);
 
                     bookmarksStringList.append(chapterName);
                 }
                 bookmarksString = bookmarksStringList.join("\n");
-
                 break;
+
             case BookmarkSavingFormat::BookmarkFormat:
                 // only looks for frame number
                 for (auto i : bookmarks) {

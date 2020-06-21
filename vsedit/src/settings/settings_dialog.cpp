@@ -121,13 +121,12 @@ void SettingsDialog::slotCall()
 
 
     BookmarkSavingFormat savedFormat = m_pSettingsManager->getBookmarkSavingFormat();
+
     switch (savedFormat) {
     case BookmarkSavingFormat::ChapterFormat:
-        m_ui.bookmarkSavingRadioButton_bookmark->setChecked(false);
         m_ui.bookmarkSavingRadioButton_chapter->setChecked(true);
         break;
     case BookmarkSavingFormat::BookmarkFormat:
-        m_ui.bookmarkSavingRadioButton_chapter->setChecked(false);
         m_ui.bookmarkSavingRadioButton_bookmark->setChecked(true);
         break;
     }

@@ -2297,12 +2297,10 @@ void PreviewDialog::loadTimelineBookmarks()
 void PreviewDialog::setupBookmarkManager()
 {
     QFileInfo fileInfo(scriptName());
-
     const VSVideoInfo * cpVideoInfo = m_pVapourSynthScriptProcessor->videoInfo();
-    QString lastUsedFilePath = m_pSettingsManager->getLastUsedPath();
 
     m_pBookmarkManagerDialog = new BookMarkManagerDialog(m_pSettingsManager, cpVideoInfo,
-                                       scriptName(), lastUsedFilePath, this);
+                                       scriptName(), this);
 
     // connect
     connect(m_ui.openBookmarkManagerButton, &QPushButton::clicked,
@@ -2313,10 +2311,8 @@ void PreviewDialog::setupBookmarkManager()
             this, &PreviewDialog::slotResponseAddBookmark);
     connect(this, &PreviewDialog::signalBookmarkCurrentFrame,
             m_pBookmarkManagerDialog, &BookMarkManagerDialog::slotAddBookmark);
-
-
-//    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalBookmarkSavedToFile,
-//            this, &PreviewDialog::slotBookmarkSavedToFile);
+//    connect(BookMarkManagerDialog, &BookMarkManagerDialog::signalBookmarkFileLoaded,
+//            this, &PreviewDialog::feed);
 }
 
 // END OF void PreviewDialog::setupBookmarkManager()
@@ -2335,12 +2331,9 @@ void PreviewDialog::saveGeometryDelayed()
 // END OF void PreviewDialog::saveGeometryDelayed()
 //==============================================================================
 
-//void PreviewDialog::slotBookmarkSavedToFile(QString a_fileName)
+//void PreviewDialog::slotShowFeedback(QString a_fileName)
 //{
-//    if(m_playing)
-//            return;
-
-//            this->feedbackStatusBar->showMessage("bookmark saved to "+ a_fileName, 3000);
+//    this->feedbackStatusBar->showMessage("bookmark saved to "+ a_fileName, 3000);
 
 
 //}

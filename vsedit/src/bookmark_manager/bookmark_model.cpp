@@ -25,8 +25,6 @@ bool BookmarkModel::setHeaderData(int section, Qt::Orientation orientation, cons
 {
     if (value != headerData(section, orientation, role)) {
         // FIXME: Implement me!
-
-
         emit headerDataChanged(orientation, section, section);
         return true;
     }
@@ -58,19 +56,25 @@ QVariant BookmarkModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     int col = index.column();
 
-    if (role == Qt::DisplayRole && col == 0)
+    if (role == Qt::DisplayRole && col == TITLE_COL)
             return m_bookmarkData[row].title;
 
-    if (role == Qt::DisplayRole && col == 1)
+    if (role == Qt::DisplayRole && col == FRAME_COL)
             return m_bookmarkData[row].frame;
 
-    if (role == Qt::DisplayRole && col == 2) {
+    if (role == Qt::DisplayRole && col == TIME_COL) {
 
            int timeInMilli =  m_bookmarkData[row].timeInMilli;
            QTime time = QTime::fromMSecsSinceStartOfDay(timeInMilli);
            return time.toString("hh:mm:ss.zzz"); // convert milliseconds to time format
 
     }
+
+    // do not clear previous cell when editing
+    if (role == Qt::EditRole && col == TITLE_COL) {
+        return m_bookmarkData[row].title;
+    }
+
     return QVariant();
 }
 
@@ -84,13 +88,13 @@ bool BookmarkModel::setData(const QModelIndex &index, const QVariant &value, int
         int col = index.column();
 
         switch (col) {
-        case 0:
+        case TITLE_COL:
             m_bookmarkData[row].title = value.toString();
             break;
-        case 1:
+        case FRAME_COL:
             m_bookmarkData[row].frame = value.toInt();
             break;
-        case 2:
+        case TIME_COL:
             m_bookmarkData[row].timeInMilli = value.toInt();
         }
 
@@ -102,7 +106,11 @@ bool BookmarkModel::setData(const QModelIndex &index, const QVariant &value, int
 Qt::ItemFlags BookmarkModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::NoItemFlags;
+        return Qt::NoItemFlags;     
+
+    int col = index.column();
+    if (col == TITLE_COL) // enable title editing
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
 
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
@@ -111,7 +119,6 @@ bool BookmarkModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     beginInsertRows(parent, row, row + count - 1);
     // FIXME: Implement me!
-
     endInsertRows();
 }
 
@@ -161,7 +168,7 @@ void BookmarkModel::removeBookmark(const QModelIndex &index)
     int row = index.row();
 
     beginRemoveRows(QModelIndex(), row, row);
-    m_bookmarkData.remove(row);
+        m_bookmarkData.remove(row);
     endRemoveRows();
 }
 
@@ -178,8 +185,7 @@ void BookmarkModel::addChapter(QString a_title, int a_timeInMilli, double a_fps)
     const int frameIndex  = double(a_timeInMilli) / double(1000) * a_fps;
 
     beginInsertRows(QModelIndex(), newRow, newRow);
-
-    BookmarkData data = {a_title, frameIndex, a_timeInMilli };
+        BookmarkData data = {a_title, frameIndex, a_timeInMilli };
     m_bookmarkData.append(data);
 
     endInsertRows();
@@ -194,7 +200,7 @@ void BookmarkModel::clearAll()
 {
     if (!m_bookmarkData.isEmpty()) {
         beginResetModel();
-        m_bookmarkData.clear();
+            m_bookmarkData.clear();
         endResetModel();
     }
 }

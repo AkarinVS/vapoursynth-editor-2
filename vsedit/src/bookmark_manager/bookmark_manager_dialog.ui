@@ -43,16 +43,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="loadChapterButton">
-       <property name="text">
-        <string>Load Chapter</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="gotoButton">
        <property name="text">
         <string>Go To</string>
