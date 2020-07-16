@@ -38,14 +38,14 @@ VSScriptProcessorDialog::VSScriptProcessorDialog(
 	Q_ASSERT(m_pSettingsManager);
 	Q_ASSERT(m_pVSScriptLibrary);
 
-	connect(m_pVSScriptLibrary,
-		SIGNAL(signalWriteLogMessage(int, const QString &)),
-		this, SLOT(slotWriteLogMessage(int, const QString &)));
+//    connect(m_pVSScriptLibrary,
+//        SIGNAL(signalWriteLogMessage(int, const QString &)),
+//        this, SLOT(slotWriteLogMessage(int, const QString &)));
 
 	m_pVapourSynthScriptProcessor = new VapourSynthScriptProcessor(
 		m_pSettingsManager, m_pVSScriptLibrary, this);
 
-	m_pStatusBarWidget = new ScriptStatusBarWidget();
+    m_pStatusBarWidget = new ScriptStatusBarWidget(); // deprecated, widget is now a standalone
 
 	connect(m_pVapourSynthScriptProcessor,
 		SIGNAL(signalWriteLogMessage(int, const QString &)),
@@ -53,8 +53,8 @@ VSScriptProcessorDialog::VSScriptProcessorDialog(
 	connect(m_pVapourSynthScriptProcessor,
 		SIGNAL(signalFrameQueueStateChanged(size_t, size_t, size_t)),
 		this, SLOT(slotFrameQueueStateChanged(size_t, size_t, size_t)));
-	connect(m_pVapourSynthScriptProcessor, SIGNAL(signalFinalized()),
-		this, SLOT(slotScriptProcessorFinalized()));
+//	connect(m_pVapourSynthScriptProcessor, SIGNAL(signalFinalized()),
+//		this, SLOT(slotScriptProcessorFinalized()));
 	connect(m_pVapourSynthScriptProcessor,
 		SIGNAL(signalDistributeFrame(int, int, const VSFrameRef *,
 			const VSFrameRef *)),
@@ -85,13 +85,13 @@ bool VSScriptProcessorDialog::initialize(const QString & a_script,
 {
 	Q_ASSERT(m_pVapourSynthScriptProcessor);
 
-	m_cpVSAPI = m_pVSScriptLibrary->getVSAPI();
-	if(!m_cpVSAPI)
+    m_cpVSAPI = m_pVSScriptLibrary->getVSAPI();
+    if(!m_cpVSAPI)
 		return false;
 
 	if(m_pVapourSynthScriptProcessor->isInitialized())
 	{
-		stopAndCleanUp();
+        stopAndCleanUp();
 		bool finalized = m_pVapourSynthScriptProcessor->finalize();
 		if(!finalized)
 		{
@@ -112,7 +112,7 @@ bool VSScriptProcessorDialog::initialize(const QString & a_script,
 	m_cpVideoInfo = m_pVapourSynthScriptProcessor->videoInfo();
 	Q_ASSERT(m_cpVideoInfo);
 
-	m_pStatusBarWidget->setVideoInfo(m_cpVideoInfo);
+    m_pStatusBarWidget->setVideoInfo(m_cpVideoInfo);
 
 	return true;
 }
@@ -171,8 +171,9 @@ void VSScriptProcessorDialog::slotFrameQueueStateChanged(size_t a_inQueue,
 	m_framesInProcess = a_inProcess;
 	m_maxThreads = a_maxThreads;
 
-	m_pStatusBarWidget->setQueueState(m_framesInQueue, m_framesInProcess,
-		m_maxThreads);
+    emit signalFrameQueueStateChanged(m_framesInQueue, m_framesInProcess, m_maxThreads);
+//	m_pStatusBarWidget->setQueueState(m_framesInQueue, m_framesInProcess,
+//		m_maxThreads);
 }
 
 // END OF void VSScriptProcessorDialog::slotFrameQueueStateChanged(
@@ -205,7 +206,7 @@ void VSScriptProcessorDialog::closeEvent(QCloseEvent * a_pEvent)
 	if(!finalized)
 	{
 		m_wantToFinalize = true;
-		emit signalWriteLogMessage(mtWarning, trUtf8("Script processor "
+        emit signalWriteLogMessage(mtWarning, tr("Script processor "
 			"is busy. Dialog will close when it is finalized."));
 		a_pEvent->ignore();
 		return;

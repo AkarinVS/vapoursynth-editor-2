@@ -72,6 +72,14 @@ public:
 
 	bool setPreviewDialogMaximized(bool a_previewDialogMaximized);
 
+    QByteArray getBookmarkManagerDialogGeometry() const;
+
+    bool setBookmarkManagerDialogGeometry(const QByteArray & a_bookmarkManagerDialogGeometry);
+
+    QByteArray getFrameInfoDialogGeometry() const;
+
+    bool setFrameInfoDialogGeometry(const QByteArray & a_frameInfoDialogGeometry);
+
 	QByteArray getJobServerWatcherGeometry() const;
 
 	bool setJobServerWatcherGeometry(const QByteArray & a_geometry);
@@ -216,13 +224,13 @@ public:
 
 	bool setLastSnapshotExtension(const QString & a_extension);
 
-        BookmarkSavingFormat getBookmarkSavingFormat() const;
+    BookmarkSavingFormat getBookmarkSavingFormat() const;
 
-        bool setBookmarkSavingFormat(const BookmarkSavingFormat & a_format);
+    bool setBookmarkSavingFormat(const BookmarkSavingFormat & a_format);
 
-        QString getBookmarkDelimiter() const;
+    QString getBookmarkDelimiter() const;
 
-        bool setBookmarkDelimiter(const QString & a_delimiter);
+    bool setBookmarkDelimiter(const QString & a_delimiter);
 
 
 

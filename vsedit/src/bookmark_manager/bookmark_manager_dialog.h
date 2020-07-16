@@ -4,15 +4,20 @@
 #include "bookmark_model.h"
 #include "vapoursynth/VapourSynth.h"
 #include "../../common-src/settings/settings_manager.h"
+#include "../../vsedit/src/preview/script_processor.h"
 
 #include <QDialog>
 #include <QFileInfo>
 
+class ScriptEditor;
+class ScriptProcessor;
+class PreviewArea;
+
 namespace Ui {
-class BookMarkManagerDialog;
+class BookmarkManagerDialog;
 }
 
-class BookMarkManagerDialog : public QDialog
+class BookmarkManagerDialog : public QDialog
 {
     Q_OBJECT
 
@@ -22,20 +27,27 @@ class BookMarkManagerDialog : public QDialog
     };
 
 public:
-    explicit BookMarkManagerDialog(SettingsManager *a_pSettingsManager,  const VSVideoInfo *a_pVideoInfo,
-                 QString a_scriptName, QWidget *a_pParent = nullptr);
+    explicit BookmarkManagerDialog(SettingsManager * a_pSettingsManager, QWidget *a_pParent = nullptr);
 
-    ~BookMarkManagerDialog();
+    ~BookmarkManagerDialog();
+
+
 
 signals:
 
+    void signalScriptBookmarkChanged(int);
     void signalAddButtonPressed();
-    void signalGotoBookmark(int a_frameIndex);
+    void signalRemoveBookmark(QModelIndex);
+    void signalGotoBookmark(const QModelIndex a_index);
     void signalBookmarkSavedToFile(QString a_fileName);
     void signalBookmarkFileLoaded(QString a_fileName);
+    void signalClearBookmark();
+    void signalLoadBookmarkFile(QFile & a_file);
+    void signalLoadChapterFile(QFile & a_file);
+    void signalSaveBookmarksToFile();
 
 private:
-    Ui::BookMarkManagerDialog *ui;
+    Ui::BookmarkManagerDialog *ui;
 
     BookmarkModel * m_bookmarkModel;
 
@@ -44,25 +56,39 @@ private:
     double timeToSecond(double fps);
 
     QString m_scriptName;
-
     double m_fps;
-
     QString m_lastUsedFilePath;
+
+protected:
+
+    void moveEvent(QMoveEvent * a_pEvent) override;
+    void hideEvent(QHideEvent * a_pEvent) override;
+
+    void setWindowGeometry();
+    void saveGeometryDelayed();
+
+    QTimer * m_pGeometrySaveTimer;
+    QByteArray m_windowGeometry;
 
 public slots:
 
-    void slotAddBookmark(int a_frameIndex);
+    void slotAddScriptBookmark(QString a_scriptName); // add script to dropdown selection
+    void slotRemoveScriptBookmark(QString &a_scriptName);
+    void slotSetTableViewModel(BookmarkModel * a_model);
+    void slotUpdateScriptBookmarkSelection(QString &a_scriptName);
 
 private slots:
 
-    void slotRemoveBookmark();
+    void slotSendRemoveBookmarkSignal();
     void slotLoadBookmarkFile(QString a_fileName);
     void slotLoadChapterFile(QString a_fileName);
     void slotLoadFile();
-    void slotRemoveAll();
-    void slotSaveBookmarksToFile();
-    void slotGotoBookmark();
     void slotGotoBookmarkFromIndex(const QModelIndex &a_index);
+    void slotCloseDialog();
+
+protected slots:
+
+    void slotSaveGeometry();
 
 };
 

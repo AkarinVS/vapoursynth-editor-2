@@ -117,7 +117,9 @@ extern const QString DEFAULT_BOOKMARK_DELIMITER;
 //==============================================================================
 
 extern const char ACTION_ID_NEW_SCRIPT[];
+extern const char ACTION_ID_NEW_TAB[];
 extern const char ACTION_ID_OPEN_SCRIPT[];
+extern const char ACTION_ID_CLOSE_TAB[];
 extern const char ACTION_ID_SAVE_SCRIPT[];
 extern const char ACTION_ID_SAVE_SCRIPT_AS[];
 extern const char ACTION_ID_TEMPLATES[];

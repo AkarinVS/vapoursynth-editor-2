@@ -44,7 +44,9 @@ const QString DEFAULT_BOOKMARK_DELIMITER = " ";
 //==============================================================================
 
 const char ACTION_ID_NEW_SCRIPT[] = "new_script";
+const char ACTION_ID_NEW_TAB[] = "new_tab";
 const char ACTION_ID_OPEN_SCRIPT[] = "open_script";
+const char ACTION_ID_CLOSE_TAB[] = "close_tab";
 const char ACTION_ID_SAVE_SCRIPT[] = "save_script";
 const char ACTION_ID_SAVE_SCRIPT_AS[] = "save_script_as";
 const char ACTION_ID_TEMPLATES[] = "templates";

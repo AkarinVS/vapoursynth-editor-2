@@ -17,7 +17,7 @@ class PreviewArea : public QScrollArea
 
 public:
 
-	PreviewArea(QWidget * a_pParent = nullptr);
+    PreviewArea(QWidget * a_pParent = nullptr);
 
     virtual ~PreviewArea() override;
 
@@ -27,9 +27,11 @@ public:
 
 	void setPixmap(const QPixmap & a_pixmap);
 
-	void checkMouseOverPreview(const QPoint & a_globalMousePos);
+    void checkMouseOverPreview(const QPoint & a_globalMousePos);
 
 public slots:
+
+    void slotSetPreviewPixmap(QPixmap a_framePixmap);
 
 	void slotScrollLeft();
 	void slotScrollRight();
@@ -58,7 +60,7 @@ private:
 
 	void drawScrollNavigator();
 
-	QLabel * m_pPreviewLabel;
+    QLabel * m_pPreviewLabel;
 
 	ScrollNavigator * m_pScrollNavigator;
 

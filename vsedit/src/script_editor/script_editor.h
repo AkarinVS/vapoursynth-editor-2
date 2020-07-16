@@ -30,7 +30,7 @@ public:
 
 	ScriptEditor(QWidget * a_pParent = nullptr);
 
-	virtual ~ScriptEditor();
+    virtual ~ScriptEditor() override;
 
 	QString text() const;
 
@@ -44,7 +44,7 @@ public:
 
 	void setModified(bool a_modified);
 
-	void setPluginsList(const VSPluginsList & a_pluginsList);
+    void setPluginsList(const VSPluginsList & a_pluginsList);
 
 	void setSettingsManager(SettingsManager * a_pSettingsManager);
 

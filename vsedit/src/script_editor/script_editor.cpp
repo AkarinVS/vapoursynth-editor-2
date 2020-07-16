@@ -61,6 +61,8 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	, m_pActionMoveTextBlockDown(nullptr)
 	, m_pActionToggleComment(nullptr)
 {
+    setMinimumWidth(500);
+
 	m_pSideBox = new QWidget(this);
 	m_pSideBox->installEventFilter(this);
 
@@ -165,7 +167,7 @@ void ScriptEditor::setModified(bool a_modified)
 void ScriptEditor::setPluginsList(const VSPluginsList & a_pluginsList)
 {
 	m_pCompleterModel->setPluginsList(a_pluginsList);
-	m_pSyntaxHighlighter->setPluginsList(a_pluginsList);
+    m_pSyntaxHighlighter->setPluginsList(a_pluginsList);
 	update();
 }
 
@@ -174,7 +176,7 @@ void ScriptEditor::setPluginsList(const VSPluginsList & a_pluginsList)
 
 void ScriptEditor::setSettingsManager(SettingsManager * a_pSettingsManager)
 {
-	m_pSettingsManager = a_pSettingsManager;
+    m_pSettingsManager = a_pSettingsManager;
 	m_pSyntaxHighlighter->setSettingsManager(a_pSettingsManager);
 	createActionsAndMenus();
 	slotLoadSettings();

@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QMouseEvent>
 #include <QObject>
+#include <QTime>
 
 #include "timeline.h"
 #include "slider.h"
@@ -20,7 +21,14 @@ public:
 
     virtual ~TimeLineView() override;
 
+    enum DisplayMode
+    {
+        Time,
+        Frames,
+    };
+
     void setFrame (int a_frame);
+    int frame();
 
     void setFramesNumber(int a_framesNumber);
 
@@ -28,16 +36,22 @@ public:
 
     void setDisplayMode(TimeLine::DisplayMode a_displayMode);
 
-    void setPlay(bool a_playing);
+    void setPlay(bool a_playing);    
+
+    int zoomFactor();
+    void setZoomFactor(int a_zoomFactor);
+
+    void centerSliderOnCurrentFrame();
 
 signals:
 
     void signalFrameChanged(int a_frame);
     void signalJumpToFrame(int a_frame);
+    void signalHoverTime(const QTime &a_time);
 
 public slots:
 
-    void slotFrameChanged(int a_frame);
+    void slotSetTimeLine(int a_numFrame, int64_t a_fpsNum, int64_t a_fpsDen);
 
     void slotResizeSceneWidth();
 
@@ -51,13 +65,17 @@ public slots:
     void slotGoToPreviousBookmark();
     void slotGoToNextBookmark();
 
+private slots:
+
+    void slotFrameChangedHandler(int a_frame);
+
 private:
 
     QGraphicsScene *scene;
     Slider *slider;
     TimeLine *timeLine;
 
-    int m_maxFrame;
+//    int m_maxFrame;
 
     bool m_playing;
 

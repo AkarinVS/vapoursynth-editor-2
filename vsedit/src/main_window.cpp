@@ -93,7 +93,7 @@ MainWindow::MainWindow() : QMainWindow()
 		new VapourSynthPluginsManager(m_pSettingsManager, this);
 	VSPluginsList vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
 
-	m_ui.scriptEdit->setPluginsList(vsPluginsList);
+    m_ui.scriptEdit->setPluginsList(vsPluginsList);
 	m_ui.scriptEdit->setSettingsManager(m_pSettingsManager);
 
 	connect(m_ui.scriptEdit, SIGNAL(textChanged()),
@@ -101,7 +101,7 @@ MainWindow::MainWindow() : QMainWindow()
 	connect(m_ui.scriptEdit, SIGNAL(modificationChanged(bool)),
 		this, SLOT(slotChangeWindowTitle()));
 	connect(m_ui.scriptEdit,
-		SIGNAL(signalScriptFileDropped(const QString &, bool *)),
+        SIGNAL(signalScriptFileDropped(const QString & , bool *)),
 		this, SLOT(slotScriptFileDropped(const QString &, bool *)));
 
 	m_ui.logView->setName("main_log");
@@ -135,7 +135,7 @@ MainWindow::MainWindow() : QMainWindow()
 		this, SLOT(slotWriteLogMessage(const QString &, const QString &)));
 
 	m_pTemplatesDialog = new TemplatesDialog(m_pSettingsManager);
-	m_pTemplatesDialog->setPluginsList(vsPluginsList);
+    m_pTemplatesDialog->setPluginsList(vsPluginsList);
 
 	connect(m_pTemplatesDialog, SIGNAL(signalPasteCodeSnippet(const QString &)),
 		this, SLOT(slotInsertTextIntoScriptAtNewLine(const QString &)));
@@ -149,7 +149,7 @@ MainWindow::MainWindow() : QMainWindow()
 		(QObject **)&m_pTemplatesDialog
 	};
 
-	m_pJobServerWatcherSocket = new JobServerWatcherSocket(this);
+    m_pJobServerWatcherSocket = new JobServerWatcherSocket(this);
 	connect(m_pJobServerWatcherSocket,
 		SIGNAL(signalWriteLogMessage(const QString &, const QString &)),
 		this, SLOT(slotWriteLogMessage(const QString &, const QString &)));
@@ -569,10 +569,10 @@ void MainWindow::slotSettingsChanged()
 	}
 
 	m_pVapourSynthPluginsManager->slotRefill();
-	VSPluginsList vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
-	m_ui.scriptEdit->setPluginsList(vsPluginsList);
+    VSPluginsList vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
+    m_ui.scriptEdit->setPluginsList(vsPluginsList);
 	m_ui.scriptEdit->slotLoadSettings();
-	m_pTemplatesDialog->setPluginsList(vsPluginsList);
+    m_pTemplatesDialog->setPluginsList(vsPluginsList);
 	m_pTemplatesDialog->slotLoadSettings();
 }
 

@@ -6,64 +6,138 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QTime>
+#include <QTimer>
 
-BookMarkManagerDialog::BookMarkManagerDialog(SettingsManager *a_pSettingsManager,
-    const VSVideoInfo *a_pVideoInfo, QString a_scriptName, QWidget * a_pParent) :
+BookmarkManagerDialog::BookmarkManagerDialog(SettingsManager * a_pSettingsManager,
+                                             QWidget * a_pParent) :
     QDialog(a_pParent),
-    ui(new Ui::BookMarkManagerDialog),
+    ui(new Ui::BookmarkManagerDialog),
     m_pSettingsManager(a_pSettingsManager)
 {
     ui->setupUi(this);
+    setWindowGeometry();
 
-    // set fileInfo and fps
-    m_scriptName = a_scriptName;
-    m_fps = double(a_pVideoInfo->fpsNum) / double(a_pVideoInfo->fpsDen);
-    m_lastUsedFilePath = a_pSettingsManager->getLastUsedPath();
 
-    m_bookmarkModel = new BookmarkModel(this);       
-    ui->bookmarkTableView->setModel(m_bookmarkModel);    
+    // signal/slot for scriptSelectComboBox
+    connect(ui->scriptSelectComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &BookmarkManagerDialog::signalScriptBookmarkChanged);
 
-    connect(ui->addButton, &QPushButton::clicked, this, &BookMarkManagerDialog::signalAddButtonPressed);
-    connect(ui->removeButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotRemoveBookmark);
-    connect(ui->loadButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotLoadFile);
-    connect(ui->saveButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotSaveBookmarksToFile);
-    connect(ui->clearButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotRemoveAll);
-    connect(ui->gotoButton, &QPushButton::clicked, this, &BookMarkManagerDialog::slotGotoBookmark);
-    connect(ui->bookmarkTableView, &QTableView::doubleClicked, this, &BookMarkManagerDialog::slotGotoBookmarkFromIndex);
+    connect(ui->addButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::signalAddButtonPressed);
+    connect(ui->removeButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::slotSendRemoveBookmarkSignal);
+    connect(ui->loadButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::slotLoadFile);
+    connect(ui->saveButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::signalSaveBookmarksToFile);
+    connect(ui->clearButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::signalClearBookmark);
+    connect(ui->closeButton, &QPushButton::clicked,
+            this, &BookmarkManagerDialog::slotCloseDialog);
+    connect(ui->bookmarkTableView, &QTableView::doubleClicked,
+            this, &BookmarkManagerDialog::slotGotoBookmarkFromIndex);
 }
 
-BookMarkManagerDialog::~BookMarkManagerDialog()
+BookmarkManagerDialog::~BookmarkManagerDialog()
 {
-    delete ui;
+    if(m_pGeometrySaveTimer->isActive())
+    {
+        m_pGeometrySaveTimer->stop();
+        slotSaveGeometry();
+    }
+}
+
+void BookmarkManagerDialog::moveEvent(QMoveEvent *a_pEvent)
+{
+    QDialog::moveEvent(a_pEvent);
+    saveGeometryDelayed();
+}
+
+void BookmarkManagerDialog::hideEvent(QHideEvent *a_pEvent)
+{
+    QDialog::hideEvent(a_pEvent);
+    saveGeometryDelayed();
+}
+
+void BookmarkManagerDialog::setWindowGeometry()
+{
+    m_pGeometrySaveTimer = new QTimer(this);
+    m_pGeometrySaveTimer->setInterval(DEFAULT_WINDOW_GEOMETRY_SAVE_DELAY);
+    connect(m_pGeometrySaveTimer, &QTimer::timeout,
+        this, &BookmarkManagerDialog::slotSaveGeometry);
+
+    m_windowGeometry = m_pSettingsManager->getBookmarkManagerDialogGeometry();
+    if(!m_windowGeometry.isEmpty())
+        restoreGeometry(m_windowGeometry);
+}
+
+void BookmarkManagerDialog::saveGeometryDelayed()
+{
+    QApplication::processEvents();
+    if(!isMaximized())
+    {
+        m_windowGeometry = saveGeometry();
+        m_pGeometrySaveTimer->start();
+    }
+}
+
+void BookmarkManagerDialog::slotAddScriptBookmark(QString a_scriptName)
+{
+    // check for duplicate
+    int count = ui->scriptSelectComboBox->count();
+    for (int i = 0; i < count; i++) {
+        if (a_scriptName == ui->scriptSelectComboBox->itemText(i)) {
+            return;
+        }
+    }
+    ui->scriptSelectComboBox->addItem(a_scriptName);
+    slotUpdateScriptBookmarkSelection(a_scriptName);
+
+}
+
+void BookmarkManagerDialog::slotRemoveScriptBookmark(QString &a_scriptName)
+{
+    int count = ui->scriptSelectComboBox->count();
+    if (count < 1) return;
+
+    for (int i = 0; i < count; i++) {
+        if (a_scriptName == ui->scriptSelectComboBox->itemText(i)) {
+            ui->scriptSelectComboBox->removeItem(i);
+            return;
+        }
+    }
+}
+
+void BookmarkManagerDialog::slotSetTableViewModel(BookmarkModel *a_model)
+{
+    ui->bookmarkTableView->setModel(a_model);
+}
+
+void BookmarkManagerDialog::slotUpdateScriptBookmarkSelection(QString &a_scriptName)
+{
+    if (ui->scriptSelectComboBox->currentText() != a_scriptName)
+        ui->scriptSelectComboBox->setCurrentText(a_scriptName);
 }
 
 
-void BookMarkManagerDialog::slotAddBookmark(int a_frameIndex)
+void BookmarkManagerDialog::slotSendRemoveBookmarkSignal()
 {
-    if (a_frameIndex < 0) return;
-
-    int timeInMilli = double(a_frameIndex) / m_fps * double(1000);
-    m_bookmarkModel->addBookmark(a_frameIndex, timeInMilli);
-}
-
-
-void BookMarkManagerDialog::slotRemoveBookmark()
-{
+    /* first remove the cel from view table, then send signal to remove bookmark in vector */
     const QModelIndexList indexList= ui->bookmarkTableView->selectionModel()->selectedIndexes();
 
     if (indexList.isEmpty()){
-           return;
-        }
+           return;        
+    }
 
-    m_bookmarkModel->removeBookmark(indexList.first());
-
+    /* deselect cel */
     ui->bookmarkTableView->selectionModel()->select(
                 ui->bookmarkTableView->selectionModel()->selection(),
                 QItemSelectionModel::Deselect);
+
+    emit signalRemoveBookmark(indexList.first());
 }
 
-void BookMarkManagerDialog::slotLoadBookmarkFile(QString fileName)
+void BookmarkManagerDialog::slotLoadBookmarkFile(QString fileName)
 {
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -93,7 +167,7 @@ void BookMarkManagerDialog::slotLoadBookmarkFile(QString fileName)
 //	saveTimelineBookmarks();
 }
 
-void BookMarkManagerDialog::slotLoadChapterFile(QString a_fileName)
+void BookmarkManagerDialog::slotLoadChapterFile(QString a_fileName)
 {
     QFile file(a_fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -141,7 +215,7 @@ void BookMarkManagerDialog::slotLoadChapterFile(QString a_fileName)
     // loop through both list
     auto t = titleList.begin();
     auto ts = timeStampList.begin();
-    while (t != titleList.end() and ts != timeStampList.end())
+    while (t != titleList.end() && ts != timeStampList.end())
     {
       auto  x = *t++;
       auto& y = *ts++;
@@ -156,7 +230,7 @@ void BookMarkManagerDialog::slotLoadChapterFile(QString a_fileName)
 
 }
 
-void BookMarkManagerDialog::slotLoadFile()
+void BookmarkManagerDialog::slotLoadFile()
 {
     const QString fileName = QFileDialog::getOpenFileName(this,
         tr("Load chapter/bookmark file"), m_lastUsedFilePath,
@@ -165,8 +239,6 @@ void BookMarkManagerDialog::slotLoadFile()
     if (fileName.isEmpty())
         return;
     else {
-
-        QString bookmarkPattern = "^\\d+(\\D+)\\d+(?:\\1\\d+)*$";
 
         // check the file for format
         QFile file(fileName);
@@ -202,123 +274,36 @@ void BookMarkManagerDialog::slotLoadFile()
             }
         }
 
-        // check passed, assigning to their loading functions
+        /* check passed, assigning to their loading functions */
+        file.seek(0); // reset file
         if (detectedFormat == "bookmarkFormat") {
-            slotRemoveAll();
-            slotLoadBookmarkFile(fileName);
+            emit signalLoadBookmarkFile(file);
         } else if (detectedFormat == "chapterFormat") {
-            slotRemoveAll();
-            slotLoadChapterFile(fileName);
+            emit signalLoadChapterFile(file);
         }
     }
 }
 
-void BookMarkManagerDialog::slotRemoveAll()
-{
-    m_bookmarkModel->clearAll();
-}
-
-void BookMarkManagerDialog::slotSaveBookmarksToFile()
-{
-    QVector<BookmarkData> bookmarks = m_bookmarkModel->bookmarks();
-    QString delimiter = m_pSettingsManager->getBookmarkDelimiter();
-
-    if(bookmarks.count() > 0)
-    {
-        QFileInfo fileInfo(m_scriptName);
-        //get file path and fileName without extension
-        QString filePath = fileInfo.absolutePath();
-        QString scriptFileName = fileInfo.baseName();
-
-        QString fileName = QFileDialog::getSaveFileName(this,
-                            tr("Save bookmark"), filePath + QDir::separator() + scriptFileName,
-                            tr("Text file (*.txt)"));
-
-        if (fileName.isEmpty())
-            return;
-        else
-        {
-            QFile file(fileName);
-            if (!file.open(QIODevice::WriteOnly))
-            {
-                QMessageBox::information(this, tr("Unable to open file"),
-                             file.errorString());
-                return;
-            }
-
-            QStringList bookmarksStringList;
-            QString bookmarksString = "";
-
-            BookmarkSavingFormat savingFormat = m_pSettingsManager->getBookmarkSavingFormat();
-
-            switch (savingFormat) {
-            case BookmarkSavingFormat::ChapterFormat:
-                // looks for timestamp, and title later
-                for (auto it = bookmarks.begin(); it != bookmarks.end(); ++it) {
-                    int index = std::distance(bookmarks.begin(), it);
-                    int chapterCounterIndex = index + 1; // +1 to start counter at 1
-                    QTime time = QTime::fromMSecsSinceStartOfDay(it->timeInMilli);
-                    int fieldWidth = 2;
-
-                    if (chapterCounterIndex > 99) // 2 digit for < 100, 3 digit for > 100
-                        fieldWidth = 3;
-
-                    // format: CHAPTER01=00:00:00.000
-                    QString chapterTime = QString("CHAPTER%1=%2")
-                            .arg(chapterCounterIndex, fieldWidth, 10, QLatin1Char('0'))
-                            .arg(time.toString("hh:mm:ss.zzz"));
-
-                    bookmarksStringList.append(chapterTime);
-
-                    // format: CHAPTER01NAME=abcde
-                    QString chapterName = QString("CHAPTER%1NAME=%2")
-                            .arg(chapterCounterIndex, fieldWidth, 10, QLatin1Char('0'))
-                            .arg(bookmarks[index].title);
-
-                    bookmarksStringList.append(chapterName);
-                }
-                bookmarksString = bookmarksStringList.join("\n");
-                break;
-
-            case BookmarkSavingFormat::BookmarkFormat:
-                // only looks for frame number
-                for (auto i : bookmarks) {
-                    bookmarksStringList.append(QVariant(i.frame).toString());
-                }
-
-                bookmarksString = bookmarksStringList.join(delimiter);
-                break;
-            }
-
-            QTextStream out(&file);
-            out << bookmarksString;
-
-            emit signalBookmarkSavedToFile(fileName);
-        }
-    }
-}
-
-void BookMarkManagerDialog::slotGotoBookmark()
-{
-    const QModelIndexList indexList= ui->bookmarkTableView->selectionModel()->selectedIndexes();
-
-    if (indexList.isEmpty()){
-           return;
-    }
-
-    slotGotoBookmarkFromIndex(indexList.first());
-}
-
-void BookMarkManagerDialog::slotGotoBookmarkFromIndex(const QModelIndex &a_index)
+void BookmarkManagerDialog::slotGotoBookmarkFromIndex(const QModelIndex &a_index)
 {
     if (!a_index.isValid())
         return;
 
-    int frameIndex = m_bookmarkModel->selectedFrameIndex(a_index);
-    emit signalGotoBookmark(frameIndex);
+    emit signalGotoBookmark(a_index);
 
-    // deselect
+    // deselect cel
     ui->bookmarkTableView->selectionModel()->select(
                 ui->bookmarkTableView->selectionModel()->selection(),
                 QItemSelectionModel::Deselect);
+}
+
+void BookmarkManagerDialog::slotCloseDialog()
+{
+    this->hide();
+}
+
+void BookmarkManagerDialog::slotSaveGeometry()
+{
+    m_pGeometrySaveTimer->stop();
+    m_pSettingsManager->setBookmarkManagerDialogGeometry(m_windowGeometry);
 }

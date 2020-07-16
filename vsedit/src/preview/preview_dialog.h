@@ -200,7 +200,7 @@ protected:
     QStatusBar *feedbackStatusBar;
 
 	PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
-    BookMarkManagerDialog * m_pBookmarkManagerDialog;
+    BookmarkManagerDialog * m_pBookmarkManagerDialog;
 
 	int m_frameExpected;
 	int m_frameShown;

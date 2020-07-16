@@ -14,7 +14,7 @@ TimeLine::TimeLine(QWidget * a_pParent)
 
     setPos(mapToParent(0,0));
 
-    connect(this, &TimeLine::signalZoomFactorChanged, this, &TimeLine::slotZoomFactorToWidth);
+//    connect(this, &TimeLine::signalZoomFactorChanged, this, &TimeLine::slotZoomFactorToWidth);
 }
 // END OF TimeLine::TimeLine(QWidget * a_pParent)
 //==============================================================================
@@ -96,16 +96,21 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         }
     }
 }
-
 // END OF void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 //==============================================================================
+
+int TimeLine::zoomFactor()
+{
+    return m_zoomFactor;}
+
 
 void TimeLine::setZoomFactor(int a_zoomFactor)
 {
     if (a_zoomFactor >= 1) {
         m_zoomFactor = a_zoomFactor;
 
-        emit signalZoomFactorChanged();
+        slotZoomFactorToWidth();
+//        emit signalZoomFactorChanged();
     }
 }
 
@@ -227,6 +232,8 @@ void TimeLine::setFrame(int a_frame)
     int oldCurrentFrame = m_currentFrame;
     if(a_frame > m_maxFrame)
         m_currentFrame = m_maxFrame;
+    else if (a_frame < 0)
+        m_currentFrame = 0;
     else
         m_currentFrame = a_frame;
 
@@ -243,10 +250,10 @@ void TimeLine::setFrame(int a_frame)
 
 void TimeLine::setFramesNumber(int a_framesNumber)
 {
-    m_maxFrame = a_framesNumber - 1;
+    m_maxFrame = a_framesNumber;
 
-    if(m_currentFrame > m_maxFrame)
-        setFrame(m_maxFrame);
+//    if(m_currentFrame > m_maxFrame)
+//        setFrame(m_maxFrame);
     update();
 }
 
@@ -257,6 +264,11 @@ void TimeLine::setFPS(double a_fps)
 {
     m_fps = a_fps;
     update();
+}
+
+double TimeLine::fps()
+{
+    return m_fps;
 }
 
 // END OF void TimeLine::setFPS(double a_fps)
@@ -415,20 +427,34 @@ void TimeLine::slotStepDown()
 
 void TimeLine::slotZoomFactorToWidth()
 {
-    double scaleMultiplier = 0.0;
+    double scaleMultiplier = 1.0;
     int updated_width;
 
-    if (m_zoomIn) {
-        scaleMultiplier = double(1) + 0.2 * double(m_zoomFactor - 1);
-        m_accuScaleMultiplier += scaleMultiplier;
-        m_zoomIn = false;
+    if (m_zoomFactor > 5) {
+        scaleMultiplier = double(1) + 2.0 * double(m_zoomFactor - 1);
+    } else {
+        scaleMultiplier = double(1) + 0.8 * double(m_zoomFactor - 1);
     }
 
-    if (m_zoomOut) {
-        scaleMultiplier = double(1) + 0.2 * double(m_zoomFactor);
-        m_accuScaleMultiplier -= scaleMultiplier;
-        m_zoomOut = false;
-    }
+//    if (m_zoomIn) {
+//        if (m_zoomFactor > 5) {
+//            scaleMultiplier = double(1) + 2.0 * double(m_zoomFactor - 1);
+//        } else {
+//            scaleMultiplier = double(1) + 0.8 * double(m_zoomFactor - 1);
+//        }
+
+////        m_accuScaleMultiplier += scaleMultiplier;
+//        m_zoomIn = false;
+//    }
+
+//    if (m_zoomOut) {
+//        if (m_zoomFactor > 5)
+//            scaleMultiplier = double(1) + 2.0 * double(m_zoomFactor - 1);
+//        else
+//            scaleMultiplier = double(1) + 0.8 * double(m_zoomFactor - 1);
+////        m_accuScaleMultiplier -= scaleMultiplier;
+//        m_zoomOut = false;
+//    }
 
 //    qDebug() << "scale multiplier : " << scaleMultiplier;
 //    qDebug() << "accumulative scale multiplier : " << m_accuScaleMultiplier;
@@ -436,16 +462,15 @@ void TimeLine::slotZoomFactorToWidth()
     if (m_zoomFactor == 1) {
         updated_width = m_baseWidth;
     } else {
-        updated_width = int(double(m_baseWidth) * double(m_accuScaleMultiplier));
+        updated_width = int(double(m_baseWidth) * double(scaleMultiplier));
     }
 
     // if width exceeded limit 32,768, scale back zoom factor and m_accuScaleMultiplier, and exit
     if (updated_width > pow(2, 15)) {
         m_zoomFactor -= 1;
-        m_accuScaleMultiplier -= scaleMultiplier;
+//        m_accuScaleMultiplier -= scaleMultiplier;
         return;
     }
-
     setViewWidth(updated_width);
 }
 

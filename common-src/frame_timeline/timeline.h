@@ -27,6 +27,7 @@ public:
         Frames,
     };
 
+    int zoomFactor();
     void setZoomFactor(int a_zoomFactor);
 
     void reloadZoomFactor();
@@ -42,6 +43,8 @@ public:
     void setFrameByPos(int a_pos);
 
     int frameToPos(int a_frame) const;
+
+    int posToFrame(int a_pos) const;
 
     int currentFramePos();
 
@@ -61,6 +64,8 @@ public:
 
     void setFPS(double a_fps);
 
+    double fps();
+
     DisplayMode displayMode() const;
 
     void setDisplayMode(DisplayMode a_displayMode);
@@ -74,8 +79,6 @@ public:
     int getClosestBookmark(int a_frame) const;
 
 private:
-
-    int posToFrame(int a_pos) const;
 
     int m_baseWidth;
     int m_viewWidth;
@@ -125,7 +128,6 @@ signals:
     void signalZoomFactorChanged();
 
     void signalTimeLineWidthChanged();
-
 
 };
 

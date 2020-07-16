@@ -66,7 +66,6 @@ private:
 
     QVector<BookmarkData> m_bookmarkData;
 
-    double m_fps;
 };
 
 #endif // BOOKMARKMODEL_H

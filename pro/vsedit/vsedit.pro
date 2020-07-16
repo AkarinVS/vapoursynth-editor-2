@@ -147,7 +147,7 @@ contains(QMAKE_COMPILER, gcc) {
 
 	LIBS += -L$$[QT_INSTALL_LIBS]
 } else {
-	CONFIG += c++11
+    CONFIG += c++11
 }
 
 include($${COMMON_DIRECTORY}/pro/common.pri)
@@ -170,17 +170,20 @@ RCC_DIR = $${PROJECT_DIRECTORY}/generated/rcc
 
 RESOURCES = $${COMMON_DIRECTORY}/resources/vsedit.qrc
 
-FORMS += $${COMMON_DIRECTORY}/common-src/log/styled_log_view_settings_dialog.ui
+FORMS += $${COMMON_DIRECTORY}/common-src/log/styled_log_view_settings_dialog.ui \
+    ../../vsedit/src/multi_tab_main_window.ui
 
 FORMS += $${PROJECT_DIRECTORY}/src/settings/settings_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_status_bar_widget/script_status_bar_widget.ui
 FORMS += $${PROJECT_DIRECTORY}/src/preview/preview_advanced_settings_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/preview/preview_dialog.ui
+FORMS += $${PROJECT_DIRECTORY}/src/preview/frame_info_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/frame_consumers/benchmark_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/frame_consumers/encode_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/main_window.ui
+FORMS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.ui
 
 HEADERS += $${COMMON_DIRECTORY}/common-src/helpers.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/aligned_vector.h
@@ -208,6 +211,8 @@ HEADERS += $${COMMON_DIRECTORY}/common-src/timeline_slider/timeline_slider.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/zoom_ratio_spinbox.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/spinbox_extended_lineedit.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_spinbox.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_tab_widget.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/collapse_expand_widget.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.h
@@ -222,6 +227,8 @@ HEADERS += $${PROJECT_DIRECTORY}/src/preview/scroll_navigator.h
 HEADERS += $${PROJECT_DIRECTORY}/src/preview/preview_area.h
 HEADERS += $${PROJECT_DIRECTORY}/src/preview/preview_advanced_settings_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/preview/preview_dialog.h
+HEADERS += $${PROJECT_DIRECTORY}/src/preview/script_processor.h
+HEADERS += $${PROJECT_DIRECTORY}/src/preview/frame_info_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_editor/number_matcher.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_editor/syntax_highlighter.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_editor/script_completer_model.h
@@ -238,6 +245,7 @@ HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/main_window.h
+HEADERS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.h
 
 SOURCES += $${COMMON_DIRECTORY}/common-src/helpers.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/settings/settings_definitions_core.cpp
@@ -263,6 +271,8 @@ SOURCES += $${COMMON_DIRECTORY}/common-src/timeline_slider/timeline_slider.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/zoom_ratio_spinbox.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/spinbox_extended_lineedit.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_spinbox.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_tab_widget.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/collapse_expand_widget.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.cpp
@@ -277,6 +287,8 @@ SOURCES += $${PROJECT_DIRECTORY}/src/preview/scroll_navigator.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview/preview_area.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview/preview_advanced_settings_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview/preview_dialog.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/preview/script_processor.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/preview/frame_info_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_editor/number_matcher.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_editor/syntax_highlighter.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_editor/script_completer_model.cpp
@@ -293,6 +305,7 @@ SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main_window.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main.cpp
 
 include($${COMMON_DIRECTORY}/pro/local_quirks.pri)

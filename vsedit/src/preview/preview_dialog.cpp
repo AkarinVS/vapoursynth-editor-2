@@ -134,8 +134,8 @@ PreviewDialog::PreviewDialog(SettingsManager * a_pSettingsManager,
 
     createActionsAndMenus(); // for context menu on right mouse click
 
-	m_pStatusBarWidget->setColorPickerVisible(
-		m_pSettingsManager->getColorPickerVisible());
+//	m_pStatusBarWidget->setColorPickerVisible(
+//		m_pSettingsManager->getColorPickerVisible());
 
 	m_ui.frameNumberSlider->setBigStep(m_bigFrameStep);
 	m_ui.frameNumberSlider->setDisplayMode(
@@ -287,7 +287,7 @@ void PreviewDialog::previewScript(const QString& a_script,
 
 
     // test
-    setupBookmarkManager();
+//    setupBookmarkManager();
 
 
 	loadTimelineBookmarks();
@@ -487,7 +487,7 @@ void PreviewDialog::slotFrameRequestDiscarded(int a_frameNumber,
 		}
 
 		m_frameExpected = m_frameShown;
-		m_ui.frameNumberSlider->setFrame(m_frameShown);
+//		m_ui.frameNumberSlider->setFrame(m_frameShown);
         m_ui.timeLineView->setFrame(m_frameShown);
 		m_ui.frameNumberSpinBox->setValue(m_frameShown);
 		m_ui.frameStatusLabel->setPixmap(m_readyPixmap);
@@ -988,7 +988,7 @@ void PreviewDialog::slotTimeLineModeChanged()
 		m_ui.timeLineModeComboBox->setCurrentIndex(timeLineModeIndex);
 	}
 
-	m_ui.frameNumberSlider->setDisplayMode(timeLineMode);
+//	m_ui.frameNumberSlider->setDisplayMode(timeLineMode);
 	m_pSettingsManager->setTimeLineMode(timeLineMode);
 
     changingTimeLineMode = false;
@@ -1122,8 +1122,8 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 	if(!m_cpFrameRef)
 		return;
 
-	if(!m_pStatusBarWidget->colorPickerVisible())
-		return;
+//	if(!m_pStatusBarWidget->colorPickerVisible())
+//		return;
 
 	double value1 = 0.0;
 	double value2 = 0.0;
@@ -1209,7 +1209,7 @@ void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 	if(colorFamily == cmGray)
 		colorString = QString("G:%1").arg(value1);
 
-    m_pStatusBarWidget->setColorPickerString(colorString);
+//    m_pStatusBarWidget->setColorPickerString(colorString);
 }
 
 // END OF void PreviewDialog::slotPreviewAreaMouseOverPoint(float a_normX,
@@ -1221,8 +1221,8 @@ void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_norm
     if(!m_cpFrameRef)
         return;
 
-    if(!m_pStatusBarWidget->colorPickerVisible())
-        return;
+//    if(!m_pStatusBarWidget->colorPickerVisible())
+//        return;
 
     size_t frameX = 0;
     size_t frameY = 0;
@@ -1231,7 +1231,7 @@ void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_norm
     frameY = size_t(float(m_framePixmap.height()) * a_normY);
 
     QString mousePosString = QString("x:%1  y:%2").arg(frameX).arg(frameY);
-    m_pStatusBarWidget->setMousePositionString(mousePosString);
+//    m_pStatusBarWidget->setMousePositionString(mousePosString);
 }
 // END OF void PreviewDialog::slotPreviewAreaShowMousePosition(float a_normX, float a_normY)
 //==============================================================================
@@ -1262,7 +1262,7 @@ void PreviewDialog::slotAdvancedSettingsChanged()
 
 void PreviewDialog::slotToggleColorPicker(bool a_colorPickerVisible)
 {
-	m_pStatusBarWidget->setColorPickerVisible(a_colorPickerVisible);
+//	m_pStatusBarWidget->setColorPickerVisible(a_colorPickerVisible);
 	m_pSettingsManager->setColorPickerVisible(a_colorPickerVisible);
 }
 
@@ -2299,18 +2299,17 @@ void PreviewDialog::setupBookmarkManager()
     QFileInfo fileInfo(scriptName());
     const VSVideoInfo * cpVideoInfo = m_pVapourSynthScriptProcessor->videoInfo();
 
-    m_pBookmarkManagerDialog = new BookMarkManagerDialog(m_pSettingsManager, cpVideoInfo,
-                                       scriptName(), this);
+//    m_pBookmarkManagerDialog = new BookmarkManagerDialog(m_pSettingsManager, this);
 
     // connect
     connect(m_ui.openBookmarkManagerButton, &QPushButton::clicked,
             this, &PreviewDialog::slotShowBookmarkManager);
-    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalGotoBookmark,
-            this, &PreviewDialog::slotGoToBookmark);
-    connect(m_pBookmarkManagerDialog, &BookMarkManagerDialog::signalAddButtonPressed,
+//    connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalGotoBookmark,
+//            this, &PreviewDialog::slotGoToBookmark);
+    connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalAddButtonPressed,
             this, &PreviewDialog::slotResponseAddBookmark);
-    connect(this, &PreviewDialog::signalBookmarkCurrentFrame,
-            m_pBookmarkManagerDialog, &BookMarkManagerDialog::slotAddBookmark);
+//    connect(this, &PreviewDialog::signalBookmarkCurrentFrame,
+//            m_pBookmarkManagerDialog, &BookmarkManagerDialog::slotAddBookmark);
 //    connect(BookMarkManagerDialog, &BookMarkManagerDialog::signalBookmarkFileLoaded,
 //            this, &PreviewDialog::feed);
 }

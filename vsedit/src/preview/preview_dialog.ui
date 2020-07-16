@@ -826,6 +826,16 @@ QSlider::handle:horizontal {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>TimeLineView</class>
+   <extends>QGraphicsView</extends>
+   <header>../../common-src/frame_timeline/timeline_view.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GenericSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>../../common-src/qt_widgets_subclasses/generic_spinbox.h</header>
+  </customwidget>
+  <customwidget>
    <class>PreviewArea</class>
    <extends>QWidget</extends>
    <header>../../src/preview/preview_area.h</header>
@@ -841,16 +851,6 @@ QSlider::handle:horizontal {
    <class>ZoomRatioSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header>../../common-src/qt_widgets_subclasses/zoom_ratio_spinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>TimeLineView</class>
-   <extends>QGraphicsView</extends>
-   <header>../../common-src/frame_timeline/timeline_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>GenericSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>../../common-src/qt_widgets_subclasses/generic_spinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

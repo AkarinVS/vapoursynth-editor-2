@@ -10,7 +10,11 @@ ZoomRatioSpinBox::ZoomRatioSpinBox(QWidget *parent): QDoubleSpinBox(parent)
     a_pLineEdit = new SpinboxExtendedLineEdit(this);
     setLineEdit(a_pLineEdit);
 
-    // other settings were set in the ui
+    setRange(0.2, 8.0);
+    setSingleStep(0.2);
+    setDecimals(1);
+    setValue(1);
+    setPrefix("x");
 }
 
 // END OF ZoomRatioSpinBox::ZoomRatioSpinBox(QWidget *parent): QDoubleSpinBox(parent)

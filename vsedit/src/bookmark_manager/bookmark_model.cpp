@@ -120,6 +120,7 @@ bool BookmarkModel::insertRows(int row, int count, const QModelIndex &parent)
     beginInsertRows(parent, row, row + count - 1);
     // FIXME: Implement me!
     endInsertRows();
+    return false;
 }
 
 bool BookmarkModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -127,6 +128,7 @@ bool BookmarkModel::removeRows(int row, int count, const QModelIndex &parent)
     beginRemoveRows(parent, row, row + count - 1);
     // FIXME: Implement me!
     endRemoveRows();
+    return false;
 }
 
 QVector<BookmarkData> BookmarkModel::bookmarks()
@@ -186,7 +188,7 @@ void BookmarkModel::addChapter(QString a_title, int a_timeInMilli, double a_fps)
 
     beginInsertRows(QModelIndex(), newRow, newRow);
         BookmarkData data = {a_title, frameIndex, a_timeInMilli };
-    m_bookmarkData.append(data);
+        m_bookmarkData.append(data);
 
     endInsertRows();
 }
@@ -210,5 +212,3 @@ int BookmarkModel::selectedFrameIndex(const QModelIndex &index)
     int row = index.row();
     return data(createIndex(row, 1)).toInt();
 }
-
-

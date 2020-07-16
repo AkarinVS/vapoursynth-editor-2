@@ -15,20 +15,20 @@ public:
 	ScriptStatusBarWidget(QWidget * a_pParent = nullptr);
 	virtual ~ScriptStatusBarWidget();
 
-	virtual bool colorPickerVisible() const;
+//	virtual bool colorPickerVisible() const;
 
 public slots:
 
-        virtual void setColorPickerVisible(bool a_visible = true); // this needs better naming
+//    virtual void setColorPickerVisible(bool a_visible = true); // this needs better naming
 
-	virtual void setColorPickerString(const QString & a_string);
+//    virtual void setColorPickerString(const QString & a_string);
 
-        virtual void setMousePositionString(const QString & a_string);
+//    virtual void setMousePositionString(const QString & a_string);
 
-	virtual void setQueueState(size_t a_inQueue, size_t a_inProcess,
-		size_t a_maxThreads);
+    virtual void setQueueState(size_t a_inQueue, size_t a_inProcess,
+                               size_t a_maxThreads);
 
-	virtual void setVideoInfo(const VSVideoInfo * a_cpVideoInfo);
+    virtual void setVideoInfo(const VSVideoInfo * a_cpVideoInfo);
 
 protected:
 

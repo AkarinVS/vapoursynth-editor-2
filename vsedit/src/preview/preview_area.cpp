@@ -19,12 +19,15 @@ PreviewArea::PreviewArea(QWidget * a_pParent) : QScrollArea(a_pParent)
 	, m_lastCursorPos(0, 0)
 	, m_lastPreviewLabelPos(0, 0)
 {
+
+
 	m_pPreviewLabel = new QLabel(this);
 	m_pPreviewLabel->setPixmap(QPixmap());
     m_pPreviewLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     QScrollArea::setWidget(m_pPreviewLabel);
 
 	setWidgetResizable(true);
+
 
     m_pScrollNavigator = new ScrollNavigator(this);
     int scrollFrameWidth = frameWidth();
@@ -57,11 +60,11 @@ const QPixmap * PreviewArea::pixmap() const
 
 void PreviewArea::setPixmap(const QPixmap & a_pixmap)
 {
-	m_pPreviewLabel->setPixmap(a_pixmap);
+    m_pPreviewLabel->setPixmap(a_pixmap);
 }
-
 // END OF void PreviewArea::setPixmap(const QPixmap & a_pixmap)
 //==============================================================================
+
 
 void PreviewArea::checkMouseOverPreview(const QPoint & a_globalMousePos)
 {
@@ -83,6 +86,11 @@ void PreviewArea::checkMouseOverPreview(const QPoint & a_globalMousePos)
 
     emit signalMouseOverPoint(normX, normY);
     emit signalMousePosition(normX, normY);
+}
+
+void PreviewArea::slotSetPreviewPixmap(QPixmap a_framePixmap)
+{
+    setPixmap(a_framePixmap);
 }
 
 // END OF void PreviewArea::checkMouseOverPreview(

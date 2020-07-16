@@ -56,7 +56,7 @@ bool VSScriptLibrary::initialize()
 	int opresult = vssInit();
 	if(!opresult)
 	{
-		QString errorString = trUtf8("Failed to initialize "
+        QString errorString = tr("Failed to initialize "
 			"VapourSynth environment!");
 		emit signalWriteLogMessage(mtCritical, errorString);
 		finalize();
@@ -67,7 +67,7 @@ bool VSScriptLibrary::initialize()
 	m_cpVSAPI = vssGetVSApi();
 	if(!m_cpVSAPI)
 	{
-		QString errorString = trUtf8("Failed to get VapourSynth API!");
+        QString errorString = tr("Failed to get VapourSynth API!");
 		emit signalWriteLogMessage(mtCritical, errorString);
 		finalize();
 		return false;
@@ -239,10 +239,10 @@ bool VSScriptLibrary::initLibrary()
 
 #ifdef Q_OS_WIN64
 		basePath = environment.value("ProgramFiles(x86)");
-		libraryFullPath = basePath + "\\VapourSynth\\core64\\vsscript.dll";
+        libraryFullPath = basePath + "\\VapourSynth\\core\\vsscript.dll";
 #else
-		basePath = environment.value("ProgramFiles");
-		libraryFullPath = basePath + "\\VapourSynth\\core32\\vsscript.dll";
+        basePath = environment.value("ProgramFiles");
+        libraryFullPath = basePath + "\\VapourSynth\\core\\vsscript.dll";
 #endif // Q_OS_WIN64
 
 		m_vsScriptLibrary.setFileName(libraryFullPath);

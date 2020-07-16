@@ -66,6 +66,8 @@ protected slots:
 
 signals:
 
+    void signalFrameQueueStateChanged(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads);
+
 	void signalWriteLogMessage(int a_messageType,
 		const QString & a_message);
 
