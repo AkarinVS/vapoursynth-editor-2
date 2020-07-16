@@ -307,8 +307,8 @@ void MultiTabMainWindow::createMenuBarActionsAndMenus()
 
     ActionToCreate actionsToCreate[] =
     {
-        {&m_pActionNewScript, ACTION_ID_NEW_SCRIPT,
-            this, SLOT(slotNewScript())},
+//        {&m_pActionNewScript, ACTION_ID_NEW_SCRIPT,
+//            this, SLOT(slotNewScript())},
         {&m_pActionNewTab, ACTION_ID_NEW_TAB,
             this, SLOT(slotCreateTab())},
         {&m_pActionOpenScript, ACTION_ID_OPEN_SCRIPT,
