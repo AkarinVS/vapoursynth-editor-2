@@ -13,7 +13,7 @@
 
 class SettingsManager : public SettingsManagerCore
 {
-public:
+public:        
 
 	SettingsManager(QObject * a_pParent);
 	virtual ~SettingsManager();
@@ -49,6 +49,11 @@ public:
 	QColor getColor(const QString & a_colorID) const;
 
 	bool setColor(const QString & a_colorID, const QColor & a_color);
+
+    QString getThemeName() const;
+
+    bool setThemeName(const QString & a_themeName);
+
 
 	//----------------------------------------------------------------------
 
@@ -231,8 +236,6 @@ public:
     QString getBookmarkDelimiter() const;
 
     bool setBookmarkDelimiter(const QString & a_delimiter);
-
-
 
 private:
 

@@ -116,6 +116,8 @@ private:
 
 	void createActionsAndMenus();
 
+    void loadThemeSettings();
+
 	QString getVapourSynthCoreName() const;
 
 	void setChildrenCoreName(const QString & a_coreName);

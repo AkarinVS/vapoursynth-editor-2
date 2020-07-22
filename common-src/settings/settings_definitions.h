@@ -39,6 +39,12 @@ enum class BookmarkSavingFormat
     ChapterFormat,
 };
 
+enum class ThemeSelectionFlag
+{
+    Import,
+    Export,
+};
+
 struct StandardAction
 {
 	QString id;
@@ -113,6 +119,7 @@ extern const char DEFAULT_DROP_FILE_TEMPLATE[];
 extern const int DEFAULT_MAX_WATCHER_CONNECTION_ATTEMPTS;
 extern const BookmarkSavingFormat DEFAULT_BOOKMARK_SAVING_FORMAT;
 extern const QString DEFAULT_BOOKMARK_DELIMITER;
+extern const QString DEFAULT_THEME_NAME;
 
 //==============================================================================
 

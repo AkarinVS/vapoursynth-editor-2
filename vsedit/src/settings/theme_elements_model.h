@@ -11,21 +11,21 @@ class SettingsManager;
 
 enum class ThemeElementType
 {
-	TextCharFormat,
-	Color
+    TextCharFormat,
+    NonTextCharFormat
 };
 
 struct ThemeElementData
 {
-	ThemeElementType type;
-	QString id;
+    QString id;
+	ThemeElementType type;	
 	QString text;
 	QIcon icon;
-	QTextCharFormat textCharFormat;
+    QTextCharFormat textCharFormat;
 	QColor color;
 };
 
-typedef std::vector<ThemeElementData> ThemeElementsList;
+typedef QVector<ThemeElementData> ThemeElementsList;
 
 class ThemeElementsModel : public QAbstractItemModel
 {
@@ -33,10 +33,10 @@ class ThemeElementsModel : public QAbstractItemModel
 
 public:
 
-	ThemeElementsModel(SettingsManager * a_pSettingsManager,
+    ThemeElementsModel(SettingsManager * a_pSettingsManager, QString a_themeName,
 		QObject * a_pParent = nullptr);
 
-	virtual ~ThemeElementsModel();
+    virtual ~ThemeElementsModel() override;
 
 	QModelIndex index(int a_row, int a_column,
 		const QModelIndex & a_parent = QModelIndex()) const override;
@@ -59,25 +59,39 @@ public:
 
 	void addThemeElement(const ThemeElementData & a_themeElementData);
 
-	void addTextCharFormat(const QString & a_id, const QString & a_text);
+    void addTextCharFormat(const QString & a_id, const QString & a_text,
+                           const QTextCharFormat & a_charFormat);
 
-	void addColor(const QString & a_id, const QString & a_text);
+    void addNonTextCharFormat(const QString & a_id, const QString & a_text,
+                              const QColor & a_color);
 
-	void reloadThemeSettings();
+    static ThemeElementsList getThemeFromListStringByName (QString &a_themeListString, const QString &a_themeName);
 
-	ThemeElementData getThemeElementData(const QString & a_id);
+    static QString removeThemeFromListString (QString &a_themeListString, const QString &a_themeName);
 
-	bool saveThemeElementData(const ThemeElementData & a_themeElementData);
+    ThemeElementData getThemeElementData(const QString & a_id);
+
+    bool setThemeElementData (const QString & a_id, ThemeElementData & a_themeElementData);
+
+    void fromThemeElementsList (const ThemeElementsList & a_themeElementsList);
+
+    ThemeElementsList toThemeElementsList();
+
+    QString themeName();
+
+    void clear();
 
 public slots:
 
-	void slotSaveThemeSettings();
+//	void slotSaveThemeSettings();
 
 private:
 
 	ThemeElementsList m_themeElementsList;
 
 	SettingsManager * m_pSettingsManager;
+
+    QString m_themeName;
 };
 
 #endif // THEME_ELEMENTS_MODEL_H_INCLUDED

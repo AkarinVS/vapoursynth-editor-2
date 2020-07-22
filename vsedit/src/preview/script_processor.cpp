@@ -397,7 +397,6 @@ bool ScriptProcessor::slotPlay(bool a_play)
 
     if(m_playing)
     {
-//		m_pActionPlay->setIcon(m_iconPause);
         m_lastFrameRequestedForPlay = m_frameShown;
         slotProcessPlayQueue();
     }
@@ -405,7 +404,6 @@ bool ScriptProcessor::slotPlay(bool a_play)
     {
         clearFramesCache();
         m_pVapourSynthScriptProcessor->flushFrameTicketsQueue();
-//		m_pActionPlay->setIcon(m_iconPlay);
     }
 
     return m_playing;
@@ -415,7 +413,6 @@ void ScriptProcessor::slotSetPlaySpeed(double a_secondsPerFrames)
 {
 //    if (m_secondsBetweenFrames == a_secondsPerFrames) return;
     m_secondsBetweenFrames = a_secondsPerFrames;
-
 }
 
 void ScriptProcessor::slotShowFrame(int a_frameNumber)

@@ -1,4 +1,5 @@
 CONFIG += qt
+CONFIG += c++17
 
 QT += widgets
 QT += network
@@ -174,6 +175,7 @@ FORMS += $${COMMON_DIRECTORY}/common-src/log/styled_log_view_settings_dialog.ui 
     ../../vsedit/src/multi_tab_main_window.ui
 
 FORMS += $${PROJECT_DIRECTORY}/src/settings/settings_dialog.ui
+FORMS += $${PROJECT_DIRECTORY}/src/settings/theme_select_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_status_bar_widget/script_status_bar_widget.ui
 FORMS += $${PROJECT_DIRECTORY}/src/preview/preview_advanced_settings_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/preview/preview_dialog.ui
@@ -213,6 +215,7 @@ HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/spinbox_extende
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_spinbox.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_tab_widget.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/collapse_expand_widget.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_stringlist_model.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.h
@@ -221,6 +224,7 @@ HEADERS += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/item_delegate_for_hotkey.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/theme_elements_model.h
+HEADERS += $${PROJECT_DIRECTORY}/src/settings/theme_select_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/settings_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_status_bar_widget/script_status_bar_widget.h
 HEADERS += $${PROJECT_DIRECTORY}/src/preview/scroll_navigator.h
@@ -273,6 +277,7 @@ SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/spinbox_extende
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_spinbox.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_tab_widget.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/collapse_expand_widget.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_stringlist_model.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.cpp
@@ -281,6 +286,7 @@ SOURCES += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/item_delegate_for_hotkey.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/theme_elements_model.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/settings/theme_select_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/settings_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/script_status_bar_widget/script_status_bar_widget.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview/scroll_navigator.cpp

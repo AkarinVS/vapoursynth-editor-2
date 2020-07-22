@@ -40,6 +40,7 @@ const int DEFAULT_MAX_WATCHER_CONNECTION_ATTEMPTS = 5;
 const BookmarkSavingFormat DEFAULT_BOOKMARK_SAVING_FORMAT =
         BookmarkSavingFormat::ChapterFormat;
 const QString DEFAULT_BOOKMARK_DELIMITER = " ";
+const QString DEFAULT_THEME_NAME = "Default Theme";
 
 //==============================================================================
 

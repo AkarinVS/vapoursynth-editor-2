@@ -1,13 +1,19 @@
 #include "settings_dialog.h"
 
 #include "../../../common-src/settings/settings_manager.h"
+#include "../../common-src/helpers.h"
+
 #include "item_delegate_for_hotkey.h"
 #include "theme_elements_model.h"
+#include "theme_select_dialog.h"
 
 #include <QFileDialog>
 #include <QListWidgetItem>
 #include <QFontDialog>
 #include <QColorDialog>
+#include <QMessageBox>
+#include <QRandomGenerator>
+#include <QStandardPaths>
 
 //==============================================================================
 
@@ -22,6 +28,8 @@ SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
 	, m_pActionsHotkeyEditModel(nullptr)
 	, m_pItemDelegateForHotkey(nullptr)
 	, m_pThemeElementsModel(nullptr)
+    , m_themePresetsFileName("")
+    , m_tempThemePresets("")
 {
 	m_ui.setupUi(this);
 	setWindowIcon(QIcon(":settings.png"));
@@ -45,13 +53,31 @@ SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
 
 	m_ui.hotkeysTable->resizeColumnsToContents();
 
-	m_pThemeElementsModel = new ThemeElementsModel(m_pSettingsManager, this);
-	m_ui.themeElementsList->setModel(m_pThemeElementsModel);
-	addThemeElements();
+    /* theme setting */
+    m_ui.themePresetCopyWidget->setVisible(false);
+    loadThemePresets();
+
+    // signal for theme preset
+    connect(m_ui. copyThemePresetButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotShowThemePresetCopyWidget);
+    connect(m_ui.cancelThemePresetCopyButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotCancelThemePresetCopy);
+    connect(m_ui.saveThemePresetButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotSaveThemePreset);
+    connect(m_ui. removeThemePresetButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotRemoveThemePreset);
+    connect(m_ui.exportThemePresetButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotHandleThemeExport);
+    connect(m_ui.importThemePresetButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotHandleThemeImport);
+    connect(m_ui.themePresetSelectionComboBox, &QComboBox::currentTextChanged,
+            this, &SettingsDialog::slotChangeThemePreset);
+
 
 	connect(m_ui.okButton, SIGNAL(clicked()), this, SLOT(slotOk()));
 	connect(m_ui.applyButton, SIGNAL(clicked()), this, SLOT(slotApply()));
 	connect(m_ui.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(this, &QDialog::rejected, this, &SettingsDialog::slotCancel);
 
 	connect(m_ui.addVSLibraryPathButton, SIGNAL(clicked()),
 		this, SLOT(slotAddVSLibraryPath()));
@@ -74,7 +100,7 @@ SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
 	connect(m_ui.selectVSDocumentationPathButton, SIGNAL(clicked()),
 		this, SLOT(slotSelectVSDocumentationPath()));
 
-	connect(m_ui.themeElementsList, SIGNAL(clicked(const QModelIndex &)),
+    connect(m_ui.themeElementsListView, SIGNAL(clicked(const QModelIndex &)),
 		this, SLOT(slotThemeElementSelected(const QModelIndex &)));
 	connect(m_ui.fontButton, SIGNAL(clicked()),
 		this, SLOT(slotFontButtonClicked()));
@@ -153,53 +179,214 @@ void SettingsDialog::slotCall()
 
 	m_pActionsHotkeyEditModel->reloadHotkeysSettings();
 
-	m_pThemeElementsModel->reloadThemeSettings();
+    QModelIndex firstElement = m_pActionsHotkeyEditModel->index(0, 0);
+    m_ui.themeElementsListView->setCurrentIndex(firstElement);
 
-	QModelIndex firstElement = m_pActionsHotkeyEditModel->index(0, 0);
-	m_ui.themeElementsList->setCurrentIndex(firstElement);
-
-	show();
+    show();
 }
 
 // END OF void SettingsDialog::slotCall()
 //==============================================================================
 
-void SettingsDialog::addThemeElements()
+void SettingsDialog::loadDefaultThemePreset()
 {
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_COMMON_SCRIPT_TEXT,
-		trUtf8("Common script text"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_KEYWORD,
-		trUtf8("Keyword"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_OPERATOR,
-		trUtf8("Operator"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_STRING,
-		trUtf8("String"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_NUMBER,
-		trUtf8("Number"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_COMMENT,
-		trUtf8("Comment"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_VS_CORE,
-		trUtf8("VapourSynth core"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_VS_NAMESPACE,
-		trUtf8("VapourSynth namespace"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_VS_FUNCTION,
-		trUtf8("VapourSynth function"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_VS_ARGUMENT,
-		trUtf8("VapourSynth argument"));
-	m_pThemeElementsModel->addTextCharFormat(TEXT_FORMAT_ID_TIMELINE,
-		trUtf8("Timeline labels"));
-	m_pThemeElementsModel->addColor(COLOR_ID_TEXT_BACKGROUND,
-		trUtf8("Text background color"));
-	m_pThemeElementsModel->addColor(COLOR_ID_ACTIVE_LINE,
-		trUtf8("Active line color"));
-	m_pThemeElementsModel->addColor(COLOR_ID_SELECTION_MATCHES,
-		trUtf8("Selection matches color"));
-	m_pThemeElementsModel->addColor(COLOR_ID_TIMELINE_BOOKMARKS,
-		trUtf8("Timeline bookmarks color"));
-}
+    delete m_pThemeElementsModel;
+    m_pThemeElementsModel = new ThemeElementsModel(m_pSettingsManager,
+        DEFAULT_THEME_NAME, this);
 
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_COMMON_SCRIPT_TEXT,
+                tr("Common script text"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_COMMON_SCRIPT_TEXT));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_KEYWORD,
+                tr("Keyword"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_KEYWORD));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_OPERATOR,
+                tr("Operator"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_OPERATOR));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_STRING,
+                tr("String"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_STRING));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_NUMBER,
+                tr("Number"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_NUMBER));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_COMMENT,
+                tr("Comment"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_COMMENT));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_VS_CORE,
+                tr("VapourSynth core"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_VS_CORE));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_VS_NAMESPACE,
+                tr("VapourSynth namespace"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_VS_NAMESPACE));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_VS_FUNCTION,
+                tr("VapourSynth function"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_VS_FUNCTION));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_VS_ARGUMENT,
+                tr("VapourSynth argument"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_VS_ARGUMENT));
+
+    m_pThemeElementsModel->addTextCharFormat(
+                TEXT_FORMAT_ID_TIMELINE,
+                tr("Timeline labels"),
+                m_pSettingsManager->getDefaultTextFormat(TEXT_FORMAT_ID_TIMELINE));
+
+    m_pThemeElementsModel->addNonTextCharFormat(
+                COLOR_ID_TEXT_BACKGROUND,
+                tr("Text background color"),
+                m_pSettingsManager->getDefaultColor(COLOR_ID_TEXT_BACKGROUND));
+
+    m_pThemeElementsModel->addNonTextCharFormat(
+                COLOR_ID_ACTIVE_LINE,
+                tr("Active line color"),
+                m_pSettingsManager->getDefaultColor(COLOR_ID_ACTIVE_LINE));
+
+    m_pThemeElementsModel->addNonTextCharFormat(
+                COLOR_ID_SELECTION_MATCHES,
+                tr("Selection matches color"),
+                m_pSettingsManager->getDefaultColor(COLOR_ID_SELECTION_MATCHES));
+
+    m_pThemeElementsModel->addNonTextCharFormat(
+                COLOR_ID_TIMELINE_BOOKMARKS,
+                tr("Timeline bookmarks color"),
+                m_pSettingsManager->getDefaultColor(COLOR_ID_TIMELINE_BOOKMARKS));
+
+    m_ui.themeElementsListView->setModel(m_pThemeElementsModel);
+}
 // END OF void SettingsDialog::addThemeElements()
 //==============================================================================
+
+void SettingsDialog::loadThemePresets()
+{
+    m_tempThemePresets.clear();
+    m_pThemePresetsListModel = new GenericStringListModel();
+
+    /* copy theme_presets.txt content to tempThemePresets and read it off stream
+     * load from temp string and add preset names to theme list model
+     * the list model will then update combobox automatically
+    */
+    QFile file("theme_presets.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        file.open(QIODevice::WriteOnly); // create file if it doesn't exist
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+    }
+
+    QTextStream out(&file);
+    QTextStream in(&m_tempThemePresets);
+
+    /* copy theme_presets content to local string */
+    m_tempThemePresets = file.readAll();
+    file.close();
+
+    bool foundOne(false);
+
+    QRegularExpression rePresetName("^\\[(.+)\\]"); // match for [preset name]
+
+    in.seek(0);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+
+        QRegularExpressionMatch reMatchPresetName = rePresetName.match(line);
+        QString presetName("");
+
+        if (reMatchPresetName.hasMatch()) {
+            foundOne = true;
+            presetName = reMatchPresetName.captured(1);
+            m_pThemePresetsListModel->append(presetName);
+        }
+    }   
+
+    if (!foundOne) {
+        /* if no theme found, empty file and set default theme to text, then recopy text to stream */
+        file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate );
+
+        loadDefaultThemePreset();
+        addThemeToTextStream(out, DEFAULT_THEME_NAME);
+
+        file.close();
+        file.open(QIODevice::ReadOnly | QIODevice::Text );
+        m_tempThemePresets.clear();
+        in.seek(0);
+        in << file.readAll();
+
+        m_pThemePresetsListModel->append(DEFAULT_THEME_NAME);
+    }
+
+    m_ui.themePresetSelectionComboBox->setModel(m_pThemePresetsListModel);
+
+    // catch if saved theme selection doesn't exist
+    QString savedThemePreset = m_pSettingsManager->getThemeName();
+    if (!m_pThemePresetsListModel->stringList().contains(savedThemePreset)) {
+        m_pSettingsManager->setThemeName(DEFAULT_THEME_NAME);
+    }
+
+    /* set selection from saved setting */
+    savedThemePreset = m_pSettingsManager->getThemeName();
+    if (savedThemePreset != m_ui.themePresetSelectionComboBox->currentText()) {
+        m_ui.themePresetSelectionComboBox->setCurrentText(savedThemePreset);
+    }
+
+    slotChangeThemePreset(m_pSettingsManager->getThemeName());
+}
+
+void SettingsDialog::addThemeToTextStream(QTextStream &out, const QString &a_themeName)
+{
+    ThemeElementsList themeElementsList = m_pThemeElementsModel->toThemeElementsList();
+    out << "[" << a_themeName << "]\n";
+
+    for (auto &themeElement : themeElementsList) {
+        out << themeElement.id << "; ";
+        out << int(themeElement.type) << "; ";
+        out << themeElement.text << "; ";
+
+        if (themeElement.type == ThemeElementType::TextCharFormat) {
+            out << themeElement.textCharFormat << "\n";
+        } else {
+            out << themeElement.color.name() << "\n";
+        }
+    }
+}
+
+// END OF void SettingsDialog::loadThemeGroupPresets()
+//==============================================================================
+
+void SettingsDialog::saveThemeSettings()
+{
+    m_pSettingsManager->setThemeName(
+                m_ui.themePresetSelectionComboBox->currentText());
+
+    QFile file("theme_presets.txt");
+    if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text )) {
+        QMessageBox::information(this, tr("Unable to write to file"),
+                                 file.errorString());
+        return;
+    }
+
+    QTextStream out(&file);
+    out << m_tempThemePresets;
+}
+
+// END OF void SettingsDialog::saveThemeSettings()
+//==============================================================================
+
 
 void SettingsDialog::slotOk()
 {
@@ -279,12 +466,20 @@ void SettingsDialog::slotApply()
 
 	m_pActionsHotkeyEditModel->slotSaveActionsHotkeys();
 
-	m_pThemeElementsModel->slotSaveThemeSettings();
+    saveThemeSettings();
 
-	emit signalSettingsChanged();
+    emit signalSettingsChanged();
 }
 
 // END OF void SettingsDialog::slotApply()
+//==============================================================================
+
+void SettingsDialog::slotCancel()
+{
+    loadThemePresets();
+}
+
+// END OF void SettingsDialog::slotCancel()
 //==============================================================================
 
 void SettingsDialog::slotAddVSLibraryPath()
@@ -321,7 +516,7 @@ void SettingsDialog::slotRemoveVSLibraryPath()
 void SettingsDialog::slotSelectVSLibraryPath()
 {
 	QString path = QFileDialog::getExistingDirectory(this,
-		trUtf8("Select VapourSynth library search path"),
+        tr("Select VapourSynth library search path"),
 		m_ui.vsLibraryPathEdit->text());
 	if(!path.isEmpty())
 		m_ui.vsLibraryPathEdit->setText(path);
@@ -364,7 +559,7 @@ void SettingsDialog::slotRemoveVSPluginsPath()
 void SettingsDialog::slotSelectVSPluginsPath()
 {
 	QString path = QFileDialog::getExistingDirectory(this,
-		trUtf8("Select VapourSynth plugins path"),
+        tr("Select VapourSynth plugins path"),
 		m_ui.vsPluginsPathEdit->text());
 	if(!path.isEmpty())
 		m_ui.vsPluginsPathEdit->setText(path);
@@ -407,7 +602,7 @@ void SettingsDialog::slotRemoveVSDocumentationPath()
 void SettingsDialog::slotSelectVSDocumentationPath()
 {
 	QString path = QFileDialog::getExistingDirectory(this,
-		trUtf8("Select documentation path"),
+        tr("Select documentation path"),
 		m_ui.vsDocumentationPathEdit->text());
 	if(!path.isEmpty())
 		m_ui.vsDocumentationPathEdit->setText(path);
@@ -449,7 +644,7 @@ void SettingsDialog::slotThemeElementSelected(const QModelIndex & a_index)
 		m_ui.colourFrame->setPalette(newPalette);
 		m_ui.colourFrame->update();
 	}
-	else if(themeElementData.type == ThemeElementType::Color)
+    else if(themeElementData.type == ThemeElementType::NonTextCharFormat)
 	{
 		m_ui.fontButton->setEnabled(false);
 		m_ui.colourButton->setEnabled(true);
@@ -472,8 +667,9 @@ void SettingsDialog::slotThemeElementSelected(const QModelIndex & a_index)
 
 void SettingsDialog::slotFontButtonClicked()
 {
-	QModelIndex index = m_ui.themeElementsList->currentIndex();
+    QModelIndex index = m_ui.themeElementsListView->currentIndex();
 	QString id = m_pThemeElementsModel->data(index, Qt::UserRole).toString();
+    QString selectedThemeName = m_pThemeElementsModel->themeName();
 	ThemeElementData themeElementData =
 		m_pThemeElementsModel->getThemeElementData(id);
 
@@ -485,9 +681,60 @@ void SettingsDialog::slotFontButtonClicked()
 
 	QFont newFont = fontDialog.selectedFont();
 	themeElementData.textCharFormat.setFont(newFont);
-	m_pThemeElementsModel->saveThemeElementData(themeElementData);
 	m_ui.fontLabel->setText(newFont.family());
 	m_ui.fontLabel->setFont(newFont);
+
+    // store to stream
+    QString tempStream("");
+    QTextStream out(&tempStream);
+
+    QTextStream in(&m_tempThemePresets);
+    in.seek(0);
+
+    QRegularExpression reThemeHeader("^\\[(.+)\\]"); // match for [preset name]
+
+    /* match for element with textCharFormat string  [a; 0; c; textChar] */
+    QRegularExpression reTextCharElements("^([\\w\\d\\s]+)\\s*;\\s*([0]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*([\\w\\d\\s,-|#]+)$");
+
+//    /* match for element with non textCharFormat string  [a; 1; c; #ffffff] */
+    QRegularExpression reNonTextElements("^([\\w\\d\\s]+)\\s*;\\s*([1]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*(#[a-z0-9]{6})\\s*$");
+
+    QString capturedThemeName("");
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QRegularExpressionMatch matchThemeHeader = reThemeHeader.match(line);
+        QRegularExpressionMatch matchTextCharElements = reTextCharElements.match(line);
+        QRegularExpressionMatch matchNonTextCharElements = reNonTextElements.match(line);
+
+        if (matchTextCharElements.hasMatch()) {
+            // match found, rewrite this line
+            if (id == matchTextCharElements.captured(1).trimmed() &&
+                    capturedThemeName == selectedThemeName) {
+                out << matchTextCharElements.captured(1).trimmed() << "; ";
+                out << matchTextCharElements.captured(2).trimmed() << "; ";
+                out << matchTextCharElements.captured(3).trimmed() << "; ";
+                out << newFont.toString() << " | ";
+                out << themeElementData.textCharFormat.foreground().color().name() << " | ";
+                out << newFont.weight() << "\n";
+            } else {
+                out << line << "\n";
+            }
+        }
+
+        if (matchNonTextCharElements.hasMatch()) {
+            out << line << "\n";
+        }
+
+        if (matchThemeHeader.hasMatch()) {
+            capturedThemeName = matchThemeHeader.captured(1).trimmed();
+            out << line << "\n";
+        }
+    }
+    /* copy temp stream to active stream */
+    m_tempThemePresets.clear();
+    in.seek(0);
+    in << out.readAll();
 }
 
 // END OF void SettingsDialog::slotFontButtonClicked()
@@ -495,8 +742,10 @@ void SettingsDialog::slotFontButtonClicked()
 
 void SettingsDialog::slotColourButtonClicked()
 {
-	QModelIndex index = m_ui.themeElementsList->currentIndex();
+    QModelIndex index = m_ui.themeElementsListView->currentIndex();
 	QString id = m_pThemeElementsModel->data(index, Qt::UserRole).toString();
+    QString selectedThemeName = m_pThemeElementsModel->themeName();
+
 	ThemeElementData themeElementData =
 		m_pThemeElementsModel->getThemeElementData(id);
 
@@ -507,7 +756,7 @@ void SettingsDialog::slotColourButtonClicked()
 		colorDialog.setCurrentColor(
 		themeElementData.textCharFormat.foreground().color());
 	}
-	else if(themeElementData.type == ThemeElementType::Color)
+    else if(themeElementData.type == ThemeElementType::NonTextCharFormat)
 		colorDialog.setCurrentColor(themeElementData.color);
 
 	int returnCode = colorDialog.exec();
@@ -533,8 +782,10 @@ void SettingsDialog::slotColourButtonClicked()
 			themeElementData.textCharFormat.foreground().color());
 		m_ui.colourFrame->setPalette(newPalette);
 		m_ui.colourFrame->update();
+
+
 	}
-	else if(themeElementData.type == ThemeElementType::Color)
+    else if(themeElementData.type == ThemeElementType::NonTextCharFormat)
 	{
 		themeElementData.color = newColor;
 
@@ -544,8 +795,311 @@ void SettingsDialog::slotColourButtonClicked()
 		m_ui.colourFrame->update();
 	}
 
-	m_pThemeElementsModel->saveThemeElementData(themeElementData);
+    /* update color dialog to reflect selected color */
+    m_pThemeElementsModel->setThemeElementData(id,themeElementData);
+
+    // store to stream
+    QString tempStream("");
+    QTextStream out(&tempStream);
+
+    QTextStream in(&m_tempThemePresets);
+    in.seek(0);
+
+    QRegularExpression reThemeHeader("^\\[(.+)\\]"); // match for [preset name]
+
+    /* match for element with textCharFormat string  [a; 0; c; textChar] */
+    QRegularExpression reTextCharElements("^([\\w\\d\\s]+)\\s*;\\s*([0]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*([\\w\\d\\s,-|#]+)$");
+
+//    /* match for element with non textCharFormat string  [a; 1; c; #ffffff] */
+    QRegularExpression reNonTextElements("^([\\w\\d\\s]+)\\s*;\\s*([1]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*(#[a-z0-9]{6})\\s*$");
+
+    QString capturedThemeName("");
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QRegularExpressionMatch matchThemeHeader = reThemeHeader.match(line);
+        QRegularExpressionMatch matchTextCharElements = reTextCharElements.match(line);
+        QRegularExpressionMatch matchNonTextCharElements = reNonTextElements.match(line);
+
+        if (matchTextCharElements.hasMatch()) {
+            // match found, rewrite this line
+            if (id == matchTextCharElements.captured(1).trimmed() &&
+                    capturedThemeName == selectedThemeName) {
+                out << matchTextCharElements.captured(1).trimmed() << "; ";
+                out << matchTextCharElements.captured(2).trimmed() << "; ";
+                out << matchTextCharElements.captured(3).trimmed() << "; ";
+
+                QStringList fontStrings = matchTextCharElements.captured(4).split("|");
+                out << fontStrings[0].trimmed() << " | ";
+                out << newColor.name() << " | ";
+                out << fontStrings[2].trimmed() << "\n";
+            } else {
+                out << line << "\n";
+            }
+        }
+
+        if (matchNonTextCharElements.hasMatch()) {
+            // match found, rewrite this line
+            if (id == matchNonTextCharElements.captured(1).trimmed() &&
+                    capturedThemeName == selectedThemeName) {
+                out << matchNonTextCharElements.captured(1).trimmed() << "; ";
+                out << matchNonTextCharElements.captured(2).trimmed() << "; ";
+                out << matchNonTextCharElements.captured(3).trimmed() << "; ";
+                out << newColor.name() << "\n";
+            } else {
+                out << line << "\n";
+            }
+        }
+
+        if (matchThemeHeader.hasMatch()) {
+            capturedThemeName = matchThemeHeader.captured(1).trimmed();
+            out << line << "\n";
+        }
+    }
+    /* copy temp stream to active stream */
+    m_tempThemePresets.clear();
+    in.seek(0);
+    in << out.readAll();
 }
 
 // END OF void SettingsDialog::slotColourButtonClicked()
 //==============================================================================
+
+void SettingsDialog::slotShowThemePresetCopyWidget()
+{
+    if (m_ui.themePresetCopyWidget->isVisible()) return;
+    m_ui.themePresetCopyWidget->show();
+    m_ui.themePresetControllerWidget->hide();
+
+    QString selectedTheme = m_ui.themePresetSelectionComboBox->currentText();
+    m_ui.themePresetLineEdit->setText(selectedTheme + "*");
+    m_ui.themePresetLineEdit->selectAll();
+    m_ui.themePresetLineEdit->setFocus();
+}
+
+void SettingsDialog::slotCancelThemePresetCopy()
+{
+    // empty stuff then set import widget visible
+    if (m_ui.themePresetCopyWidget->isVisible())
+        m_ui.themePresetCopyWidget->hide();
+
+    m_ui.themePresetLineEdit->clear();
+
+    if (m_ui.themePresetControllerWidget->isVisible()) return;
+    m_ui.themePresetControllerWidget->show();
+}
+
+void SettingsDialog::slotSaveThemePreset()
+{
+    if (!m_ui.themePresetCopyWidget->isVisible()) return;
+
+    QString themeToCopy = m_ui.themePresetSelectionComboBox->currentText();
+    QString newThemeName = m_ui.themePresetLineEdit->text().trimmed();
+
+    // check for duplicate name
+    if (m_pThemePresetsListModel->stringList().contains(newThemeName)) {
+        QMessageBox::information(this, tr("Duplicated Theme Name"),
+                                 tr("Theme name already existed"));
+        m_ui.themePresetLineEdit->selectAll();
+        m_ui.themePresetLineEdit->setFocus();
+        return;
+    }
+    m_ui.themePresetLineEdit->clear();
+    m_ui.themePresetCopyWidget->hide();
+    m_ui.themePresetControllerWidget->show();
+
+    QTextStream out(&m_tempThemePresets);
+    addThemeToTextStream(out, newThemeName);
+    m_pThemePresetsListModel->append(newThemeName);
+}
+
+void SettingsDialog::slotHandleThemeExport()
+{
+    /* create a selection dialog to choose themes to export */
+    ThemeSelectDialog * themeSelectDialog = new ThemeSelectDialog(
+                m_pThemePresetsListModel->stringList(),
+                ThemeSelectionFlag::Export, this);
+    themeSelectDialog->show();
+
+    connect(themeSelectDialog, &ThemeSelectDialog::signalExportSelectedList,
+            this, &SettingsDialog::slotExportSelectedThemePresets);
+}
+
+void SettingsDialog::slotExportSelectedThemePresets(QStringList &a_selectedThemePresets)
+{
+    QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    QString fileName = QFileDialog::getSaveFileName(this,
+                        tr("Export theme preset"), defaultDir + QDir::separator() + tr("theme"),
+                        tr("Theme file (*.txt)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QFile::Truncate ))
+    {
+        QMessageBox::information(this, tr("Unable to open destination file"),
+                                 file.errorString());
+        return;
+    }
+
+    QTextStream in(&m_tempThemePresets);
+    in.seek(0);
+    QTextStream out(&file);
+
+    QRegularExpression reThemeHeader("^\\[(.+)\\]"); // match for [preset name]
+    QRegularExpression reThemeElements("^(.+);(.+);(.+);(.+)"); // match for a;b;c;d
+
+    QString capturedThemeName("");
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QRegularExpressionMatch matchThemeHeader = reThemeHeader.match(line);
+        QRegularExpressionMatch matchThemeElements = reThemeElements.match(line);
+
+        if (matchThemeElements.hasMatch()) {
+            if (a_selectedThemePresets.contains(capturedThemeName))
+                out << line << "\n";
+        }
+
+        if (matchThemeHeader.hasMatch()) {
+            capturedThemeName = matchThemeHeader.captured(1);
+            if (a_selectedThemePresets.contains(capturedThemeName)) { // copy to export
+                out << line << "\n";
+            }
+        }
+    }
+}
+
+void SettingsDialog::slotHandleThemeImport()
+{
+    m_themePresetsFileName = QFileDialog::getOpenFileName(this,
+        tr("Load theme file"), "",
+        tr("Theme file (*.txt)"));
+
+    if (m_themePresetsFileName.isEmpty())
+        return;
+
+    QFile file(m_themePresetsFileName);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::information(this, tr("Unable to open file"),
+                                 file.errorString());
+        return;
+    }
+
+    QRegularExpression rePresetName("^\\[(.+)\\]"); // match for [preset name]
+    QStringList themePresetNameList;
+    QString capturedThemeName("");
+
+    /* scan stream for preset names, store them in a qstringlist for filtering */
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+
+        QRegularExpressionMatch matchPresetName = rePresetName.match(line);
+
+        if (matchPresetName.hasMatch()) {
+            capturedThemeName = matchPresetName.captured(1).trimmed();
+            themePresetNameList.append(capturedThemeName);
+        }
+    }
+
+    if (themePresetNameList.count() < 1) {
+        QMessageBox::information(this, tr("No theme found"),
+                                 tr("No theme preset found"));
+        return;
+    }
+    ThemeSelectDialog * themeSelectDialog = new ThemeSelectDialog(
+                themePresetNameList, ThemeSelectionFlag::Import, this);
+    themeSelectDialog->show();
+
+    connect(themeSelectDialog, &ThemeSelectDialog::signalImportSelectedList,
+            this, &SettingsDialog::slotImportSelectedThemePresets);
+}
+
+void SettingsDialog::slotImportSelectedThemePresets(QStringList & a_selectedThemePresets)
+{
+    if (m_themePresetsFileName == "") return;
+
+    QFile readFile(m_themePresetsFileName);
+    readFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    QTextStream in(&readFile);
+    QTextStream out(&m_tempThemePresets);
+    out.seek(0);
+
+    QRegularExpression reThemeHeader("^\\[(.+)\\]"); // match for [preset name]
+
+    /* match for element with textCharFormat string  [a; 0; c; textChar] */
+    QRegularExpression reTextCharElements("^([\\w\\d\\s]+)\\s*;\\s*([0]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*([\\w\\d\\s,-|#]+)$");
+
+    /* match for element with non textCharFormat string  [a; 1; c; #ffffff] */
+    QRegularExpression reNonTextElements("^([\\w\\d\\s]+)\\s*;\\s*([1]{1})\\s*;\\s*([\\w\\d\\s]+)\\s*;\\s*(#[a-z0-9]{6})\\s*$");
+
+    QString capturedThemeName("");
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QRegularExpressionMatch matchThemeHeader = reThemeHeader.match(line);
+        QRegularExpressionMatch matchTextCharElements = reTextCharElements.match(line);
+        QRegularExpressionMatch matchNonTextCharElements = reNonTextElements.match(line);
+
+        if (matchTextCharElements.hasMatch()|| matchNonTextCharElements.hasMatch()) {
+            if (a_selectedThemePresets.contains(capturedThemeName))
+                out << line << "\n";
+        }
+
+        if (matchThemeHeader.hasMatch()) {
+            capturedThemeName = matchThemeHeader.captured(1).trimmed();
+
+            if (a_selectedThemePresets.contains(capturedThemeName)) {
+                // check import name to local, rename it if name exist
+                if (m_pThemePresetsListModel->stringList().contains(capturedThemeName)) {
+                    QString newName = capturedThemeName + "_"
+                            + QVariant(rand() % 10000 + 1).toString();
+
+                    m_pThemePresetsListModel->append(newName);
+                    out << "[" << newName << "]" << "\n";
+                } else {
+                    m_pThemePresetsListModel->append(capturedThemeName);
+                    out << line << "\n";
+                }
+            }
+        }
+    }
+}
+
+void SettingsDialog::slotChangeThemePreset(const QString &a_themePreset)
+{
+    delete m_pThemeElementsModel;
+    m_pThemeElementsModel = new ThemeElementsModel(m_pSettingsManager, a_themePreset);
+
+    ThemeElementsList elementlist =
+            ThemeElementsModel::getThemeFromListStringByName(m_tempThemePresets, a_themePreset);
+
+    m_pThemeElementsModel->fromThemeElementsList(elementlist);
+    m_ui.themeElementsListView->setModel(m_pThemeElementsModel);
+}
+
+void SettingsDialog::slotRemoveThemePreset()
+{
+    if (m_pThemePresetsListModel->stringList().count() == 1) return;
+    QString selectedThemePreset = m_ui.themePresetSelectionComboBox->currentText();
+
+    /* don't remove default */
+    if (selectedThemePreset == DEFAULT_THEME_NAME) return;
+    m_pThemePresetsListModel->removeOne(selectedThemePreset);   
+
+    m_tempThemePresets =
+            ThemeElementsModel::removeThemeFromListString(m_tempThemePresets, selectedThemePreset);
+}
+
+/* overloaded operator for QTextCharFormat data */
+/* outputting as [monospace,10,-1,7,50,0,0,0,1,0 | #ffffff | 75] */
+QTextStream &operator<<(QTextStream &out, const QTextCharFormat &b)
+{
+    out << b.font().toString() << " | ";
+    out << b.foreground().color().name() << " | ";
+    out << b.fontWeight();
+    return out;
+}

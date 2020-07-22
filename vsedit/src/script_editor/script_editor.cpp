@@ -4,7 +4,7 @@
 #include "script_completer.h"
 #include "syntax_highlighter.h"
 #include "../../../common-src/settings/settings_manager.h"
-#include "../settings/settings_dialog.h"
+#include "../../src/settings/theme_elements_model.h"
 
 #include <QTextBlock>
 #include <QCursor>
@@ -179,7 +179,7 @@ void ScriptEditor::setSettingsManager(SettingsManager * a_pSettingsManager)
     m_pSettingsManager = a_pSettingsManager;
 	m_pSyntaxHighlighter->setSettingsManager(a_pSettingsManager);
 	createActionsAndMenus();
-	slotLoadSettings();
+    slotLoadSettings();
 }
 
 // END OF void ScriptEditor::setSettingsManager(
@@ -220,30 +220,8 @@ void ScriptEditor::slotLoadSettings()
 	m_charactersTypedToStartCompletion =
 		m_pSettingsManager->getCharactersTypedToStartCompletion();
 
-	m_commonScriptTextFormat = m_pSettingsManager->getTextFormat(
-		TEXT_FORMAT_ID_COMMON_SCRIPT_TEXT);
-	QFont commonScriptTextFont = m_commonScriptTextFormat.font();
-	document()->setDefaultFont(commonScriptTextFont);
-
-	m_tabText = m_pSettingsManager->getTabText();
-	m_spacesInTab = m_pSettingsManager->getSpacesInTab();
-	QFontMetrics metrics(commonScriptTextFont);
-	setTabStopWidth(metrics.width(' ') * m_spacesInTab);
-
-	m_backgroundColor = m_pSettingsManager->getColor(COLOR_ID_TEXT_BACKGROUND);
-	QColor textColor = m_commonScriptTextFormat.foreground().color();
-
-	QString sheet = QString("QFrame {color: %1; background-color: %2;}")
-		.arg(textColor.name()).arg(m_backgroundColor.name());
-	setStyleSheet(sheet);
-
-	m_activeLineColor = m_pSettingsManager->getColor(COLOR_ID_ACTIVE_LINE);
-	m_selectionMatchesColor =
-		m_pSettingsManager->getColor(COLOR_ID_SELECTION_MATCHES);
-	m_highlightSelectionMatches =
-		m_pSettingsManager->getHighlightSelectionMatches();
-	m_highlightSelectionMatchesMinLength =
-		m_pSettingsManager->getHighlightSelectionMatchesMinLength();
+    /* load theme */
+    loadThemeSettings();
 
 	QKeySequence hotkey;
 	for(QAction * pAction : m_settableActionsList)
@@ -930,10 +908,66 @@ void ScriptEditor::createActionsAndMenus()
 		addAction(pAction);
 		m_settableActionsList.push_back(pAction);
 		connect(pAction, SIGNAL(triggered()), this, item.slotToConnect);
-	}
+    }
+}
+// END OF void ScriptEditor::createActionsAndMenus()
+//==============================================================================
+
+void ScriptEditor::loadThemeSettings()
+{
+    QString savedThemeName = m_pSettingsManager->getThemeName();
+
+    QFile file("theme_presets.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        file.open(QIODevice::WriteOnly); // create file if it doesn't exist
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+    }
+
+    QTextStream in(&file);
+    QString themePresetsList(in.readAll());
+
+    ThemeElementsList elementsList =
+            ThemeElementsModel::getThemeFromListStringByName(themePresetsList, savedThemeName);
+
+    /* load values from theme element list */
+
+    for (auto &element : elementsList) {
+        if (element.id == TEXT_FORMAT_ID_COMMON_SCRIPT_TEXT)
+            m_commonScriptTextFormat = element.textCharFormat;
+        if (element.id == COLOR_ID_TEXT_BACKGROUND) {
+            m_backgroundColor = element.color;
+        }
+        if (element.id == COLOR_ID_ACTIVE_LINE) {
+            m_activeLineColor = element.color;
+        }
+        if (element.id == COLOR_ID_SELECTION_MATCHES) {
+            m_selectionMatchesColor = element.color;
+        }
+
+    }
+
+    QFont commonScriptTextFont = m_commonScriptTextFormat.font();
+    document()->setDefaultFont(commonScriptTextFont);
+
+    m_tabText = m_pSettingsManager->getTabText();
+    m_spacesInTab = m_pSettingsManager->getSpacesInTab();
+    QFontMetrics metrics(commonScriptTextFont);
+    setTabStopWidth(metrics.width(' ') * m_spacesInTab);
+
+    QColor textColor = m_commonScriptTextFormat.foreground().color();
+
+    QString sheet = QString("QFrame {color: %1; background-color: %2;}")
+        .arg(textColor.name()).arg(m_backgroundColor.name());
+    setStyleSheet(sheet);
+
+    m_highlightSelectionMatches =
+        m_pSettingsManager->getHighlightSelectionMatches();
+    m_highlightSelectionMatchesMinLength =
+        m_pSettingsManager->getHighlightSelectionMatchesMinLength();
+
 }
 
-// END OF void ScriptEditor::createActionsAndMenus()
+// END OF void ScriptEditor::loadThemeSettings()
 //==============================================================================
 
 QString ScriptEditor::getVapourSynthCoreName() const

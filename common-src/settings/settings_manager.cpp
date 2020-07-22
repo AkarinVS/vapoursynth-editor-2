@@ -51,6 +51,8 @@ const char ALWAYS_KEEP_CURRENT_FRAME_KEY[] = "always_keep_current_frame";
 const char LAST_SNAPSHOT_EXTENSION_KEY[] = "last_snapshot_extension";
 const char BOOKMARK_SAVING_FORMAT_KEY[] = "bookmark_saving_format";
 const char BOOKMARK_DELIMITER_KEY[] = "bookmark_delimiter";
+const char THEME_NAME_KEY[] = "theme_name";
+
 //==============================================================================
 
 const char HOTKEYS_GROUP[] = "hotkeys";
@@ -300,7 +302,7 @@ QTextCharFormat SettingsManager::getDefaultTextFormat(
 	else if(a_textFormatID == TEXT_FORMAT_ID_KEYWORD)
 	{
 		defaultFormat.setForeground(QColor("#0EAA95"));
-		defaultFormat.setFontWeight(QFont::Bold);
+        defaultFormat.setFontWeight(QFont::Bold);
 	}
 	else if(a_textFormatID == TEXT_FORMAT_ID_OPERATOR)
 	{
@@ -413,7 +415,21 @@ QColor SettingsManager::getColor(const QString & a_colorID) const
 bool SettingsManager::setColor(const QString & a_colorID,
 	const QColor & a_color)
 {
-	return setValueInGroup(THEME_GROUP, a_colorID, a_color.name());
+    return setValueInGroup(THEME_GROUP, a_colorID, a_color.name());
+}
+
+//==============================================================================
+
+QString SettingsManager::getThemeName() const
+{
+    return value(THEME_NAME_KEY, DEFAULT_THEME_NAME).toString();
+}
+
+//==============================================================================
+
+bool SettingsManager::setThemeName(const QString &themeName)
+{
+    return setValue(THEME_NAME_KEY, themeName);
 }
 
 //==============================================================================
@@ -754,7 +770,7 @@ bool SettingsManager::setColorPickerVisible(bool a_colorPickerVisible)
 PlayFPSLimitMode SettingsManager::getPlayFPSLimitMode() const
 {
 	return (PlayFPSLimitMode)value(PLAY_FPS_LIMIT_MODE_KEY,
-		(int)DEFAULT_PLAY_FPS_LIMIT_MODE).toInt();
+        int(DEFAULT_PLAY_FPS_LIMIT_MODE)).toInt();
 }
 
 bool SettingsManager::setPlayFPSLimitMode(PlayFPSLimitMode a_mode)
