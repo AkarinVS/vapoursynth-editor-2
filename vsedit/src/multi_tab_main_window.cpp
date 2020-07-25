@@ -31,6 +31,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pVapourSynthPluginsManager(nullptr)
   , m_pStatusBarWidget(nullptr)
   , m_previousTabIndex(0)
+  , m_playing(false)
 {
     m_ui->setupUi(this);
 
@@ -70,7 +71,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createJobServerWatcher();
 
     connect(m_ui->displayModeToggleButton, &QPushButton::clicked,
-            this, &MultiTabMainWindow::slotDisplayModeChanged);
+            this, &MultiTabMainWindow::slotTimeLineDisplayModeChanged);
 
     connect(m_ui->frameNumberIndicatorSpinBox, QOverload<int>::of(&GenericSpinBox::valueChanged),
             this, &MultiTabMainWindow::slotShowFrameFromTimeLine);
@@ -122,12 +123,10 @@ void MultiTabMainWindow::slotCreateTab()
     connect(ep.previewArea, &PreviewArea::signalMouseOverPoint,
         this, &MultiTabMainWindow::slotPreviewAreaMouseOverPoint);
 
-
     // autocomplete feature in editor
     VSPluginsList vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
     ep.editor->setPluginsList(vsPluginsList);
     ep.editor->setSettingsManager(m_pSettingsManager);
-
 
     // create new tab for editor and previewArea
     int tabCount = m_ui->scriptTabWidget->count();
@@ -135,7 +134,7 @@ void MultiTabMainWindow::slotCreateTab()
     m_ui->scriptTabWidget->addTab(ep.editor, tabName);
     m_ui->previewTabWidget->addTab(ep.previewArea, tabName);
 
-    ep.scriptName = "";
+    ep.scriptName = QString("script_%1").arg(rand() % 10000 + 1);
     m_pEditorPreviewVector.append(ep);
 
     // add script to bookmark manager
@@ -768,7 +767,6 @@ bool MultiTabMainWindow::loadScriptFromFile(const QString &a_filePath)
     m_pBenchmarkDialog->resetSavedRange();
 
     return true;
-
 }
 
 bool MultiTabMainWindow::safeToCloseFile()
@@ -978,6 +976,24 @@ void MultiTabMainWindow::slotRemoveTab()
     QString scriptName = m_pEditorPreviewVector[currentTabIndex].scriptName;
     processor->cleanUpOnClose();
 
+    // remove script from compare group
+    for (auto &group : m_compareGroupList) {
+        group.erase(
+            std::remove_if (group.begin(), group.end(),
+                [&scriptName](ClipItem const & item) {
+                        return item.scriptName == scriptName;
+                    }),
+            group.end());
+    }
+
+    // remove group from grouplist if it has no item
+    m_compareGroupList.erase(
+        std::remove_if (m_compareGroupList.begin(), m_compareGroupList.end(),
+            [](CompareGroup const & group) {
+                    return group.count() < 1;
+                }),
+        m_compareGroupList.end());
+
     m_ui->scriptTabWidget->removeTab(currentTabIndex); // remove tab
     m_ui->previewTabWidget->removeTab(currentTabIndex);
     m_pEditorPreviewVector.remove(currentTabIndex); // remove widgets from vector
@@ -996,24 +1012,46 @@ void MultiTabMainWindow::slotChangePreviewTab(int a_index)
         m_ui->scriptTabWidget->setCurrentIndex(a_index);
 }
 
-void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_currentTabIndex, int a_selectedTabIndex)
+void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex)
 {
-    QString script = m_pEditorPreviewVector[a_currentTabIndex].processor->script();
+    ScriptProcessor *processor = m_pEditorPreviewVector[a_leftTabIndex].processor;
+    QString script = processor->script();
     if (script.isEmpty())
         return;
 
+    QString scriptName = processor->scriptName();
+
     // save timeline frame number and zoom ratio from last tab
-    int currentFrame = m_pEditorPreviewVector[a_currentTabIndex].processor->currentFrame();
+    int currentFrame = processor->currentFrame();
     int currentZoomRatio = m_ui->timeLineView->zoomFactor();
 
-    int savedFrame = m_pEditorPreviewVector[a_currentTabIndex].lastTimeLineFrameIndex;
-    int savedRatio = m_pEditorPreviewVector[a_currentTabIndex].lastZoomRatio;
+    /* check to see if current and next tab are in same group */
+    int leftClipGroup = m_pEditorPreviewVector[a_leftTabIndex].group;
+    int rightClipGroup = m_pEditorPreviewVector[a_rightTabIndex].group;
 
-    if (savedFrame != currentFrame)
-        m_pEditorPreviewVector[a_currentTabIndex].lastTimeLineFrameIndex = currentFrame;
+    /* if same group, copy current frame index and zoom ratio of left clip to right clip */
+    if (leftClipGroup == rightClipGroup) {
 
-    if (savedRatio != currentZoomRatio)
-        m_pEditorPreviewVector[a_currentTabIndex].lastZoomRatio = currentZoomRatio;
+        m_pEditorPreviewVector[a_rightTabIndex].lastTimeLineFrameIndex = currentFrame;
+        m_pEditorPreviewVector[a_rightTabIndex].lastZoomRatio = currentZoomRatio;
+
+        if (processor->isPlaying()) {
+            processor->slotPlay(false);
+            m_playing = true;
+            m_currentPlayingFrame = currentFrame;
+        }
+    } else {
+        /* search for all other clip with the same group and copy current frame to them */
+        for (auto &ep : m_pEditorPreviewVector) {
+            if (ep.group == leftClipGroup) {
+                ep.lastTimeLineFrameIndex = currentFrame;
+                ep.lastZoomRatio = currentZoomRatio;
+            }
+        }
+
+        m_playing = false;
+        processor->slotPlay(m_playing);
+    }
 }
 
 void MultiTabMainWindow::slotChangeScriptTab(int a_index)
@@ -1027,34 +1065,47 @@ void MultiTabMainWindow::slotChangeScriptTab(int a_index)
     if (a_index < 0) return;
 
     // check if current tab have script running
-    QString script = m_pEditorPreviewVector[a_index].processor->script();
+    ScriptProcessor *processor = m_pEditorPreviewVector[a_index].processor;
+    QString script = processor->script();
+
     if (!script.isEmpty()) {
         m_ui->timeLineView->setEnabled(true);
 
-        // load last saved frame and zoom factor for timelineview
-        int lastFrame = m_pEditorPreviewVector[a_index].lastTimeLineFrameIndex;
-        int lastZoomRatio = m_pEditorPreviewVector[a_index].lastZoomRatio;
+        int savedFrame = m_pEditorPreviewVector[a_index].lastTimeLineFrameIndex;
+        int savedZoomRatio = m_pEditorPreviewVector[a_index].lastZoomRatio;
 
         /* reset time line and set last saved frame and zoomfactor */
-        ScriptProcessor * processor = m_pEditorPreviewVector[a_index].processor;
         const VSVideoInfo * vsVideoInfo = processor->vsVideoInfo(); // retrieve numFrames and fps
 
         slotSetTimeLineAndIndicator(vsVideoInfo->numFrames, vsVideoInfo->fpsNum, vsVideoInfo->fpsDen);
-        m_ui->timeLineView->setZoomFactor(lastZoomRatio);
-        m_ui->timeLineView->setFrame(lastFrame);
+        m_ui->timeLineView->setZoomFactor(savedZoomRatio);
+
+        if (m_playing) {
+            processor->slotGotoFrame(m_currentPlayingFrame);
+            processor->slotPlay(true);
+        } else {
+            m_pActionPlay->setIcon(m_iconPlay);
+
+            m_ui->timeLineView->setFrame(savedFrame);
+            processor->showFrameFromTimeLine(savedFrame); // call this to actually show frame
+        }
 
         m_ui->timeLineView->centerSliderOnCurrentFrame();
+
+        slotSetPlayFPSLimit();
 
         m_pStatusBarWidget->show();
         m_pStatusBarWidget->setVideoInfo(vsVideoInfo);
 
         /* change script bookmark in bookmark manager */
-        QString scriptName = m_pEditorPreviewVector[a_index].scriptName;
+        QString scriptName = processor->scriptName();
         m_pBookmarkManagerDialog->slotUpdateScriptBookmarkSelection(scriptName);
+
     } else {
         // set satusbar to null
         m_pStatusBarWidget->hide();
         m_ui->timeLineView->setEnabled(false);
+
     }
 }
 
@@ -1071,16 +1122,53 @@ void MultiTabMainWindow::slotPreviewScript()
 
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
 
-
     if (processor->previewScript(script, scriptName)) {
         if (!m_ui->timeLineView->isEnabled())
             m_ui->timeLineView->setEnabled(true);
 
-        slotDisplayModeChanged(); // set display mode
+        slotTimeLineDisplayModeChanged(); // set display mode
+        slotSetPlayFPSLimit(); // set fps play limit
+
 
         const VSVideoInfo * vsVideoInfo = processor->vsVideoInfo();
         m_pStatusBarWidget->setVideoInfo(vsVideoInfo); // set status bar
         m_pStatusBarWidget->show();
+
+        /* create for compare tab */
+        ClipProp prop(vsVideoInfo->numFrames, vsVideoInfo->height, vsVideoInfo->width);
+        ClipItem vi(scriptName, prop);
+
+        CompareGroup newGroup;
+
+        /* add clip to compare group */
+        /* if group list is empty, set vidinfo as the first group */
+        if (m_compareGroupList.count() < 1) {
+            newGroup.append(vi);
+            m_pEditorPreviewVector[currentIndex].group = m_compareGroupList.count();
+            m_compareGroupList.append(newGroup);
+        } else {
+            for (auto &group : m_compareGroupList) {
+                auto groupIndex = &group - m_compareGroupList.data(); // gives index access
+
+                for (auto &item : group) {
+                    // check if item script name exist in group, if it exist, don't do anything
+                    if (item.scriptName == vi.scriptName) {
+                        goto endLoop;
+                    } else {
+                        if (item.properties == vi.properties) {
+                            group.append(vi);
+                            m_pEditorPreviewVector[currentIndex].group = int(groupIndex);
+                            goto endLoop;
+                        }
+                    }
+                }
+            }
+            newGroup.append(vi);
+            m_pEditorPreviewVector[currentIndex].group = m_compareGroupList.count();
+            m_compareGroupList.append(newGroup);
+
+        }
+        endLoop:;
     }
 }
 
@@ -1090,7 +1178,7 @@ void MultiTabMainWindow::slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_
     m_ui->timeLineView->slotSetTimeLine(a_numFrames, a_fpsNum, a_fpsDen);
 }
 
-void MultiTabMainWindow::slotDisplayModeChanged()
+void MultiTabMainWindow::slotTimeLineDisplayModeChanged()
 {
     TimeLine::DisplayMode timeLineDisplayMode = TimeLine::DisplayMode::Frames;
 
@@ -1128,7 +1216,6 @@ void MultiTabMainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
         m_ui->frameTimeTimeEdit->setTime(time);
 
     processor->showFrameFromTimeLine(a_frameNumber);
-    /* processor and timeline signal/slot was created on tab creation */
 }
 
 
@@ -1431,8 +1518,8 @@ void MultiTabMainWindow::slotPlay(bool a_play)
         m_pActionPlay->setIcon(m_iconPlay);
     }
 
+    m_playing = playing;
     m_ui->timeLineView->setPlay(playing); // passing the flag into timeline
-
 }
 
 void MultiTabMainWindow::slotSetPlayFPSLimit()
@@ -1489,8 +1576,7 @@ void MultiTabMainWindow::slotSetPlayFPSLimit()
     processor->slotSetPlaySpeed(secondsBetweenFrames);
     m_ui->playFpsLimitLineEdit->setText(outputText);
 
-
-//	m_pSettingsManager->setPlayFPSLimitMode(selectedValue);
+//	m_pSettingsManager->setPlayFPSLimitMode(mode);
 //	m_pSettingsManager->setPlayFPSLimit(limit);
 
 }
@@ -2076,4 +2162,9 @@ void MultiTabMainWindow::slotWriteLogMessage(const QString & a_message,
 
     QUrl fileUrl = QUrl::fromLocalFile(filePath);
     QDesktopServices::openUrl(fileUrl);
+}
+
+inline bool operator==(const ClipProp& lhs, const ClipProp& rhs)
+{
+    return lhs.tie() == rhs.tie();
 }

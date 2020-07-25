@@ -33,7 +33,36 @@ struct EditorPreview {
     QString scriptName;
     int lastTimeLineFrameIndex;
     int lastZoomRatio;
+    int group;
 };
+
+struct ClipProp {
+    int frameNums;
+    int width;
+    int height;
+
+    ClipProp(int fn, int w, int h)
+        : frameNums(fn), width(w), height(h)
+    {}
+
+    auto tie() const {
+        return std::tie(frameNums, width, height);
+    }
+};
+
+struct ClipItem {
+    QString scriptName;
+    ClipProp properties;
+
+    ClipItem(QString sn, ClipProp cp)
+        : scriptName(sn), properties(cp)
+    {}
+};
+
+typedef QVector<ClipItem> CompareGroup;
+
+/* operator implementation to compare clip item.properties for grouping */
+inline bool operator==(const ClipProp& lhs, const ClipProp& rhs);
 
 class MultiTabMainWindow : public QMainWindow
 {
@@ -102,7 +131,6 @@ private:
 
     /* Toolbar */
     QToolBar * mainToolBar;
-
 
     /* menu actions */
     bool saveScriptToFile(const QString& a_filePath);
@@ -193,6 +221,8 @@ private:
     /* playback icon */
     QIcon m_iconPlay;
     QIcon m_iconPause;
+    bool m_playing;
+    int m_currentPlayingFrame;
 
     /* editor parameters */
     QString m_lastSavedText;
@@ -204,6 +234,8 @@ private:
 
     bool m_setScriptBookmarkFromBookmarkManager;
 
+    /* compare group */
+    QVector<CompareGroup> m_compareGroupList;
 
 public slots:
 
@@ -216,12 +248,12 @@ private slots:
     void slotCreateTab();
     void slotRemoveTab();
     void slotChangePreviewTab(int a_index);
-    void slotSaveTabBeforeChanged(int a_currentTabIndex, int a_selectedTabIndex);
+    void slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex);
     void slotChangeScriptTab(int a_index);
     void slotPreviewScript();
     void slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen);
 
-    void slotDisplayModeChanged();
+    void slotTimeLineDisplayModeChanged();
     void slotShowFrameFromTimeLine(int a_frameNumber);
     void slotJumpPlayFromTimeLine(int a_frameNumber);
     void slotUpdateFrameTimeIndicators(int a_frameNumber, const QTime &a_time); // update frame spinbox and time edit

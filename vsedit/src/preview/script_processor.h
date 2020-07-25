@@ -32,6 +32,8 @@ public:
 
     void showFrameFromFrameIndicator(int a_frameNumber);
 
+    bool isPlaying();
+
 
 
 protected:
@@ -72,7 +74,6 @@ protected slots:
 
     void slotProcessPlayQueue();
 
-
     void slotShowFrame(int a_frameNumber);
 
 public slots:
@@ -80,6 +81,7 @@ public slots:
     void slotJumpPlay(int a_frameNumber); // set frame when jump in timeline during play
     bool slotPlay(bool a_play);
     void slotSetPlaySpeed(double a_secondsPerFrames);
+    void slotGotoFrame(int a_frameNumber);
 
 signals:
 

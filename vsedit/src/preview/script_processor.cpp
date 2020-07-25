@@ -139,9 +139,6 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
 
     setScriptName(a_scriptName);
 
-//    setupBookmarkManager();
-
-
 //	loadTimelineBookmarks();
 
 //    if(m_pSettingsManager->getPreviewDialogMaximized())
@@ -167,6 +164,11 @@ void ScriptProcessor::showFrameFromTimeLine(int a_frameNumber)
 void ScriptProcessor::showFrameFromFrameIndicator(int a_frameNumber)
 {
 
+}
+
+bool ScriptProcessor::isPlaying()
+{
+    return m_playing;
 }
 
 void ScriptProcessor::stopAndCleanUp()
@@ -415,6 +417,14 @@ void ScriptProcessor::slotSetPlaySpeed(double a_secondsPerFrames)
     m_secondsBetweenFrames = a_secondsPerFrames;
 }
 
+void ScriptProcessor::slotGotoFrame(int a_frameNumber)
+{
+    if ((a_frameNumber > m_cpVideoInfo->numFrames) || (a_frameNumber < 0))
+        m_frameShown = 0;
+
+    m_frameShown = a_frameNumber;
+}
+
 void ScriptProcessor::slotShowFrame(int a_frameNumber)
 {
     if(m_playing)
@@ -436,6 +446,7 @@ void ScriptProcessor::slotShowFrame(int a_frameNumber)
     if(requested)
     {
         m_frameExpected = a_frameNumber;
+
 //		m_ui.frameStatusLabel->setPixmap(m_busyPixmap);
     }
     // if requested frame failed, send last success requested frame
