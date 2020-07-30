@@ -14,7 +14,6 @@ public:
     ZoomRatioSpinBox(QWidget *parent = nullptr);
 
 protected:
-    // reimplement wheelEvent for more reasonable scale when zoom out
     virtual void wheelEvent(QWheelEvent * a_pEvent) override;
     virtual void mousePressEvent(QMouseEvent * a_pEvent) override;
     virtual void keyPressEvent(QKeyEvent * a_pEvent) override;

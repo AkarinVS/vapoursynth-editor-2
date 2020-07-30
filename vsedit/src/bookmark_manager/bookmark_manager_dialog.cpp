@@ -17,9 +17,8 @@ BookmarkManagerDialog::BookmarkManagerDialog(SettingsManager * a_pSettingsManage
     ui->setupUi(this);
     setWindowGeometry();
 
-
     // signal/slot for scriptSelectComboBox
-    connect(ui->scriptSelectComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    connect(ui->scriptSelectComboBox, &QComboBox::currentTextChanged,
             this, &BookmarkManagerDialog::signalScriptBookmarkChanged);
 
     connect(ui->addButton, &QPushButton::clicked,
@@ -81,31 +80,23 @@ void BookmarkManagerDialog::saveGeometryDelayed()
     }
 }
 
-void BookmarkManagerDialog::slotAddScriptBookmark(QString a_scriptName)
+void BookmarkManagerDialog::slotAddScriptBookmark(QString &a_scriptName)
 {
     // check for duplicate
-    int count = ui->scriptSelectComboBox->count();
-    for (int i = 0; i < count; i++) {
-        if (a_scriptName == ui->scriptSelectComboBox->itemText(i)) {
-            return;
-        }
-    }
-    ui->scriptSelectComboBox->addItem(a_scriptName);
-    slotUpdateScriptBookmarkSelection(a_scriptName);
+    int foundIndex = ui->scriptSelectComboBox->findText(a_scriptName);
+    if (foundIndex > -1) return;
 
+    ui->scriptSelectComboBox->addItem(a_scriptName);
+//    slotUpdateScriptBookmarkSelection(a_scriptName);
 }
 
 void BookmarkManagerDialog::slotRemoveScriptBookmark(QString &a_scriptName)
 {
     int count = ui->scriptSelectComboBox->count();
-    if (count < 1) return;
+    if (count < 0) return;
 
-    for (int i = 0; i < count; i++) {
-        if (a_scriptName == ui->scriptSelectComboBox->itemText(i)) {
-            ui->scriptSelectComboBox->removeItem(i);
-            return;
-        }
-    }
+    int foundIndex = ui->scriptSelectComboBox->findText(a_scriptName);
+    ui->scriptSelectComboBox->removeItem(foundIndex);
 }
 
 void BookmarkManagerDialog::slotSetTableViewModel(BookmarkModel *a_model)
@@ -117,6 +108,14 @@ void BookmarkManagerDialog::slotUpdateScriptBookmarkSelection(QString &a_scriptN
 {
     if (ui->scriptSelectComboBox->currentText() != a_scriptName)
         ui->scriptSelectComboBox->setCurrentText(a_scriptName);
+}
+
+void BookmarkManagerDialog::slotUpdateScriptName(const QString &a_oldName, const QString &a_newName)
+{
+    if (a_oldName == a_newName) return;
+    int foundIndex = ui->scriptSelectComboBox->findText(a_oldName);
+    if (foundIndex == -1) return;
+    ui->scriptSelectComboBox->setItemText(foundIndex, a_newName);
 }
 
 

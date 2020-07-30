@@ -48,6 +48,7 @@ const char ACTION_ID_NEW_SCRIPT[] = "new_script";
 const char ACTION_ID_NEW_TAB[] = "new_tab";
 const char ACTION_ID_OPEN_SCRIPT[] = "open_script";
 const char ACTION_ID_CLOSE_TAB[] = "close_tab";
+const char ACTION_ID_CLOSE_ALL_TABS[] = "close_all_tabs";
 const char ACTION_ID_SAVE_SCRIPT[] = "save_script";
 const char ACTION_ID_SAVE_SCRIPT_AS[] = "save_script_as";
 const char ACTION_ID_TEMPLATES[] = "templates";
@@ -87,6 +88,7 @@ const char ACTION_ID_DUPLICATE_SELECTION[] = "duplicate_selection";
 const char ACTION_ID_COMMENT_SELECTION[] = "comment_selection";
 const char ACTION_ID_UNCOMMENT_SELECTION[] = "uncomment_selection";
 const char ACTION_ID_REPLACE_TAB_WITH_SPACES[] = "replace_tab_with_spaces";
+const char ACTION_ID_BOOKMARK_MANAGER[] = "bookmark_manager";
 const char ACTION_ID_TIMELINE_LOAD_CHAPTERS[] = "timeline_load_chapters";
 const char ACTION_ID_TIMELINE_CLEAR_BOOKMARKS[] = "timeline_clear_bookmarks";
 const char ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME[] =
@@ -125,6 +127,10 @@ const char COLOR_ID_TEXT_BACKGROUND[] = "text_background_color";
 const char COLOR_ID_ACTIVE_LINE[] = "active_line_color";
 const char COLOR_ID_SELECTION_MATCHES[] = "selection_matches";
 const char COLOR_ID_TIMELINE_BOOKMARKS[] = "timeline_bookmarks";
+
+//==============================================================================
+
+const char COMMENT_TOKEN[] = "#";
 
 //==============================================================================
 

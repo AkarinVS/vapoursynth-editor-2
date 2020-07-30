@@ -50,9 +50,9 @@ PreviewArea::~PreviewArea()
 // END OF PreviewArea::~PreviewArea()
 //==============================================================================
 
-const QPixmap * PreviewArea::pixmap() const
+QPixmap PreviewArea::pixmap()
 {
-	return m_pPreviewLabel->pixmap();
+    return m_pPreviewLabel->pixmap(Qt::ReturnByValue);
 }
 
 // END OF const QPixmap * PreviewArea::pixmap() const
@@ -249,8 +249,8 @@ void PreviewArea::mouseReleaseEvent(QMouseEvent * a_pEvent)
 
 void PreviewArea::drawScrollNavigator()
 {
-	int contentsWidth = m_pPreviewLabel->pixmap()->width();
-	int contentsHeight = m_pPreviewLabel->pixmap()->height();
+    int contentsWidth = m_pPreviewLabel->pixmap(Qt::ReturnByValue).width();
+    int contentsHeight = m_pPreviewLabel->pixmap(Qt::ReturnByValue).height();
 	int viewportX = -m_pPreviewLabel->x();
 	int viewportY = -m_pPreviewLabel->y();
 	int viewportWidth = viewport()->width();

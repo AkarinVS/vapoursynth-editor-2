@@ -99,6 +99,10 @@ public:
 
 	bool getAutoLoadLastScript() const;
 
+    bool setEncodingPresetSelection(const QString & a_preset);
+
+    QString getEncodingPresetSelection() const;
+
 	bool setAutoLoadLastScript(bool a_autoLoadLastScript);
 
 	bool getZoomPanelVisible() const;

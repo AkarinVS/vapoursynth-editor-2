@@ -20,7 +20,7 @@ public:
 	ScriptBenchmarkDialog(SettingsManager * a_pSettingsManager,
 		VSScriptLibrary * a_pVSScriptLibrary,
 		QWidget * a_pParent = nullptr);
-	virtual ~ScriptBenchmarkDialog();
+    virtual ~ScriptBenchmarkDialog() override;
 
 	virtual bool initialize(const QString & a_script,
 		const QString & a_scriptName) override;

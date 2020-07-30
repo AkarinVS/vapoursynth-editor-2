@@ -50,7 +50,7 @@ public:
 
 	std::vector<QAction *> actionsForMenu() const;
 
-	std::vector<vsedit::VariableToken> variables() const;
+        std::vector<vsedit::VariableToken> variables() const;
 
 public slots:
 
@@ -60,7 +60,7 @@ public slots:
 
 	void slotInsertCompletion(const QString & a_completionString);
 
-	void slotDuplicateSelection();
+        void slotDuplicateSelection();
 
 	void slotCommentSelection();
 
@@ -128,8 +128,8 @@ private:
 
 	void indentNewLine();
 
-	void insertSelectedLinesBegin(const QString & a_text);
-	void removeSelectedLinesBegin(const QString & a_text);
+        void insertSelectedLinesBegin(const QString & a_text);
+        void removeSelectedLinesBegin(const QString & a_text);
 
 	void fillVariables();
 
@@ -171,13 +171,11 @@ private:
 
 	QMenu * m_pContextMenu;
 	QAction * m_pActionDuplicateSelection;
-	QAction * m_pActionCommentSelection;
-	QAction * m_pActionUncommentSelection;
 	QAction * m_pActionReplaceTabWithSpaces;
 	QAction * m_pActionAutocomplete;
 	QAction * m_pActionMoveTextBlockUp;
 	QAction * m_pActionMoveTextBlockDown;
-	QAction * m_pActionToggleComment;
+    QAction * m_pActionToggleComment;
 
 	std::vector<QAction *> m_settableActionsList;
 

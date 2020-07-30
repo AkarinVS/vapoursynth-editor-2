@@ -10,7 +10,6 @@ class GenericTabWidget : public QTabWidget
 public:
     GenericTabWidget(QWidget *parent = nullptr);
 
-
 private:
 
     int m_currentSelectedIndex;

@@ -22,6 +22,7 @@ class VSEditorLog;
 class ScriptBenchmarkDialog;
 class EncodeDialog;
 class TemplatesDialog;
+class PreviewAdvancedSettingsDialog;
 class FrameInfoDialog;
 class JobServerWatcherSocket;
 
@@ -30,9 +31,12 @@ struct EditorPreview {
     PreviewArea * previewArea;
     ScriptProcessor * processor;
     BookmarkModel * bookmarkModel;
-    QString scriptName;
+    QString scriptName; /* unique id use for grouping */
+    QString scriptFilePath;
     int lastTimeLineFrameIndex;
     int lastZoomRatio;
+    QString tabName;
+    int tabNumber;
     int group;
 };
 
@@ -70,18 +74,25 @@ class MultiTabMainWindow : public QMainWindow
 
 public:
     explicit MultiTabMainWindow(QWidget *a_pParent = nullptr);
-    ~MultiTabMainWindow();
+    ~MultiTabMainWindow() override;
 
     VSEditorLog * m_logView;
+
+protected:
+
+    void closeEvent(QCloseEvent * a_pEvent) override;
+
+//    void moveEvent(QMoveEvent * a_pEvent) override;
+
+//    void resizeEvent(QResizeEvent * a_pEvent) override;
+
+//    void changeEvent(QEvent * a_pEvent) override;
+
 
 private:
     Ui::MultiTabMainWindow *m_ui;
 
-    ScriptEditor * m_pScriptEdit;
-
     SettingsManager * m_pSettingsManager;
-
-    SettingsDialog * m_pSettingsDialog;
 
     VSScriptLibrary * m_pVSScriptLibrary;
 
@@ -89,15 +100,19 @@ private:
 
     ScriptStatusBarWidget * m_pStatusBarWidget;
 
+    SettingsDialog * m_pSettingsDialog;
     ScriptBenchmarkDialog * m_pBenchmarkDialog;
     EncodeDialog * m_pEncodeDialog;
     TemplatesDialog * m_pTemplatesDialog;
     FrameInfoDialog * m_pFrameInfoDialog;
+    PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
     BookmarkManagerDialog * m_pBookmarkManagerDialog;
 
     JobServerWatcherSocket * m_pJobServerWatcherSocket;
 
-//    VSPluginsList *m_vsPluginsList;
+    QVector<QObject **> m_orphanQObjects;
+
+    VSPluginsList m_vsPluginsList;
 
     void createSettingDialog();
 
@@ -105,6 +120,8 @@ private:
 
     void createVapourSynthPluginsManager();
 
+    void createAdvancedSettingsDialog();
+    void createTemplatesDialog();
     void createBenchmarkDialog();
     void createEncodeDialog();
     void createJobServerWatcher();
@@ -116,15 +133,10 @@ private:
     void createFrameInfoDialog();
     void createBookmarkManager();
 
-
-    void setLogSignals();
-
     void setTabSignals(); // setup signals between editor and previewArea
-    void setEditorSignals(); // setup signals for editor
     void setTimeLineSignals();
 
-
-    void createMenuBarActionsAndMenus();
+    void createMenuActionsAndContextMenuActions();
     void createContextMenuActionsAndMenus();
     void createStatusBar();
     void setPlaybackPanel();
@@ -136,8 +148,9 @@ private:
     bool saveScriptToFile(const QString& a_filePath);
     bool loadScriptFromFile(const QString& a_filePath);
     bool safeToCloseFile();
+    bool IsScriptOpened(const QString & a_filePath);
 
-    void setCurrentScriptFilePath(QString & a_storedFilePath, const QString & a_filePath);
+    void setCurrentScriptFilePath(const QString & a_filePath);
     void loadStartUpScript();
 
     void fillRecentScriptsMenu();
@@ -149,17 +162,29 @@ private:
 
     void createGeometrySaveTimer(); // obsolete?
 
+    void createGarbageCollection();
+    void destroyOrphanQObjects();
+
     QVector<EditorPreview> m_pEditorPreviewVector;
 
-    int m_previousTabIndex;
-
     /* MenuBar menus and actions */
-    QAction * m_pActionNewScript;
+//    QAction * m_pActionNewScript;
     QAction * m_pActionNewTab;
     QAction * m_pActionOpenScript;
     QAction * m_pActionCloseTab;
+    QAction * m_pActionCloseAllTabs;
     QAction * m_pActionSaveScript;
     QAction * m_pActionSaveScriptAs;
+
+    QAction * m_pActionDuplicateSelection;
+    QAction * m_pActionCommentSelection;
+    QAction * m_pActionUncommentSelection;
+    QAction * m_pActionReplaceTabWithSpaces;
+    QAction * m_pActionAutocomplete;
+    QAction * m_pActionMoveTextBlockUp;
+    QAction * m_pActionMoveTextBlockDown;
+    QAction * m_pActionToggleComment;
+
     QAction * m_pActionTemplates;
     QAction * m_pActionSettings;
     QAction * m_pActionPreview;
@@ -169,6 +194,7 @@ private:
     QAction * m_pActionEnqueueEncodeJob;
     QAction * m_pActionJobs;
     QAction * m_pActionExit;
+    QAction * m_pActionBookmarkManager;
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
@@ -180,22 +206,17 @@ private:
     QMenu * m_pPreviewContextMenu;
     QAction * m_pActionFrameToClipboard;
     QAction * m_pActionSaveSnapshot;
-    QAction * m_pActionToggleZoomPanel;
     QMenu * m_pMenuZoomModes;
     QActionGroup * m_pActionGroupZoomModes;
     QAction * m_pActionSetZoomModeNoZoom;
     QAction * m_pActionSetZoomModeFixedRatio;
     QAction * m_pActionSetZoomModeFitToFrame;
-    QMenu * m_pMenuZoomScaleModes;
-    QActionGroup * m_pActionGroupZoomScaleModes;
-    QAction * m_pActionSetZoomScaleModeNearest;
-    QAction * m_pActionSetZoomScaleModeBilinear;
     QAction * m_pActionToggleCropPanel;
     QAction * m_pActionToggleTimeLinePanel;
     QMenu * m_pMenuTimeLineModes;
     QActionGroup * m_pActionGroupTimeLineModes;
-    QAction * m_pActionSetTimeLineModeTime;
-    QAction * m_pActionSetTimeLineModeFrames;
+//    QAction * m_pActionSetTimeLineModeTime;
+//    QAction * m_pActionSetTimeLineModeFrames;
     QAction * m_pActionTimeStepForward;
     QAction * m_pActionTimeStepBack;
     QAction * m_pActionPasteCropSnippetIntoScript;
@@ -213,7 +234,7 @@ private:
 
     std::map<QString, ZoomMode> m_actionIDToZoomModeMap;
 
-    std::map<QString, Qt::TransformationMode> m_actionIDToZoomScaleModeMap;
+//    std::map<QString, Qt::TransformationMode> m_actionIDToZoomScaleModeMap;
 
     std::map<QString, TimeLineSlider::DisplayMode>
         m_actionIDToTimeLineModeMap;
@@ -224,10 +245,11 @@ private:
     bool m_playing;
     int m_currentPlayingFrame;
 
-    /* editor parameters */
-    QString m_lastSavedText;
-
-//    std::vector<QAction *> m_settableActionsList;
+    /* Window */
+    QString m_currentTabScriptFilePath;
+    QList<int> m_tabNumberList;
+    bool m_closingApp;
+    bool m_closingTab;
 
     QTimer * m_pGeometrySaveTimer;
     QByteArray m_windowGeometry;
@@ -245,14 +267,18 @@ public slots:
 
 private slots:
 
-    void slotCreateTab();
-    void slotRemoveTab();
+    void slotCreateTab(const QString & a_tabName = "",
+                       const QString & a_scriptFilePath = "",
+                       const QString & a_scriptText = "");
+    bool slotRemoveTab();
+    bool slotRemoveAllTabs();
     void slotChangePreviewTab(int a_index);
     void slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex);
     void slotChangeScriptTab(int a_index);
     void slotPreviewScript();
     void slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen);
 
+    /* time line */
     void slotTimeLineDisplayModeChanged();
     void slotShowFrameFromTimeLine(int a_frameNumber);
     void slotJumpPlayFromTimeLine(int a_frameNumber);
@@ -264,18 +290,29 @@ private slots:
     void slotShowFrameInfoDialog();
     void slotShowBookmarkManager();
 
-    void slotZoomModeChanged(int a_mode);
+    void slotZoomModeChanged();
     void slotZoomRatioChanged(double a_zoomRatio);
     void setPreviewPixmap();
     void slotPreviewAreaSizeChanged();
     void slotPreviewAreaMouseOverPoint(float a_normX, float a_normY);
+    void slotPreviewAreaMouseRightButtonReleased();
+    void slotCallAdvancedSettingsDialog();
+    void slotPasteShownFrameNumberIntoScript();
 
     void slotPlay(bool a_play);
     void slotSetPlayFPSLimit();
 
+    /* editor */
+    void slotDuplicateSelection();
+    void slotReplaceTabWithSpaces();
+    void slotComplete();
+    void slotMoveTextBlockUp();
+    void slotMoveTextBlockDown();
+    void slotToggleComment();
+
     /* bookmark */
     void slotUpdateScriptBookmarkList();
-    void slotSetScriptBookmark(int);
+    void slotSetScriptBookmark(const QString & a_text);
     void slotAddBookmark();
     void slotRemoveBookmark(QModelIndex a_index);
     void slotGoToBookmark(const QModelIndex a_modelIndex);
@@ -287,7 +324,7 @@ private slots:
     /* slot for menu actions */
     void slotNewScript();
     bool slotSaveScript();
-    bool slotSaveScriptAs(QString & a_offeredFilePath);
+    bool slotSaveScriptAs();
     bool slotOpenScript();
 
     void slotTemplates();
@@ -298,9 +335,12 @@ private slots:
     void slotEnqueueEncodeJob();
     void slotJobs();
 
+    void slotFrameToClipboard();
+    void slotSaveSnapshot();
+
     void slotAbout();
 
-    void slotChangeWindowTitle(const QString & a_storedFilePath);
+    void slotChangeWindowTitle(const QString & a_title);
     void slotEditorTextChanged();
     void slotOpenRecentScriptActionTriggered();
 
@@ -310,6 +350,8 @@ private slots:
     void slotSaveGeometry();
 
 signals:
+
+    void signalTabNameChanged(const QString &a_oldName, const QString &a_newName);
 
 };
 

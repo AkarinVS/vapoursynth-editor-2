@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Vapoursynth Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">

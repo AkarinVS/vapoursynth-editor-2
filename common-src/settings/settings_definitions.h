@@ -77,9 +77,9 @@ struct DropFileCategory
 
 struct BookmarkData
 {
-        QString title;
-        int frame;
-        int timeInMilli;
+    QString title;
+    int frame;
+    int timeInMilli;
 };
 
 //==============================================================================
@@ -127,6 +127,7 @@ extern const char ACTION_ID_NEW_SCRIPT[];
 extern const char ACTION_ID_NEW_TAB[];
 extern const char ACTION_ID_OPEN_SCRIPT[];
 extern const char ACTION_ID_CLOSE_TAB[];
+extern const char ACTION_ID_CLOSE_ALL_TABS[];
 extern const char ACTION_ID_SAVE_SCRIPT[];
 extern const char ACTION_ID_SAVE_SCRIPT_AS[];
 extern const char ACTION_ID_TEMPLATES[];
@@ -162,6 +163,7 @@ extern const char ACTION_ID_DUPLICATE_SELECTION[];
 extern const char ACTION_ID_COMMENT_SELECTION[];
 extern const char ACTION_ID_UNCOMMENT_SELECTION[];
 extern const char ACTION_ID_REPLACE_TAB_WITH_SPACES[];
+extern const char ACTION_ID_BOOKMARK_MANAGER[];
 extern const char ACTION_ID_TIMELINE_LOAD_CHAPTERS[];
 extern const char ACTION_ID_TIMELINE_CLEAR_BOOKMARKS[];
 extern const char ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME[];
@@ -196,5 +198,10 @@ extern const char COLOR_ID_SELECTION_MATCHES[];
 extern const char COLOR_ID_TIMELINE_BOOKMARKS[];
 
 //==============================================================================
+
+extern const char COMMENT_TOKEN[];
+
+//==============================================================================
+
 
 #endif // SETTINGS_DEFINITIONS_H_INCLUDED

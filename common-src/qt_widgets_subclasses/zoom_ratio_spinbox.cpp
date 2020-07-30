@@ -41,18 +41,20 @@ void ZoomRatioSpinBox::wheelEvent(QWheelEvent * a_pEvent)
 
 void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * a_pEvent)
 {
-    QDoubleSpinBox::mousePressEvent(a_pEvent);
-
     QStyleOptionSpinBox opt;
     this->initStyleOption(&opt);
 
-    // ARROW UP IS PRESSED
-    if(this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxUp).contains(a_pEvent->pos()) )
-        stepUp();
+    bool upArrowButtonPressed =
+            this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxUp).contains(a_pEvent->pos());
+    bool downArrowButtonPressed =
+            this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxDown).contains(a_pEvent->pos());
 
-    // ARROW DOWN IS PRESSED
-    if( this->style()->subControlRect(QStyle::CC_SpinBox, &opt, QStyle::SC_SpinBoxDown).contains(a_pEvent->pos()) )
+    if (upArrowButtonPressed) {
+        stepUp();
+    } else if (downArrowButtonPressed)
         stepDown();
+    else
+        QDoubleSpinBox::mousePressEvent(a_pEvent);
 
     a_pEvent->ignore();
 }
@@ -62,15 +64,14 @@ void ZoomRatioSpinBox::mousePressEvent(QMouseEvent * a_pEvent)
 
 void ZoomRatioSpinBox::keyPressEvent(QKeyEvent * a_pEvent)
 {
-    QDoubleSpinBox::keyPressEvent(a_pEvent);
-
-    if (a_pEvent->key() == Qt::Key_Up) {
-        stepUp();
+    if (a_pEvent->key() == Qt::Key_Up){
+        stepUp();    
     }
-
-    if (a_pEvent->key() == Qt::Key_Down)
+    else if (a_pEvent->key() == Qt::Key_Down) {
         stepDown();
-
+    } else {
+        QDoubleSpinBox::keyPressEvent(a_pEvent);
+    }
     a_pEvent->ignore();
 }
 
@@ -94,9 +95,8 @@ void ZoomRatioSpinBox::stepDown()
 {
     if (value() > 1.0)
         setValue(floor(value()-0.2));
-    else {
+    else
         setValue(value()-0.2);
-    }
 }
 
 // END OF void ZoomRatioSpinBox::stepDown)

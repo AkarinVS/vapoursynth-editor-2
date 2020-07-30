@@ -9,52 +9,15 @@
 ScriptProcessor::ScriptProcessor(SettingsManager * a_pSettingsManager,
                                  VSScriptLibrary * a_pVSScriptLibrary, QWidget * a_pParent) :
     VSScriptProcessorDialog(a_pSettingsManager, a_pVSScriptLibrary, a_pParent)
-
-//  , m_pAdvancedSettingsDialog(nullptr)
   , m_frameExpected(0)
   , m_frameShown(-1)
   , m_lastFrameRequestedForPlay(-1)
-//  , m_bigFrameStep(10)
   , m_cpFrameRef(nullptr)
-//  , m_changingCropValues(false)
-//  , m_pPreviewContextMenu(nullptr)
-//  , m_pActionFrameToClipboard(nullptr)
-//  , m_pActionSaveSnapshot(nullptr)
-//  , m_pActionToggleZoomPanel(nullptr)
-//  , m_pMenuZoomModes(nullptr)
-//  , m_pActionGroupZoomModes(nullptr)
-//  , m_pActionSetZoomModeNoZoom(nullptr)
-//  , m_pActionSetZoomModeFixedRatio(nullptr)
-//  , m_pActionSetZoomModeFitToFrame(nullptr)
-//  , m_pMenuZoomScaleModes(nullptr)
-//  , m_pActionGroupZoomScaleModes(nullptr)
-//  , m_pActionSetZoomScaleModeNearest(nullptr)
-//  , m_pActionSetZoomScaleModeBilinear(nullptr)
-//  , m_pActionToggleCropPanel(nullptr)
-//  , m_pActionToggleTimeLinePanel(nullptr)
-//  , m_pMenuTimeLineModes(nullptr)
-//  , m_pActionGroupTimeLineModes(nullptr)
-//  , m_pActionSetTimeLineModeTime(nullptr)
-//  , m_pActionSetTimeLineModeFrames(nullptr)
-//  , m_pActionTimeStepForward(nullptr)
-//  , m_pActionTimeStepBack(nullptr)
-//  , m_pActionPasteCropSnippetIntoScript(nullptr)
-//  , m_pActionAdvancedSettingsDialog(nullptr)
-//  , m_pActionToggleColorPicker(nullptr)
-//  , m_pActionPlay(nullptr)
-//  , m_pActionLoadChapters(nullptr)
-//  , m_pActionClearBookmarks(nullptr)
-//  , m_pActionBookmarkCurrentFrame(nullptr)
-//  , m_pActionUnbookmarkCurrentFrame(nullptr)
-//  , m_pActionGoToPreviousBookmark(nullptr)
-//  , m_pActionGoToNextBookmark(nullptr)
-//  , m_pActionPasteShownFrameNumberIntoScript(nullptr)
   , m_playing(false)
   , m_processingPlayQueue(false)
   , m_secondsBetweenFrames(0)
   , m_pPlayTimer(nullptr)
 //  , m_alwaysKeepCurrentFrame(DEFAULT_ALWAYS_KEEP_CURRENT_FRAME)
-//  , m_pGeometrySaveTimer(nullptr)
 {
     m_pPlayTimer = new QTimer(this);
     m_pPlayTimer->setTimerType(Qt::PreciseTimer);
@@ -84,8 +47,6 @@ void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, cons
     m_cpVSAPI->freeFrame(a_cpPreviewFrameRef);
 
     emit signalSetCurrentFrame(); // receiver can grab framePixmap
-//	m_ui.previewArea->checkMouseOverPreview(QCursor::pos());
-
 }
 
 QPixmap ScriptProcessor::framePixmap()
@@ -121,8 +82,8 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
     // emit signal to setup timeline and range of spinbox
     emit signalSetTimeLineAndIndicator(lastFrameNumber, m_cpVideoInfo->fpsNum, m_cpVideoInfo->fpsDen);
 
-    bool scriptChanged = ((previousScript != a_script) &&
-        (previousScriptName != a_scriptName));
+//    bool scriptChanged = ((previousScript != a_script) &&
+//        (previousScriptName != a_scriptName));
 
 //    if(scriptChanged && (!m_alwaysKeepCurrentFrame))
 //	{
@@ -134,12 +95,7 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
         m_frameExpected = lastFrameNumber;
 
 //    resetCropSpinBoxes();
-
-//	slotSetPlayFPSLimit();
-
     setScriptName(a_scriptName);
-
-//	loadTimelineBookmarks();
 
 //    if(m_pSettingsManager->getPreviewDialogMaximized())
 //		showMaximized();
@@ -205,7 +161,6 @@ void ScriptProcessor::stopAndCleanUp()
     }
 
     VSScriptProcessorDialog::stopAndCleanUp();
-
 }
 
 bool ScriptProcessor::requestShowFrame(int a_frameNumber)

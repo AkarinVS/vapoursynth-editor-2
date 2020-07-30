@@ -23,11 +23,11 @@ public:
 
 	void setWidget(QWidget * a_pWidget) = delete;
 
-	const QPixmap * pixmap() const;
+    QPixmap pixmap() ;
 
 	void setPixmap(const QPixmap & a_pixmap);
 
-    void checkMouseOverPreview(const QPoint & a_globalMousePos);
+    void checkMouseOverPreview(const QPoint & a_globalMousePos);      
 
 public slots:
 

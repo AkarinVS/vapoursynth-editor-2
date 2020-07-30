@@ -22,7 +22,7 @@ public:
 	EncodeDialog(SettingsManager * a_pSettingsManager,
 		VSScriptLibrary * a_pVSScriptLibrary,
 		QWidget * a_pParent = nullptr);
-	virtual ~EncodeDialog();
+    virtual ~EncodeDialog() override;
 
 	bool initialize(const QString & a_script, const QString & a_scriptName);
 

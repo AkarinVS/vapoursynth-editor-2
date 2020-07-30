@@ -29,13 +29,11 @@ class BookmarkManagerDialog : public QDialog
 public:
     explicit BookmarkManagerDialog(SettingsManager * a_pSettingsManager, QWidget *a_pParent = nullptr);
 
-    ~BookmarkManagerDialog();
-
-
+    ~BookmarkManagerDialog() override;
 
 signals:
 
-    void signalScriptBookmarkChanged(int);
+    void signalScriptBookmarkChanged(const QString & a_text);
     void signalAddButtonPressed();
     void signalRemoveBookmark(QModelIndex);
     void signalGotoBookmark(const QModelIndex a_index);
@@ -72,10 +70,12 @@ protected:
 
 public slots:
 
-    void slotAddScriptBookmark(QString a_scriptName); // add script to dropdown selection
+    void slotAddScriptBookmark(QString &a_scriptName); // add script to dropdown selection
     void slotRemoveScriptBookmark(QString &a_scriptName);
     void slotSetTableViewModel(BookmarkModel * a_model);
     void slotUpdateScriptBookmarkSelection(QString &a_scriptName);
+    void slotUpdateScriptName(const QString &a_oldName, const QString &a_newName);
+
 
 private slots:
 

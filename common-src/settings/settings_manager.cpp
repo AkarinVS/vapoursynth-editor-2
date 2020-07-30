@@ -20,6 +20,7 @@ const char PREVIEW_DIALOG_MAXIMIZED_KEY[] = "preview_dialog_maximized";
 const char JOB_SERVER_WATCHER_MAXIMIZED_KEY[] = "job_server_watcher_maximized";
 const char JOBS_HEADER_STATE_KEY[] = "jobs_header_state";
 const char AUTO_LOAD_LAST_SCRIPT_KEY[] = "auto_load_last_script";
+const char ENCODING_PRESET_SELECTION_KEY[] = "encoding_preset_selection";
 const char ZOOM_PANEL_VISIBLE_KEY[] = "zoom_panel_visible";
 const char ZOOM_MODE_KEY[] = "zoom_mode";
 const char ZOOM_RATIO_KEY[] = "zoom_ratio";
@@ -110,6 +111,8 @@ void SettingsManager::initializeStandardActions()
 			QKeySequence::Open},
         {ACTION_ID_CLOSE_TAB, tr("Close tab"), QIcon(":close.png"),
             QKeySequence::Close},
+        {ACTION_ID_CLOSE_ALL_TABS, tr("Close all tabs"), QIcon(":close_all.png"),
+            QKeySequence()},
         {ACTION_ID_SAVE_SCRIPT, tr("Save script"), QIcon(":save.png"),
 			QKeySequence::Save},
         {ACTION_ID_SAVE_SCRIPT_AS, tr("Save script as..."),
@@ -177,12 +180,13 @@ void SettingsManager::initializeStandardActions()
         {ACTION_ID_TIME_STEP_BACK, tr("Time: step back"),
 			QIcon(":time_back.png"),
 			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Left)},
-		{ACTION_ID_ADVANCED_PREVIEW_SETTINGS,
-            tr("Preview advanced settings"), QIcon(":settings.png"),
-			QKeySequence()},
+        {ACTION_ID_ADVANCED_PREVIEW_SETTINGS, tr("Preview advanced settings"),
+            QIcon(":settings.png"), QKeySequence()},
         {ACTION_ID_TOGGLE_COLOR_PICKER, tr("Color panel"),
 			QIcon(":color_picker.png"), QKeySequence()},
         {ACTION_ID_PLAY, tr("Play"), QIcon(":play.png"), QKeySequence()},
+        {ACTION_ID_BOOKMARK_MANAGER, tr("Bookmark manager"),
+            QIcon(":bookmark_manager.png"), QKeySequence()},
         {ACTION_ID_TIMELINE_LOAD_CHAPTERS, tr("Load chapters"),
 			QIcon(":load.png"), QKeySequence()},
         {ACTION_ID_TIMELINE_CLEAR_BOOKMARKS, tr("Clear bookmarks"),
@@ -567,7 +571,17 @@ bool SettingsManager::setJobsHeaderState(const QByteArray & a_headerState)
 bool SettingsManager::getAutoLoadLastScript() const
 {
 	return value(AUTO_LOAD_LAST_SCRIPT_KEY, DEFAULT_AUTO_LOAD_LAST_SCRIPT)
-		.toBool();
+            .toBool();
+}
+
+bool SettingsManager::setEncodingPresetSelection(const QString &a_preset)
+{
+    return setValue(ENCODING_PRESET_SELECTION_KEY, a_preset);
+}
+
+QString SettingsManager::getEncodingPresetSelection() const
+{
+    return value(ENCODING_PRESET_SELECTION_KEY).toString();
 }
 
 bool SettingsManager::setAutoLoadLastScript(bool a_autoLoadLastScript)

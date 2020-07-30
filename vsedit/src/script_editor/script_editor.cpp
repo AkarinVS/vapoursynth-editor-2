@@ -24,12 +24,6 @@
 #include <QMenu>
 #include <algorithm>
 
-//==============================================================================
-
-const char COMMENT_TOKEN[] = "#";
-
-//==============================================================================
-
 ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	QPlainTextEdit(a_pParent)
 	, m_pSettingsManager(nullptr)
@@ -53,8 +47,6 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	, m_spacesInTab(DEFAULT_SPACES_IN_TAB)
 	, m_pContextMenu(nullptr)
 	, m_pActionDuplicateSelection(nullptr)
-	, m_pActionCommentSelection(nullptr)
-	, m_pActionUncommentSelection(nullptr)
 	, m_pActionReplaceTabWithSpaces(nullptr)
 	, m_pActionAutocomplete(nullptr)
 	, m_pActionMoveTextBlockUp(nullptr)
@@ -188,8 +180,7 @@ void ScriptEditor::setSettingsManager(SettingsManager * a_pSettingsManager)
 
 std::vector<QAction *> ScriptEditor::actionsForMenu() const
 {
-	return {m_pActionDuplicateSelection, m_pActionCommentSelection,
-		m_pActionUncommentSelection, m_pActionReplaceTabWithSpaces,
+    return {m_pActionDuplicateSelection, m_pActionReplaceTabWithSpaces,
 		m_pActionMoveTextBlockUp, m_pActionMoveTextBlockDown,
 		m_pActionToggleComment};
 }
@@ -290,25 +281,25 @@ void ScriptEditor::slotInsertCompletion(const QString & a_completionString)
 
 void ScriptEditor::slotDuplicateSelection()
 {
-	QTextCursor cursor = textCursor();
-	int l_selectionStart = cursor.selectionStart();
-	int l_selectionEnd = cursor.selectionEnd();
+    QTextCursor cursor = textCursor();
+    int l_selectionStart = cursor.selectionStart();
+    int l_selectionEnd = cursor.selectionEnd();
 
-	QString newText = cursor.selectedText();
-	if(cursor.hasSelection())
-	{
-		cursor.clearSelection();
-	}
-	else
-	{
-		newText = cursor.block().text() + QString("\n");
-		cursor.movePosition(QTextCursor::StartOfBlock);
-	}
-	cursor.insertText(newText);
+    QString newText = cursor.selectedText();
+    if(cursor.hasSelection())
+    {
+        cursor.clearSelection();
+    }
+    else
+    {
+        newText = cursor.block().text() + QString("\n");
+        cursor.movePosition(QTextCursor::StartOfBlock);
+    }
+    cursor.insertText(newText);
 
-	cursor.setPosition(l_selectionStart, QTextCursor::MoveAnchor);
-	cursor.setPosition(l_selectionEnd, QTextCursor::KeepAnchor);
-	setTextCursor(cursor);
+    cursor.setPosition(l_selectionStart, QTextCursor::MoveAnchor);
+    cursor.setPosition(l_selectionEnd, QTextCursor::KeepAnchor);
+    setTextCursor(cursor);
 }
 
 // END OF void ScriptEditor::slotDuplicateSelection()
@@ -773,6 +764,8 @@ void ScriptEditor::slotTextChanged()
 		return;
 
 	m_plainText = newPlainText;
+    setModified(true);
+
 	QString vsCoreName = getVapourSynthCoreName();
 	setChildrenCoreName(vsCoreName);
 }
@@ -881,10 +874,6 @@ void ScriptEditor::createActionsAndMenus()
 	{
 		{&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION,
 			SLOT(slotDuplicateSelection())},
-		{&m_pActionCommentSelection, ACTION_ID_COMMENT_SELECTION,
-			SLOT(slotCommentSelection())},
-		{&m_pActionUncommentSelection, ACTION_ID_UNCOMMENT_SELECTION,
-			SLOT(slotUncommentSelection())},
 		{&m_pActionReplaceTabWithSpaces, ACTION_ID_REPLACE_TAB_WITH_SPACES,
 			SLOT(slotReplaceTabWithSpaces())},
 		{&m_pActionAutocomplete, ACTION_ID_AUTOCOMPLETE,
