@@ -2284,15 +2284,14 @@ void MultiTabMainWindow::slotAbout()
     QByteArray aboutData(reinterpret_cast<const char*>(aboutResource.data()),
         aboutResource.size());
     QString aboutString = QString::fromUtf8(aboutData);
-    QMessageBox::about(this, "VapourSynth Editor", aboutString);
+    QMessageBox::about(this, VAPOURSYNTH_EDITOR_NAME, aboutString);
 }
 
 void MultiTabMainWindow::slotChangeWindowTitle(const QString & a_title)
 {
     if (m_pEditorPreviewVector.count() < 1) return;
 
-    QString vsEditorText = QString::fromUtf8("VapourSynth Editor");
-    QString windowTitleText = a_title + " - " + vsEditorText;
+    QString windowTitleText = a_title + " - " + VAPOURSYNTH_EDITOR_NAME;
     setWindowTitle(windowTitleText);
 }
 

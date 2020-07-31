@@ -84,6 +84,10 @@ struct BookmarkData
 
 //==============================================================================
 
+extern const QString VAPOURSYNTH_EDITOR_NAME;
+
+//==============================================================================
+
 extern const bool DEFAULT_MAIN_WINDOW_MAXIMIZED;
 extern const bool DEFAULT_PREVIEW_DIALOG_MAXIMIZED;
 extern const bool DEFAULT_JOBS_DIALOG_MAXIMIZED;

@@ -1,3 +1,51 @@
+Vapoursynth Editor 2
+
+r1: [2020-07-30]
+- Fixed webp saving in wrong image quality. Image formats now save with their own quality parameters instead of sharing one single parameter
+- All remaining menu and context menu functions of the original have been transferred
+- Proper closing handler and default auto tab naming for multi tab
+- Fixed wrong zoom ratio step when controlled by arrow keys
+- Encoding preset selection now auto saved
+- Removed bilinear scale mode on preview
+- Crop editor temporary removed for new implementation
+- Similar clips comparison feature added. Clips are assign to group automatically on first load. Clips in same group will be sharing the same timeline
+- Multiple groups navigation between clips. Frame position and timeline zoom level of groups are remembered
+- Continuous playback when switching between clips in the same group
+- A new theme preset system for the editor. Themes are stored in a separate file "theme_presets.txt" under the app folder
+- Themes can now be copied, removed, exported and imported
+- Rewrite of the theme saving mechanism, including a temperary string to hold changes in theme setting before the changed was saved
+- New detachable multi tab UI
+- Script window can be detached from preview window
+- Bookmark manager intergrated with multi tab support
+- Timeline navigation integrated with multi tab support
+- A tab widget subclass with a hook in between tab change
+- A collapsable widget for log window
+- Transferred most menu functions to new UI
+- Chapter title is now editable in bookmark manager and can be saved. (no XML)
+- Added logoic to detect file format when loading chapter/bookmark file
+- Some refactoring and clean up
+- Mouse click and drag in timeline works now
+- Fix: added a check for negative frame request(drag to beginning) from breaking the timeline
+- Image saving (png) now uses better compression for smaller file size (quality 50 instead of no compression)
+- New bookmark manager to interact with timeline
+- bookmark can now be save as chapter file or bookmark with delimiter
+- bookmark settings are saved
+- Fixed wrong eyedropper position on zoom
+- Zooming from preview area now uses new zoom ratio
+- Fixed bug that the time line stop drawing ruler at the end
+- playback will now keep playing when jumping to other frames
+- Fixed video playback looping when end reached
+- Removed the triangle icon at the bottom right of the statusbar
+- Removing some annoying deprecated type casting
+- Finishing zoom raito spinbox, now it works with mouse scroll, mouse click and keyboard control.
+- A new extended class for handling text selecting in spinbox on single click. The default one requires triple click.
+- Added mouse position over prevew display in the script status bar widget
+- A new zoomable timeline
+
+/-----------------------------------------------------------------/
+
+Vapoursynth Editor
+
 r20:
 
 r19:

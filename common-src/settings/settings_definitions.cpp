@@ -2,6 +2,10 @@
 
 //==============================================================================
 
+const QString VAPOURSYNTH_EDITOR_NAME = "VapourSynth Editor 2";
+
+//==============================================================================
+
 const bool DEFAULT_MAIN_WINDOW_MAXIMIZED = false;
 const bool DEFAULT_PREVIEW_DIALOG_MAXIMIZED = false;
 const bool DEFAULT_JOBS_DIALOG_MAXIMIZED = false;
