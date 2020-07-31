@@ -3,6 +3,7 @@
 #include "preview/script_processor.h"
 #include "preview/frame_info_dialog.h"
 #include "preview/preview_advanced_settings_dialog.h"
+#include "preview/frame_painter.h"
 #include "../../common-src/qt_widgets_subclasses/collapse_expand_widget.h"
 #include "../../common-src/log/vs_editor_log.h"
 #include "../../common-src/vapoursynth/vapoursynth_script_processor.h"
@@ -1438,38 +1439,43 @@ void MultiTabMainWindow::setPreviewPixmap()
     // get pixmap from processor as base
     QPixmap framePixmap = m_pEditorPreviewVector[currentTabIndex].processor->framePixmap();
     PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
+    double ratio = 1.0;
 
     ZoomMode zoomMode = ZoomMode(m_ui->zoomModeComboBox->currentData().toInt());
     if(zoomMode == ZoomMode::NoZoom)
     {
-        previewArea->setPixmap(framePixmap);
+        previewArea->setPixmap(framePixmap, ratio);
         return;
     }
 
     QPixmap previewPixmap;
-    int frameWidth = 0;
-    int frameHeight = 0;
-//	Qt::TransformationMode scaleMode = (Qt::TransformationMode)
-//		m_ui.scaleModeComboBox->currentData().toInt();
+    int frameWidth = framePixmap.width();
+    int frameHeight = framePixmap.height();
 
+    double h_ratio = 1.0;
+    double w_ratio = 1.0;
     if(zoomMode == ZoomMode::FixedRatio)
     {
-        double ratio = m_ui->zoomRatioSpinBox->value();
-        frameWidth = int (double(framePixmap.width()) * ratio);
-        frameHeight = int (double(framePixmap.height()) * ratio);
+        ratio = m_ui->zoomRatioSpinBox->value();
     }
     else /* zoomMode::fitToFrame */
     {
-        QRect previewRect = previewArea->geometry();
+        QRect previewAreaRect = previewArea->geometry();
         int cropSize = previewArea->frameWidth() * 2;
-        frameWidth = previewRect.width() - cropSize;
-        frameHeight = previewRect.height() - cropSize;
+        double previewAreaWidth = previewAreaRect.width() - cropSize;
+        double previewAreaHeight = previewAreaRect.height() - cropSize;
+
+        h_ratio = previewAreaHeight / double(frameHeight);
+        w_ratio = previewAreaWidth / double(frameWidth);
+
+        if (double(frameHeight) * w_ratio > previewAreaHeight) {
+            ratio = h_ratio;
+        } else if (double(frameWidth) * h_ratio > previewAreaWidth) {
+            ratio = w_ratio;
+        }
     }
 
-    previewPixmap = framePixmap.scaled(frameWidth, frameHeight,
-        Qt::KeepAspectRatio);
-
-    previewArea->setPixmap(previewPixmap);
+    previewArea->setPixmap(framePixmap, ratio);
 }
 
 void MultiTabMainWindow::slotPreviewAreaSizeChanged()

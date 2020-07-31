@@ -10,6 +10,7 @@ class ScrollNavigator;
 class QKeyEvent;
 class QWheelEvent;
 class QMouseEvent;
+class FramePainter;
 
 class PreviewArea : public QScrollArea
 {
@@ -21,17 +22,15 @@ public:
 
     virtual ~PreviewArea() override;
 
-	void setWidget(QWidget * a_pWidget) = delete;
-
     QPixmap pixmap() ;
 
-	void setPixmap(const QPixmap & a_pixmap);
+    FramePainter *m_pFramePainter;
+
+    void setPixmap(const QPixmap & a_pixmap, const qreal a_ratio);
 
     void checkMouseOverPreview(const QPoint & a_globalMousePos);      
 
 public slots:
-
-    void slotSetPreviewPixmap(QPixmap a_framePixmap);
 
 	void slotScrollLeft();
 	void slotScrollRight();
@@ -60,13 +59,11 @@ private:
 
 	void drawScrollNavigator();
 
-    QLabel * m_pPreviewLabel;
-
 	ScrollNavigator * m_pScrollNavigator;
 
 	bool m_draggingPreview;
 	QPoint m_lastCursorPos;
-	QPoint m_lastPreviewLabelPos;
+    QPoint m_lastFramePainterPos;
 };
 
 #endif // PREVIEWAREA_H
