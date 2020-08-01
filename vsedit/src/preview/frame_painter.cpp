@@ -13,13 +13,12 @@ void FramePainter::paintEvent(QPaintEvent *a_pEvent)
     painter.scale(m_ratio, m_ratio);
     painter.drawPixmap(0, 0, m_framePixmap.width(),m_framePixmap.height(), m_framePixmap);
     painter.end();
-
-    update();
 }
 
 void FramePainter::drawFrame(const QPixmap &a_framePixmap)
 {
     m_framePixmap = a_framePixmap;
+    update();
 }
 
 QPixmap FramePainter::pixmap()
@@ -31,4 +30,5 @@ void FramePainter::setRatio(const qreal a_ratio)
 {
     if (m_ratio != a_ratio)
         m_ratio = a_ratio;
+    update();
 }
