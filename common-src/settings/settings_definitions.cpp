@@ -88,6 +88,7 @@ const char ACTION_ID_TIME_STEP_BACK[] = "time_step_back";
 const char ACTION_ID_ADVANCED_PREVIEW_SETTINGS[] = "advanced_preview_settings";
 const char ACTION_ID_TOGGLE_COLOR_PICKER[] = "toggle_color_picker";
 const char ACTION_ID_PLAY[] = "play";
+const char ACTION_ID_FIND[] = "find";
 const char ACTION_ID_DUPLICATE_SELECTION[] = "duplicate_selection";
 const char ACTION_ID_COMMENT_SELECTION[] = "comment_selection";
 const char ACTION_ID_UNCOMMENT_SELECTION[] = "uncomment_selection";
@@ -131,6 +132,12 @@ const char COLOR_ID_TEXT_BACKGROUND[] = "text_background_color";
 const char COLOR_ID_ACTIVE_LINE[] = "active_line_color";
 const char COLOR_ID_SELECTION_MATCHES[] = "selection_matches";
 const char COLOR_ID_TIMELINE_BOOKMARKS[] = "timeline_bookmarks";
+
+//==============================================================================
+
+const char FIND_ID_WHOLE_WORDS[] = "whole_words";
+const char FIND_ID_MATCH_CASE[] = "match_case";
+const char FIND_ID_REGEX[] = "regex";
 
 //==============================================================================
 

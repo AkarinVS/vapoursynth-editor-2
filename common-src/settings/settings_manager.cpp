@@ -119,6 +119,8 @@ void SettingsManager::initializeStandardActions()
 			QIcon(":save_as.png"), QKeySequence::SaveAs},
         {ACTION_ID_EXIT, tr("Exit"), QIcon(":exit.png"),
 			QKeySequence::Quit},
+        {ACTION_ID_FIND, tr("Find"),
+            QIcon(), QKeySequence::Find},
         {ACTION_ID_DUPLICATE_SELECTION, tr("Duplicate selection or line"),
 			QIcon(), QKeySequence(Qt::CTRL + Qt::Key_D)},
         {ACTION_ID_COMMENT_SELECTION, tr("Comment lines"), QIcon(),

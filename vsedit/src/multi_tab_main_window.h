@@ -24,6 +24,7 @@ class EncodeDialog;
 class TemplatesDialog;
 class PreviewAdvancedSettingsDialog;
 class FrameInfoDialog;
+class FindDialog;
 class JobServerWatcherSocket;
 
 struct EditorPreview {
@@ -105,6 +106,7 @@ private:
     EncodeDialog * m_pEncodeDialog;
     TemplatesDialog * m_pTemplatesDialog;
     FrameInfoDialog * m_pFrameInfoDialog;
+    FindDialog * m_pFindDialog;
     PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
     BookmarkManagerDialog * m_pBookmarkManagerDialog;
 
@@ -130,6 +132,7 @@ private:
 
     void createMainToolBar();
 
+    void createFindDialog();
     void createFrameInfoDialog();
     void createBookmarkManager();
 
@@ -157,6 +160,8 @@ private:
 
     void setUpZoomPanel();
 
+    QFlags<QTextDocument::FindFlag> extractFindFlags(const QMap<QString, bool> & a_flagsMap);
+
     double YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane,
                              const VSAPI * a_cpVSAPI, const VSFrameRef * a_cpFrameRef);
 
@@ -176,6 +181,7 @@ private:
     QAction * m_pActionSaveScript;
     QAction * m_pActionSaveScriptAs;
 
+    QAction * m_pActionFind;
     QAction * m_pActionDuplicateSelection;
     QAction * m_pActionCommentSelection;
     QAction * m_pActionUncommentSelection;
@@ -303,12 +309,18 @@ private slots:
     void slotSetPlayFPSLimit();
 
     /* editor */
+    void slotOpenFind();
     void slotDuplicateSelection();
     void slotReplaceTabWithSpaces();
     void slotComplete();
     void slotMoveTextBlockUp();
     void slotMoveTextBlockDown();
     void slotToggleComment();
+    void slotEditorFindText(const QString & a_text, const QMap<QString, bool> & a_flagsMap);
+    void slotEditorReplaceText(const QString & a_findText, const QString & a_replaceText,
+                               const QMap<QString, bool> & a_flagsMap);
+    void slotReplaceAllText(const QString & a_findText, const QString & a_replaceText,
+                            const QMap<QString, bool> & a_flagsMap);
 
     /* bookmark */
     void slotUpdateScriptBookmarkList();

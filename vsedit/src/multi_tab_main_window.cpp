@@ -9,6 +9,7 @@
 #include "../../common-src/vapoursynth/vapoursynth_script_processor.h"
 #include "../../common-src/ipc_defines.h"
 #include "vapoursynth/vs_script_processor_dialog.h"
+#include "script_editor/find_dialog.h"
 
 #include "settings/settings_dialog.h"
 
@@ -27,6 +28,7 @@
 #include <QToolBar>
 #include <QClipboard>
 #include <QImageWriter>
+#include <QFlags>
 
 MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     QMainWindow(a_pParent),
@@ -67,6 +69,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
 //  , m_pActionGoToNextBookmark(nullptr)
   , m_pActionPasteShownFrameNumberIntoScript(nullptr)
 
+  , m_pActionFind(nullptr)
   , m_pActionDuplicateSelection(nullptr)
   , m_pActionCommentSelection(nullptr)
   , m_pActionUncommentSelection(nullptr)
@@ -88,6 +91,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createBookmarkManager();
     createTemplatesDialog();
     createAdvancedSettingsDialog();
+    createFindDialog();
 
     createGarbageCollection();
     slotCreateTab();
@@ -344,6 +348,20 @@ void MultiTabMainWindow::createMainToolBar()
     mainToolBar->addAction(m_pActionBenchmark);
 }
 
+void MultiTabMainWindow::createFindDialog()
+{
+    m_pFindDialog = new FindDialog(this);
+
+    connect(m_pFindDialog, &FindDialog::signalFindText,
+            this, &MultiTabMainWindow::slotEditorFindText);
+
+    connect(m_pFindDialog, &FindDialog::signalReplaceText,
+            this, &MultiTabMainWindow::slotEditorReplaceText);
+
+    connect(m_pFindDialog, &FindDialog::signalReplaceAllText,
+            this, &MultiTabMainWindow::slotReplaceAllText);
+}
+
 void MultiTabMainWindow::createFrameInfoDialog()
 {
     m_pFrameInfoDialog = new FrameInfoDialog(m_pSettingsManager ,this);
@@ -421,8 +439,9 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
         {&m_pActionSaveScriptAs, ACTION_ID_SAVE_SCRIPT_AS, false,
             this, SLOT(slotSaveScriptAs())},
         {&m_pActionExit, ACTION_ID_EXIT, false,
-            this, SLOT(close())},
-
+            this, SLOT(close())},        
+        {&m_pActionFind, ACTION_ID_FIND, false,
+            this, SLOT(slotOpenFind())},
         {&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION, false,
             this, SLOT(slotDuplicateSelection())},
         {&m_pActionReplaceTabWithSpaces, ACTION_ID_REPLACE_TAB_WITH_SPACES, false,
@@ -545,6 +564,7 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     QMenu * pEditMenu = m_ui->menuBar->addMenu(tr("Edit"));
 
     QList editorActions = {
+        m_pActionFind,
         m_pActionDuplicateSelection,
         m_pActionReplaceTabWithSpaces,
         m_pActionMoveTextBlockUp,
@@ -914,7 +934,22 @@ void MultiTabMainWindow::setUpZoomPanel()
             this, &MultiTabMainWindow::slotZoomModeChanged);
 
     connect(m_ui->zoomRatioSpinBox, QOverload<double>::of(&ZoomRatioSpinBox::valueChanged),
-        this, &MultiTabMainWindow::slotZoomRatioChanged);
+            this, &MultiTabMainWindow::slotZoomRatioChanged);
+}
+
+QFlags<QTextDocument::FindFlag> MultiTabMainWindow::extractFindFlags(const QMap<QString, bool> &a_flags)
+{
+    QFlags<QTextDocument::FindFlag> findFlags;
+    QMapIterator<QString, bool> i(a_flags);
+    while (i.hasNext()) {
+        i.next();
+        if (i.key() == FIND_ID_MATCH_CASE && i.value() == true) {
+            findFlags |= QTextDocument::FindCaseSensitively;
+        } else if (i.key() == FIND_ID_WHOLE_WORDS && i.value() == true) {
+            findFlags |= QTextDocument::FindWholeWords;
+        }
+    }
+    return findFlags;
 }
 
 double MultiTabMainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane, const VSAPI *a_cpVSAPI, const VSFrameRef *a_cpFrameRef)
@@ -1690,6 +1725,11 @@ void MultiTabMainWindow::slotSetPlayFPSLimit()
 
 }
 
+void MultiTabMainWindow::slotOpenFind()
+{
+    m_pFindDialog->show();
+}
+
 void MultiTabMainWindow::slotDuplicateSelection()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
@@ -1730,6 +1770,39 @@ void MultiTabMainWindow::slotToggleComment()
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotToggleComment();
+}
+
+void MultiTabMainWindow::slotEditorFindText(const QString &a_text, const QMap <QString, bool> & a_flagsMap)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+
+    QFlags<QTextDocument::FindFlag> findFlags = extractFindFlags(a_flagsMap);
+
+    editor->slotFind(a_text, findFlags, a_flagsMap[FIND_ID_REGEX]);
+}
+
+void MultiTabMainWindow::slotEditorReplaceText(const QString & a_findText, const QString & a_replaceText,
+                                               const QMap<QString, bool> & a_flagsMap)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+
+    QFlags<QTextDocument::FindFlag> findFlags = extractFindFlags(a_flagsMap);
+
+    editor->slotReplace(a_findText, a_replaceText, findFlags, a_flagsMap[FIND_ID_REGEX]);
+}
+
+void MultiTabMainWindow::slotReplaceAllText(const QString & a_findText, const QString & a_replaceText,
+                                            const QMap<QString, bool> & a_flagsMap)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+
+    QFlags<QTextDocument::FindFlag> findFlags = extractFindFlags(a_flagsMap);
+
+    editor->slotReplaceAll(a_findText, a_replaceText, findFlags, a_flagsMap[FIND_ID_REGEX]);
+
 }
 
 void MultiTabMainWindow::slotUpdateScriptBookmarkList()

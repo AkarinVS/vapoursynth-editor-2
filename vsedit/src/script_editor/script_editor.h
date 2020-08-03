@@ -48,9 +48,9 @@ public:
 
 	void setSettingsManager(SettingsManager * a_pSettingsManager);
 
-	std::vector<QAction *> actionsForMenu() const;
+    QVector<QAction *> actionsForMenu() const;
 
-        std::vector<vsedit::VariableToken> variables() const;
+    QVector<vsedit::VariableToken> variables() const;
 
 public slots:
 
@@ -60,7 +60,7 @@ public slots:
 
 	void slotInsertCompletion(const QString & a_completionString);
 
-        void slotDuplicateSelection();
+    void slotDuplicateSelection();
 
 	void slotCommentSelection();
 
@@ -81,6 +81,14 @@ public slots:
 	void slotMoveTextBlockDown();
 
 	void slotToggleComment();
+
+    QTextCursor slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
+
+    void slotReplace(const QString & a_findText, const QString & a_replaceText,
+                     const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
+
+    void slotReplaceAll(const QString & a_findText, const QString & a_replaceText,
+                        const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
 
 signals:
 
@@ -128,8 +136,8 @@ private:
 
 	void indentNewLine();
 
-        void insertSelectedLinesBegin(const QString & a_text);
-        void removeSelectedLinesBegin(const QString & a_text);
+    void insertSelectedLinesBegin(const QString & a_text);
+    void removeSelectedLinesBegin(const QString & a_text);
 
 	void fillVariables();
 
@@ -177,12 +185,12 @@ private:
 	QAction * m_pActionMoveTextBlockDown;
     QAction * m_pActionToggleComment;
 
-	std::vector<QAction *> m_settableActionsList;
+    QVector<QAction *> m_settableActionsList;
 
 	QString m_droppedFilePath;
 	int m_droppedFileNumber;
 
-	std::vector<vsedit::VariableToken> m_variables;
+    QVector<vsedit::VariableToken> m_variables;
 };
 
 #endif // SCRIPTEDITOR_H

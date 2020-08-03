@@ -273,7 +273,7 @@ void PreviewDialog::previewScript(const QString& a_script,
 	if(scriptChanged && (!m_alwaysKeepCurrentFrame))
 	{
 		m_frameExpected = 0;
-		m_ui.previewArea->setPixmap(QPixmap());
+//		m_ui.previewArea->setPixmap(QPixmap());
 	}
 
 	if(m_frameExpected > lastFrameNumber)
@@ -323,12 +323,12 @@ void PreviewDialog::stopAndCleanUp()
 	// -helps to keep the scrolling position when refreshing the script;
 	// -leaves the image blank on sudden error;
 	// -creates a blinking effect indicating the script is being refreshed.
-	const QPixmap * pPreviewPixmap = m_ui.previewArea->pixmap();
-	int pixmapWidth = pPreviewPixmap->width();
-	int pixmapHeight = pPreviewPixmap->height();
+        QPixmap previewPixmap = m_ui.previewArea->pixmap();
+        int pixmapWidth = previewPixmap.width();
+        int pixmapHeight = previewPixmap.height();
 	QPixmap blackPixmap(pixmapWidth, pixmapHeight);
 	blackPixmap.fill(Qt::black);
-	m_ui.previewArea->setPixmap(blackPixmap);
+        m_ui.previewArea->setPixmap(blackPixmap, 1.0);
 
 	if(m_cpFrameRef)
 	{
@@ -2018,21 +2018,21 @@ void PreviewDialog::setPreviewPixmap()
 
 		if(ratio == 1)
 		{
-			m_ui.previewArea->setPixmap(croppedPixmap);
+                        m_ui.previewArea->setPixmap(croppedPixmap, 1);
 			return;
 		}
 
 		QPixmap zoomedPixmap = croppedPixmap.scaled(
 			croppedPixmap.width() * ratio, croppedPixmap.height() * ratio,
 			Qt::KeepAspectRatio, Qt::FastTransformation);
-		m_ui.previewArea->setPixmap(zoomedPixmap);
+//		m_ui.previewArea->setPixmap(zoomedPixmap);
 		return;
 	}
 
     ZoomMode zoomMode = ZoomMode(m_ui.zoomModeComboBox->currentData().toInt());
 	if(zoomMode == ZoomMode::NoZoom)
 	{
-		m_ui.previewArea->setPixmap(m_framePixmap);
+//		m_ui.previewArea->setPixmap(m_framePixmap);
 		return;
 	}
 
@@ -2058,7 +2058,7 @@ void PreviewDialog::setPreviewPixmap()
 
 	previewPixmap = m_framePixmap.scaled(frameWidth, frameHeight,
 		Qt::KeepAspectRatio, scaleMode);
-	m_ui.previewArea->setPixmap(previewPixmap);
+//	m_ui.previewArea->setPixmap(previewPixmap);
 }
 
 // END OF bool void PreviewDialog::setPreviewPixmap()

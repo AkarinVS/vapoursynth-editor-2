@@ -178,7 +178,7 @@ void ScriptEditor::setSettingsManager(SettingsManager * a_pSettingsManager)
 //		SettingsManager * a_pSettingsManager)
 //==============================================================================
 
-std::vector<QAction *> ScriptEditor::actionsForMenu() const
+QVector<QAction *> ScriptEditor::actionsForMenu() const
 {
     return {m_pActionDuplicateSelection, m_pActionReplaceTabWithSpaces,
 		m_pActionMoveTextBlockUp, m_pActionMoveTextBlockDown,
@@ -188,9 +188,9 @@ std::vector<QAction *> ScriptEditor::actionsForMenu() const
 // END OF std::vector<QAction *> ScriptEditor::actionsForMenu() const
 //==============================================================================
 
-std::vector<vsedit::VariableToken> ScriptEditor::variables() const
+QVector<vsedit::VariableToken> ScriptEditor::variables() const
 {
-	std::vector<vsedit::VariableToken> cleanVariables = m_variables;
+    QVector<vsedit::VariableToken> cleanVariables = m_variables;
 	for(vsedit::VariableToken & variable : cleanVariables)
 		variable.evaluate = nullptr;
 	return cleanVariables;
@@ -569,7 +569,58 @@ void ScriptEditor::slotToggleComment()
 		}
 	}
 
-	cursor.endEditBlock();
+    cursor.endEditBlock();
+}
+
+QTextCursor ScriptEditor::slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
+{
+    QTextDocument *doc = document();
+    if (a_useRegEx == true) {
+        QRegularExpression re(a_text);
+        return doc->find(re);
+    } else {
+        return doc->find(a_text, a_flags);
+    }
+}
+
+void ScriptEditor::slotReplace(const QString & a_findText, const QString & a_replaceText,
+                               const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
+{
+    QTextCursor cursor = slotFind(a_findText, a_flags, a_useRegEx);
+
+    if (cursor.hasSelection()) {
+        cursor.insertText(a_replaceText);
+    }
+}
+
+void ScriptEditor::slotReplaceAll(const QString &a_findText, const QString &a_replaceText,
+                                  const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
+{
+    QTextCursor cursor = textCursor();
+    cursor.beginEditBlock();
+    cursor.movePosition(QTextCursor::Start);
+    QTextCursor newCursor = textCursor();
+    quint64 count = 0;
+
+    if (!a_findText.isEmpty()) {
+        while (true) {
+            newCursor = slotFind(a_findText, a_flags, a_useRegEx);
+
+            if (!newCursor.isNull())
+            {
+                if (newCursor.hasSelection())
+                {
+                    newCursor.insertText(a_replaceText);
+                    count++;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    cursor.endEditBlock();
 }
 
 // END OF void ScriptEditor::slotToggleComment()
@@ -846,7 +897,7 @@ void ScriptEditor::slotShowCustomMenu(const QPoint & a_position)
 	if(m_pSettingsManager)
 	{
 		m_pContextMenu->addSeparator();
-		std::vector<QAction *> actionsList = actionsForMenu();
+        QVector<QAction *> actionsList = actionsForMenu();
 		for(QAction * pAction : actionsList)
 			m_pContextMenu->addAction(pAction);
 	}
