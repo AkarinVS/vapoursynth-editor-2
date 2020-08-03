@@ -439,7 +439,19 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
         {&m_pActionSaveScriptAs, ACTION_ID_SAVE_SCRIPT_AS, false,
             this, SLOT(slotSaveScriptAs())},
         {&m_pActionExit, ACTION_ID_EXIT, false,
-            this, SLOT(close())},        
+            this, SLOT(close())},
+        {&m_pActionUndo, ACTION_ID_UNDO, false,
+            this, SLOT(slotEditorUndo())},
+        {&m_pActionRedo, ACTION_ID_REDO, false,
+            this, SLOT(slotEditorRedo())},
+        {&m_pActionCut, ACTION_ID_CUT, false,
+            this, SLOT(slotEditorCut())},
+        {&m_pActionCopy, ACTION_ID_COPY, false,
+            this, SLOT(slotEditorCopy())},
+        {&m_pActionPaste, ACTION_ID_PASTE, false,
+            this, SLOT(slotEditorPaste())},
+        {&m_pActionSelectAll, ACTION_ID_SELECT_ALL, false,
+            this, SLOT(slotEditorSelectAll())},
         {&m_pActionFind, ACTION_ID_FIND, false,
             this, SLOT(slotOpenFind())},
         {&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION, false,
@@ -563,8 +575,19 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 
     QMenu * pEditMenu = m_ui->menuBar->addMenu(tr("Edit"));
 
-    QList editorActions = {
-        m_pActionFind,
+    pEditMenu->addAction(m_pActionUndo);
+    pEditMenu->addAction(m_pActionRedo);
+    pEditMenu->addSeparator();
+    pEditMenu->addAction(m_pActionCut);
+    pEditMenu->addAction(m_pActionCopy);
+    pEditMenu->addAction(m_pActionPaste);
+    pEditMenu->addSeparator();
+    pEditMenu->addAction(m_pActionSelectAll);
+    pEditMenu->addSeparator();
+    pEditMenu->addAction(m_pActionFind);
+    pEditMenu->addSeparator();
+
+    QList editorActions = {        
         m_pActionDuplicateSelection,
         m_pActionReplaceTabWithSpaces,
         m_pActionMoveTextBlockUp,
@@ -1723,6 +1746,48 @@ void MultiTabMainWindow::slotSetPlayFPSLimit()
 //	m_pSettingsManager->setPlayFPSLimitMode(mode);
 //	m_pSettingsManager->setPlayFPSLimit(limit);
 
+}
+
+void MultiTabMainWindow::slotEditorUndo()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->undo();
+}
+
+void MultiTabMainWindow::slotEditorRedo()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->redo();
+}
+
+void MultiTabMainWindow::slotEditorCut()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->cut();
+}
+
+void MultiTabMainWindow::slotEditorCopy()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->copy();
+}
+
+void MultiTabMainWindow::slotEditorPaste()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->paste();
+}
+
+void MultiTabMainWindow::slotEditorSelectAll()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->selectAll();
 }
 
 void MultiTabMainWindow::slotOpenFind()

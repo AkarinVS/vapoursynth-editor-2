@@ -181,7 +181,14 @@ private:
     QAction * m_pActionSaveScript;
     QAction * m_pActionSaveScriptAs;
 
+    QAction * m_pActionUndo;
+    QAction * m_pActionRedo;
+    QAction * m_pActionCut;
+    QAction * m_pActionCopy;
+    QAction * m_pActionPaste;
+    QAction * m_pActionSelectAll;
     QAction * m_pActionFind;
+
     QAction * m_pActionDuplicateSelection;
     QAction * m_pActionCommentSelection;
     QAction * m_pActionUncommentSelection;
@@ -309,6 +316,13 @@ private slots:
     void slotSetPlayFPSLimit();
 
     /* editor */
+    void slotEditorUndo();
+    void slotEditorRedo();
+    void slotEditorCut();
+    void slotEditorCopy();
+    void slotEditorPaste();
+    void slotEditorSelectAll();
+
     void slotOpenFind();
     void slotDuplicateSelection();
     void slotReplaceTabWithSpaces();
