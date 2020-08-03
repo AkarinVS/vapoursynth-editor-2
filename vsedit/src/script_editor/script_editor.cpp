@@ -572,55 +572,37 @@ void ScriptEditor::slotToggleComment()
     cursor.endEditBlock();
 }
 
-QTextCursor ScriptEditor::slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
+bool ScriptEditor::slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
 {
-    QTextDocument *doc = document();
+    QTextCursor cursor;
     if (a_useRegEx == true) {
         QRegularExpression re(a_text);
-        return doc->find(re);
+        return find(re);
     } else {
-        return doc->find(a_text, a_flags);
+        return find(a_text, a_flags);
     }
 }
 
 void ScriptEditor::slotReplace(const QString & a_findText, const QString & a_replaceText,
                                const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
 {
-    QTextCursor cursor = slotFind(a_findText, a_flags, a_useRegEx);
-
-    if (cursor.hasSelection()) {
-        cursor.insertText(a_replaceText);
+    if (slotFind(a_findText, a_flags, a_useRegEx)) {
+        textCursor().insertText(a_replaceText);
     }
 }
 
 void ScriptEditor::slotReplaceAll(const QString &a_findText, const QString &a_replaceText,
                                   const QTextDocument::FindFlags &a_flags, bool a_useRegEx)
 {
-    QTextCursor cursor = textCursor();
-    cursor.beginEditBlock();
-    cursor.movePosition(QTextCursor::Start);
-    QTextCursor newCursor = textCursor();
+    textCursor().beginEditBlock();
+    moveCursor(QTextCursor::Start);
     quint64 count = 0;
 
-    if (!a_findText.isEmpty()) {
-        while (true) {
-            newCursor = slotFind(a_findText, a_flags, a_useRegEx);
-
-            if (!newCursor.isNull())
-            {
-                if (newCursor.hasSelection())
-                {
-                    newCursor.insertText(a_replaceText);
-                    count++;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
+    while (slotFind(a_findText, a_flags, a_useRegEx)) {
+        textCursor().insertText(a_replaceText);
+        count++;
     }
-    cursor.endEditBlock();
+    textCursor().endEditBlock();
 }
 
 // END OF void ScriptEditor::slotToggleComment()

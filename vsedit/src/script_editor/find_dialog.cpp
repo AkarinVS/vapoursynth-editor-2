@@ -12,6 +12,7 @@ FindDialog::FindDialog(QWidget *parent) :
     connect(ui->replaceButton, &QPushButton::clicked, this, &FindDialog::slotSendReplaceSignal);
     connect(ui->replaceAllButton, &QPushButton::clicked, this, &FindDialog::slotSendReplaceAllSignal);
     connect(ui->regexCheckBox, &QCheckBox::stateChanged, this, &FindDialog::slotRegExOnly);
+    connect(ui->closeButton, &QPushButton::clicked, [=](){ ui->FindLineEdit->setFocus(); hide(); });
 }
 
 FindDialog::~FindDialog()

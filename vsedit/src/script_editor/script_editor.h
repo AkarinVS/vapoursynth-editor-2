@@ -82,7 +82,7 @@ public slots:
 
 	void slotToggleComment();
 
-    QTextCursor slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
+    bool slotFind(const QString &a_text, const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
 
     void slotReplace(const QString & a_findText, const QString & a_replaceText,
                      const QTextDocument::FindFlags &a_flags, bool a_useRegEx);
