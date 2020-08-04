@@ -141,6 +141,7 @@ private:
 
     void createMenuActionsAndContextMenuActions();
     void createContextMenuActionsAndMenus();
+    void createTabBarContextMenuActions();
     void createStatusBar();
     void setPlaybackPanel();
 
@@ -172,6 +173,8 @@ private:
 
     QVector<EditorPreview> m_pEditorPreviewVector;
 
+    QMenu * m_pTabBarContectMenu;
+
     /* MenuBar menus and actions */
 //    QAction * m_pActionNewScript;
     QAction * m_pActionNewTab;
@@ -187,6 +190,7 @@ private:
     QAction * m_pActionCopy;
     QAction * m_pActionPaste;
     QAction * m_pActionSelectAll;
+    QAction * m_pActionCopyToNewTab;
     QAction * m_pActionFind;
 
     QAction * m_pActionDuplicateSelection;
@@ -283,12 +287,13 @@ private slots:
     void slotCreateTab(const QString & a_tabName = "",
                        const QString & a_scriptFilePath = "",
                        const QString & a_scriptText = "");
-    bool slotRemoveTab();
+    bool slotRemoveTab(int a_index = -1);
     bool slotRemoveAllTabs();
     void slotChangePreviewTab(int a_index);
     void slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex);
     void slotChangeScriptTab(int a_index);
     void slotPreviewScript();
+    void slotTabBarContextMenu(int a_tabIndex);
     void slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen);
 
     /* time line */
@@ -322,6 +327,7 @@ private slots:
     void slotEditorCopy();
     void slotEditorPaste();
     void slotEditorSelectAll();
+    void slotEditorCopyToNewTab();
 
     void slotOpenFind();
     void slotDuplicateSelection();

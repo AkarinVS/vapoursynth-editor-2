@@ -14,9 +14,15 @@ private:
 
     int m_currentSelectedIndex;
 
+protected:
+
+    virtual void mousePressEvent (QMouseEvent *a_pEvent) override;
+
 signals:
 
     void signalAboutToChanged(int currentTabIndex, int selectedTabIndex);
+    void tabBarRightClicked(int index);
+    void tabBarMiddleClicked(int index);
 
 private slots:
 

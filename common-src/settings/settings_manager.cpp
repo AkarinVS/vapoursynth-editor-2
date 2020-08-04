@@ -125,6 +125,7 @@ void SettingsManager::initializeStandardActions()
         {ACTION_ID_PASTE, tr("Paste"), QIcon(":paste.png"), QKeySequence::Paste},
         {ACTION_ID_SELECT_ALL, tr("Select All"), QIcon(":select_all.png"),
             QKeySequence::SelectAll},
+        {ACTION_ID_COPY_TO_NEW_TAB, tr("Copy To New Tab"), QIcon(), QKeySequence()},
         {ACTION_ID_FIND, tr("Find"), QIcon(), QKeySequence::Find},
         {ACTION_ID_DUPLICATE_SELECTION, tr("Duplicate selection or line"),
 			QIcon(), QKeySequence(Qt::CTRL + Qt::Key_D)},
@@ -253,7 +254,7 @@ QAction * SettingsManager::createStandardAction(const QString & a_actionID,
 
 	QAction * pAction = new QAction(it->icon, it->title, a_pParent);
 	pAction->setData(it->id);
-	pAction->setShortcut(hotkey);
+    pAction->setShortcut(hotkey);
 
     return pAction;
 }

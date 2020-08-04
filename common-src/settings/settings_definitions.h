@@ -149,6 +149,7 @@ extern const char ACTION_ID_CUT[];
 extern const char ACTION_ID_COPY[];
 extern const char ACTION_ID_PASTE[];
 extern const char ACTION_ID_SELECT_ALL[];
+extern const char ACTION_ID_COPY_TO_NEW_TAB[];
 extern const char ACTION_ID_ABOUT[];
 extern const char ACTION_ID_AUTOCOMPLETE[];
 extern const char ACTION_ID_SAVE_SNAPSHOT[];

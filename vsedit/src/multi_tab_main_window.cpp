@@ -105,6 +105,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createMainToolBar();
 
     createContextMenuActionsAndMenus();
+    createTabBarContextMenuActions();
     createStatusBar();
 
     setPlaybackPanel();
@@ -452,6 +453,8 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotEditorPaste())},
         {&m_pActionSelectAll, ACTION_ID_SELECT_ALL, false,
             this, SLOT(slotEditorSelectAll())},
+        {&m_pActionCopyToNewTab, ACTION_ID_COPY_TO_NEW_TAB, false,
+            this, SLOT(slotEditorCopyToNewTab())},
         {&m_pActionFind, ACTION_ID_FIND, false,
             this, SLOT(slotOpenFind())},
         {&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION, false,
@@ -583,6 +586,7 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     pEditMenu->addAction(m_pActionPaste);
     pEditMenu->addSeparator();
     pEditMenu->addAction(m_pActionSelectAll);
+    pEditMenu->addAction(m_pActionCopyToNewTab);
     pEditMenu->addSeparator();
     pEditMenu->addAction(m_pActionFind);
     pEditMenu->addSeparator();
@@ -679,6 +683,17 @@ void MultiTabMainWindow::createContextMenuActionsAndMenus()
     m_pPreviewContextMenu->addAction(m_pActionPasteShownFrameNumberIntoScript);
 
     //        m_pPreviewContextMenu->addAction(m_pActionSaveBookmarkToFile);
+}
+
+void MultiTabMainWindow::createTabBarContextMenuActions()
+{
+    m_pTabBarContectMenu = new QMenu(this);
+
+    connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarRightClicked,
+            this, &MultiTabMainWindow::slotTabBarContextMenu);
+
+    connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarMiddleClicked,
+            this, &MultiTabMainWindow::slotRemoveTab);
 }
 
 void MultiTabMainWindow::createStatusBar()
@@ -1062,12 +1077,16 @@ void MultiTabMainWindow::destroyOrphanQObjects()
     }
 }
 
-bool MultiTabMainWindow::slotRemoveTab()
+bool MultiTabMainWindow::slotRemoveTab(int a_index)
 {
     if (!safeToCloseFile()) return false;
     m_closingTab = true;
 
-    int currentTabIndex = m_ui->previewTabWidget->currentIndex();
+    int currentTabIndex;
+    if (a_index > -1)
+        currentTabIndex = a_index; // if trigger from middle click
+    else
+        currentTabIndex = m_ui->previewTabWidget->currentIndex();
 
     // cleanup cache from processor
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -1311,8 +1330,12 @@ void MultiTabMainWindow::slotPreviewScript()
             m_compareGroupList.append(newGroup);
         }
         endLoop:;
-
     }
+}
+
+void MultiTabMainWindow::slotTabBarContextMenu(int a_tabIndex)
+{
+    m_pTabBarContectMenu->popup(QCursor::pos());
 }
 
 void MultiTabMainWindow::slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen)
@@ -1788,6 +1811,17 @@ void MultiTabMainWindow::slotEditorSelectAll()
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->selectAll();
+}
+
+void MultiTabMainWindow::slotEditorCopyToNewTab()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
+
+    QString text = editor->toPlainText();
+    if (text.isEmpty()) return;
+
+    slotCreateTab("", "", text);
 }
 
 void MultiTabMainWindow::slotOpenFind()
