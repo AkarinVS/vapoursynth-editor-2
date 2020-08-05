@@ -1346,7 +1346,7 @@ void MultiTabMainWindow::slotTabBarContextMenu(int a_tabIndex)
 
 void MultiTabMainWindow::slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen)
 {
-    m_ui->frameNumberIndicatorSpinBox->setMaximum(a_numFrames - 1);
+    m_ui->frameNumberIndicatorSpinBox->setMaximum(a_numFrames);
     m_ui->timeLineView->slotSetTimeLine(a_numFrames, a_fpsNum, a_fpsDen);
 }
 
