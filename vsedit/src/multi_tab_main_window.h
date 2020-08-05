@@ -132,7 +132,7 @@ private:
 
     void createMainToolBar();
 
-    void createFindDialog();
+    void createFindDialog();   
     void createFrameInfoDialog();
     void createBookmarkManager();
 
@@ -211,7 +211,8 @@ private:
     QAction * m_pActionEnqueueEncodeJob;
     QAction * m_pActionJobs;
     QAction * m_pActionExit;
-    QAction * m_pActionBookmarkManager;
+    QAction * m_pActionShowBookmarkManager;
+    QAction * m_pActionShowFrameInfoDialog;
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
@@ -305,8 +306,8 @@ private slots:
     void slotTimeLineFrameChanged(int a_frame);
 
     void slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads);
-    void slotShowFrameInfoDialog();
-    void slotShowBookmarkManager();
+    void slotShowFrameInfoDialog(bool a_visible);
+    void slotShowBookmarkManager(bool a_visible);
 
     void slotZoomModeChanged();
     void slotZoomRatioChanged(double a_zoomRatio);

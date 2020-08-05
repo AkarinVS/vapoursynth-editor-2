@@ -24,6 +24,10 @@ private:
 
     SettingsManager * m_pSettingsManager;
 
+signals:
+
+    void signalDialogHidden();
+
 protected:
 
     void moveEvent(QMoveEvent * a_pEvent) override;

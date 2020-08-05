@@ -78,6 +78,8 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pActionMoveTextBlockUp(nullptr)
   , m_pActionMoveTextBlockDown(nullptr)
   , m_pActionToggleComment(nullptr)
+  , m_pActionShowBookmarkManager(nullptr)
+  , m_pActionShowFrameInfoDialog(nullptr)
   , m_playing(false)
   , m_closingApp(false)
   , m_closingTab(false)
@@ -366,17 +368,17 @@ void MultiTabMainWindow::createFindDialog()
 void MultiTabMainWindow::createFrameInfoDialog()
 {
     m_pFrameInfoDialog = new FrameInfoDialog(m_pSettingsManager ,this);
-    connect(m_ui->frameInfoButton, &QToolButton::clicked,
-            this, &MultiTabMainWindow::slotShowFrameInfoDialog);
+
+    connect(m_pFrameInfoDialog, &FrameInfoDialog::signalDialogHidden,
+            this, [=](){ m_pActionShowFrameInfoDialog->setChecked(false);});
 }
 
 void MultiTabMainWindow::createBookmarkManager()
 {
     m_pBookmarkManagerDialog = new BookmarkManagerDialog(m_pSettingsManager, this);
 
-    // connect
-    connect(m_ui->bookmarkManagerButton, &QPushButton::clicked,
-            this, &MultiTabMainWindow::slotShowBookmarkManager);
+    connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalDialogHidden,
+            this, [=](){ m_pActionShowBookmarkManager->setChecked(false);});
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalScriptBookmarkChanged,
             this, &MultiTabMainWindow::slotSetScriptBookmark);
@@ -401,7 +403,6 @@ void MultiTabMainWindow::createBookmarkManager()
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalSaveBookmarksToFile,
             this, &MultiTabMainWindow::slotSaveBookmarksToFile);
-
 }
 
 void MultiTabMainWindow::setTimeLineSignals()
@@ -490,9 +491,10 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotFrameToClipboard())},
         {&m_pActionSaveSnapshot, ACTION_ID_SAVE_SNAPSHOT, false,
             this, SLOT(slotSaveSnapshot())},
-
-        {&m_pActionBookmarkManager, ACTION_ID_BOOKMARK_MANAGER, false,
-            this, SLOT(slotShowBookmarkManager())},
+        {&m_pActionShowBookmarkManager, ACTION_ID_SHOW_BOOKMARK_MANAGER, true,
+            this, SLOT(slotShowBookmarkManager(bool))},
+        {&m_pActionShowFrameInfoDialog, ACTION_ID_SHOW_FRAME_INFO_DIALOG, true,
+            this, SLOT(slotShowFrameInfoDialog(bool))},
 
         {&m_pActionAbout, ACTION_ID_ABOUT, false,
             this, SLOT(slotAbout())},
@@ -667,7 +669,11 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 //------------------------------------------------------------------------------
 
     QMenu * pWindowMenu = m_ui->menuBar->addMenu(tr("Window"));
-    pWindowMenu->addAction(m_pActionBookmarkManager);
+    pWindowMenu->addAction(m_ui->ToolsDockWidget->toggleViewAction());
+    pWindowMenu->addAction(m_pActionShowBookmarkManager);
+    m_ui->bookmarkManagerButton->setDefaultAction(m_pActionShowBookmarkManager);
+    pWindowMenu->addAction(m_pActionShowFrameInfoDialog);
+    m_ui->frameInfoButton->setDefaultAction(m_pActionShowFrameInfoDialog);
 
 //------------------------------------------------------------------------------
 
@@ -1416,16 +1422,14 @@ void MultiTabMainWindow::slotUpdateStatusBarQueueState(size_t a_framesInQueue, s
     m_pStatusBarWidget->setQueueState(a_framesInQueue, a_frameInProcess, a_maxThreads);
 }
 
-void MultiTabMainWindow::slotShowFrameInfoDialog()
+void MultiTabMainWindow::slotShowFrameInfoDialog(bool a_visible)
 {
-    if (!m_pFrameInfoDialog->isVisible())
-        m_pFrameInfoDialog->show();
+    m_pFrameInfoDialog->setVisible(a_visible);
 }
 
-void MultiTabMainWindow::slotShowBookmarkManager()
+void MultiTabMainWindow::slotShowBookmarkManager(bool a_visible)
 {
-    if (!m_pBookmarkManagerDialog->isVisible())
-        m_pBookmarkManagerDialog->show();
+    m_pBookmarkManagerDialog->setVisible(a_visible);
 }
 
 void MultiTabMainWindow::slotZoomModeChanged()

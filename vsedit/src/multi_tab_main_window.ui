@@ -366,7 +366,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="ToolsDockWidget_2">
+  <widget class="QDockWidget" name="ToolsDockWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
      <horstretch>0</horstretch>
@@ -422,6 +422,9 @@
      <property name="text">
       <string>FI</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QToolButton" name="bookmarkManagerButton">
      <property name="geometry">
@@ -440,6 +443,9 @@
      </property>
      <property name="text">
       <string>BM</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

@@ -39,6 +39,7 @@ void FrameInfoDialog::moveEvent(QMoveEvent *a_pEvent)
 
 void FrameInfoDialog::hideEvent(QHideEvent *a_pEvent)
 {
+    emit signalDialogHidden();
     QDialog::hideEvent(a_pEvent);
     saveGeometryDelayed();
 }

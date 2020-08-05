@@ -53,7 +53,8 @@ void BookmarkManagerDialog::moveEvent(QMoveEvent *a_pEvent)
 }
 
 void BookmarkManagerDialog::hideEvent(QHideEvent *a_pEvent)
-{
+{    
+    emit signalDialogHidden();
     QDialog::hideEvent(a_pEvent);
     saveGeometryDelayed();
 }
@@ -156,7 +157,7 @@ void BookmarkManagerDialog::slotLoadBookmarkFile(QString fileName)
             QRegularExpressionMatch bookmarkMatch = i.next();
             int frameIndex = bookmarkMatch.captured(0).toInt();
 
-            int timeInMilli = (double(frameIndex) / m_fps) * 1000;
+            int timeInMilli = (double(frameIndex) / m_fps) * double(1000);
 
             m_bookmarkModel->addBookmark(frameIndex, timeInMilli);
         }

@@ -44,6 +44,8 @@ signals:
     void signalLoadChapterFile(QFile & a_file);
     void signalSaveBookmarksToFile();
 
+    void signalDialogHidden();
+
 private:
     Ui::BookmarkManagerDialog *ui;
 
