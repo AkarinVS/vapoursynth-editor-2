@@ -773,101 +773,179 @@ NodePair & VapourSynthScriptProcessor::getNodePair(int a_outputIndex,
 QString VapourSynthScriptProcessor::framePropsString(
 	const VSFrameRef * a_cpFrame) const
 {
-	if(!a_cpFrame)
+    if(!a_cpFrame)
         return tr("Null frame.");
 
-	Q_ASSERT(m_cpVSAPI);
+    Q_ASSERT(m_cpVSAPI);
 
-	QString propsString;
-	QStringList propsStringList;
+    QString propsString;
+    QStringList propsStringList;
 
-	std::map<char, QString> propTypeToString =
-	{
-		{ptUnset, "<unset>"},
-		{ptInt, "int"},
-		{ptFloat, "float"},
-		{ptData, "data"},
-		{ptNode, "node"},
-		{ptFrame, "frame"},
-		{ptFunction, "function"},
-	};
+    std::map<char, QString> propTypeToString =
+    {
+        {ptUnset, "<unset>"},
+        {ptInt, "int"},
+        {ptFloat, "float"},
+        {ptData, "data"},
+        {ptNode, "node"},
+        {ptFrame, "frame"},
+        {ptFunction, "function"},
+    };
 
-	const VSMap * cpProps = m_cpVSAPI->getFramePropsRO(a_cpFrame);
+    const VSMap * cpProps = m_cpVSAPI->getFramePropsRO(a_cpFrame);
 
-	int propsNumber = m_cpVSAPI->propNumKeys(cpProps);
-	for(int i = 0; i < propsNumber; ++i)
-	{
-		const char * propKey = m_cpVSAPI->propGetKey(cpProps, i);
-		if(!propKey)
-			continue;
-		QString currentPropString = QString("%1 : ").arg(propKey);
-		char propType = m_cpVSAPI->propGetType(cpProps, propKey);
-		currentPropString += propTypeToString[propType];
-		int elementsNumber = m_cpVSAPI->propNumElements(cpProps, propKey);
-		if(elementsNumber > 1)
-			currentPropString += "[]";
-		switch(propType)
-		{
-		case ptFrame:
-		case ptNode:
-		case ptFunction:
-			break;
-		case ptUnset:
-			currentPropString += ": <unset>";
-			break;
-		case ptInt:
-		case ptFloat:
-		case ptData:
-		{
-			currentPropString += " : ";
-			QStringList elementStringList;
-			for(int j = 0; j < elementsNumber; ++j)
-			{
-				QString elementString;
-				int error;
-				if(propType == ptInt)
-				{
-					int64_t element = m_cpVSAPI->propGetInt(cpProps,
-						propKey, j, &error);
-					if(error)
-						elementString = "<error>";
-					else
-						elementString = QString::number(element);
-				}
-				else if(propType == ptFloat)
-				{
-					double element = m_cpVSAPI->propGetFloat(cpProps,
-						propKey, j, &error);
-					if(error)
-						elementString = "<error>";
-					else
-						elementString = QString::number(element);
-				}
-				else if(propType == ptData)
-				{
-					const char * element = m_cpVSAPI->propGetData(cpProps,
-						propKey, j, &error);
-					if(error)
-						elementString = "<error>";
-					else
-						elementString = QString::fromUtf8(element);
-				}
+    int propsNumber = m_cpVSAPI->propNumKeys(cpProps);
+    int error;
+    for(int i = 0; i < propsNumber; ++i)
+    {
+        const char * propKey = m_cpVSAPI->propGetKey(cpProps, i);
+        if(!propKey)
+            continue;
+        QString currentPropString = QString("%1 : ").arg(propKey);
+        char propType = m_cpVSAPI->propGetType(cpProps, propKey);
 
-				elementStringList += elementString;
-			}
-			currentPropString += elementStringList.join(", ");
-			break;
-		}
-		default:
-			Q_ASSERT(false);
-		}
+        if (QString(propKey) == "_ColorRange") {
+            int64_t colorRange = m_cpVSAPI->propGetInt(cpProps, propKey, 0, &error);
+            if (error) break;
+            static QMap<int, QString> colorRangeMap = {
+                {0, "full range"},
+                {1, "limited range"}
+            };
+            currentPropString += colorRangeMap[colorRange];
 
-		propsStringList += currentPropString;
-	}
+        } else
+        if (QString(propKey) == "_FieldBased") {
+            int64_t fieldBased = m_cpVSAPI->propGetInt(cpProps, propKey, 0, &error);
+            if (error) break;
+            static QMap<int, QString> fieldBasedMap = {
+                {0, "frame based (progressive)"},
+                {1, "bottom field first"},
+                {2, "top field first"}
+            };
+            currentPropString += fieldBasedMap[fieldBased];
 
-	propsString = propsStringList.join("\n");
+        } else
+        if (QString(propKey) == "_ChromaLocation") {
+            int64_t chromaLocation = m_cpVSAPI->propGetInt(cpProps, propKey, 0, &error);
+            if (error) break;
+            static QMap<int, QString> chromaLocationMap = {
+                {0, "left"},
+                {1, "center"},
+                {2, "top left"},
+                {3, "top"},
+                {4, "bottom left"},
+                {5, "bottom"}
+            };
+            currentPropString += chromaLocationMap[chromaLocation];
 
-	return propsString;
+        } else
+        if (QString(propKey) == "_Matrix") {
+            int64_t matrix = m_cpVSAPI->propGetInt(cpProps, propKey, 0, &error);
+            if (error) break;
+            static QMap<int, QStringList> matrixMap = {
+                {0, {"IEC 61966-2-1 sRGB",
+                     "SMPTE ST 428-1 (2006)"}},
+                {1, {"Rec. ITU-R BT.709-6",
+                     "Rec. ITU-R BT.1361-0 (historical)",
+                     "IEC 61966-2-1 sYCC",
+                     "IEC 61966-2-4 xvYCC709",
+                     "SMPTE RP 177 (1993) Annex B"}},
+                {2, {""}},
+                {3, {""}},
+                {4, {"FCC Title 47 Code of Federal Regulations (2003) 73.682 (a) (20)"}},
+                {5, {"Rec. ITU-R BT.470-6 System B, G (historical)",
+                     "Rec. ITU-R BT.601-7 625",
+                     "Rec. ITU-R BT.1358-0 625 (historical)",
+                     "Rec. ITU-R BT.1700-0 625 PAL and 625 SECAM",
+                     "IEC 61966-2-4 xvYCC601"}},
+                {6, {"Rec. ITU-R BT.601-7 525",
+                     "Rec. ITU-R BT.1358-1 525 or 625 (historical)",
+                     "Rec. ITU-R BT.1700-0 NTSC",
+                     "SMPTE ST 170 (2004)"}},
+                {7, {"SMPTE ST 240 (1999, historical)"}},
+                {8, {""}},
+                {9, {"Rec. ITU-R BT.2020-2 non-constant luminance system",
+                     "Rec. ITU-R BT.2100-1 Y′CbCr"}},
+                {10, {"Rec. ITU-R BT.2020-2 constant luminance system"}},
+                {11, {"SMPTE ST 2085 (2015)"}},
+                {12, {""}},
+                {13, {""}},
+                {14, {"Rec. ITU-R BT.2100-1 ICTCP"}}
+            };
+            currentPropString += matrixMap[matrix].join(", ");
+        } else
+        if (QString(propKey) == "_PictType") {
+            QString pictType = m_cpVSAPI->propGetData(cpProps, propKey, 0, &error);
+            if (error) break;
+            currentPropString += pictType;
+        } else {
+
+            int elementsNumber = m_cpVSAPI->propNumElements(cpProps, propKey);
+            if(elementsNumber > 1)
+                currentPropString += "[]";
+            switch(propType)
+            {
+            case ptFrame:
+            case ptNode:
+            case ptFunction:
+                break;
+            case ptUnset:
+                currentPropString += ": <unset>";
+                break;
+            case ptInt:
+            case ptFloat:
+            case ptData:
+            {
+//                currentPropString += " : ";
+                QStringList elementStringList;
+                for(int j = 0; j < elementsNumber; ++j)
+                {
+                    QString elementString;
+                    int error;
+                    if(propType == ptInt)
+                    {
+                        int64_t element = m_cpVSAPI->propGetInt(cpProps,
+                                                                propKey, j, &error);
+                        if(error)
+                            elementString = "<error>";
+                        else
+                            elementString = QString::number(element);
+                    }
+                    else if(propType == ptFloat)
+                    {
+                        double element = m_cpVSAPI->propGetFloat(cpProps,
+                                                                 propKey, j, &error);
+                        if(error)
+                            elementString = "<error>";
+                        else
+                            elementString = QString::number(element);
+                    }
+                    else if(propType == ptData)
+                    {
+                        const char * element = m_cpVSAPI->propGetData(cpProps,
+                                                                      propKey, j, &error);
+                        if(error)
+                            elementString = "<error>";
+                        else
+                            elementString = QString::fromUtf8(element);
+                    }
+
+                    elementStringList += elementString;
+                }
+                currentPropString += elementStringList.join(", ");
+                break;
+            }
+            default:
+                Q_ASSERT(false);
+            }
+
+        }
+
+        propsStringList += currentPropString;
+    }
+
+    propsString = propsStringList.join("\n");
+    return propsString;
 }
 
 // END OF QString VapourSynthScriptProcessor::framePropsString(
@@ -878,6 +956,7 @@ void VapourSynthScriptProcessor::printFrameProps(const VSFrameRef * a_cpFrame)
 {
     QString message = tr("Frame properties:\n%1")
 		.arg(framePropsString(a_cpFrame));
+    qDebug() << message;
 	emit signalWriteLogMessage(mtDebug, message);
 }
 

@@ -208,6 +208,10 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     connect(ep.previewArea, &PreviewArea::signalMouseRightButtonReleased,
         this, &MultiTabMainWindow::slotPreviewAreaMouseRightButtonReleased);
 
+    // update frame properties for frame info dialog
+    connect(ep.processor, &ScriptProcessor::signalUpdateFramePropsString,
+        this, &MultiTabMainWindow::slotUpdateFramePropsString);
+
     // autocomplete feature in editor
     ep.editor->setPluginsList(m_vsPluginsList);
     ep.editor->setSettingsManager(m_pSettingsManager);
@@ -671,9 +675,13 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     QMenu * pWindowMenu = m_ui->menuBar->addMenu(tr("Window"));
     pWindowMenu->addAction(m_ui->ToolsDockWidget->toggleViewAction());
     pWindowMenu->addAction(m_pActionShowBookmarkManager);
+    m_pActionShowBookmarkManager->setIconText("BM");
     m_ui->bookmarkManagerButton->setDefaultAction(m_pActionShowBookmarkManager);
+    m_ui->bookmarkManagerButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    m_pActionShowFrameInfoDialog->setIconText("FI");
     pWindowMenu->addAction(m_pActionShowFrameInfoDialog);
     m_ui->frameInfoButton->setDefaultAction(m_pActionShowFrameInfoDialog);
+    m_ui->frameInfoButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
 
 //------------------------------------------------------------------------------
 
@@ -1773,6 +1781,14 @@ void MultiTabMainWindow::slotSetPlayFPSLimit()
 //	m_pSettingsManager->setPlayFPSLimitMode(mode);
 //	m_pSettingsManager->setPlayFPSLimit(limit);
 
+}
+
+void MultiTabMainWindow::slotUpdateFramePropsString(const QString &a_framePropsString)
+{
+    if(!m_pFrameInfoDialog->isVisible())
+        return;
+
+    m_pFrameInfoDialog->setFramePropsString(a_framePropsString);
 }
 
 void MultiTabMainWindow::slotEditorUndo()

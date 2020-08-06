@@ -31,6 +31,11 @@ void FrameInfoDialog::setMousePositionString(const QString &a_string)
     ui->mousePositionLabel->setText(a_string);
 }
 
+void FrameInfoDialog::setFramePropsString(const QString &a_string)
+{
+    ui->framePropsLabel->setText(a_string);
+}
+
 void FrameInfoDialog::moveEvent(QMoveEvent *a_pEvent)
 {
     QDialog::moveEvent(a_pEvent);

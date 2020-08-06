@@ -376,7 +376,7 @@
    <property name="minimumSize">
     <size>
      <width>80</width>
-     <height>38</height>
+     <height>44</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -385,11 +385,17 @@
      <height>524287</height>
     </size>
    </property>
+   <property name="accessibleName">
+    <string/>
+   </property>
    <property name="layoutDirection">
     <enum>Qt::RightToLeft</enum>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QDockWidget::title { text-align: center; }</string>
    </property>
    <property name="features">
     <set>QDockWidget::DockWidgetClosable</set>

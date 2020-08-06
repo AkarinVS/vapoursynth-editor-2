@@ -19,6 +19,7 @@ public:
 
     void setColorPickerString(const QString & a_string);
     void setMousePositionString(const QString & a_string);
+    void setFramePropsString(const QString & a_string);
 private:
     Ui::FrameInfoDialog *ui;
 

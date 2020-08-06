@@ -34,8 +34,6 @@ public:
 
     bool isPlaying();
 
-
-
 protected:
 
     virtual void stopAndCleanUp() override;
@@ -44,8 +42,6 @@ protected:
 
     void setCurrentFrame(const VSFrameRef * a_cpOutputFrameRef,
         const VSFrameRef * a_cpPreviewFrameRef);
-
-    void setPreviewPixmap();
 
     QPixmap pixmapFromCompatBGR32(const VSFrameRef * a_cpFrameRef);
 
@@ -92,6 +88,8 @@ signals:
     void signalFrameChanged(int a_frame);
 
     void signalUpdateFrameTimeIndicators(int a_frameIndex, const QTime &a_time);
+
+    void signalUpdateFramePropsString(const QString & a_framePropsString);
 
 };
 

@@ -321,6 +321,8 @@ private slots:
     void slotPlay(bool a_play);
     void slotSetPlayFPSLimit();
 
+    void slotUpdateFramePropsString(const QString & a_framePropsString);
+
     /* editor */
     void slotEditorUndo();
     void slotEditorRedo();

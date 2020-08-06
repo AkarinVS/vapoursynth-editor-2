@@ -44,6 +44,10 @@ void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, cons
     m_cpVSAPI->freeFrame(m_cpFrameRef);
     m_cpFrameRef = a_cpOutputFrameRef;
     m_framePixmap = pixmapFromCompatBGR32(a_cpPreviewFrameRef);
+
+    QString framePropsString = m_pVapourSynthScriptProcessor->framePropsString(m_cpFrameRef);
+    emit signalUpdateFramePropsString(framePropsString); // send frame properties string
+
     m_cpVSAPI->freeFrame(a_cpPreviewFrameRef);
 
     emit signalSetCurrentFrame(); // receiver can grab framePixmap
