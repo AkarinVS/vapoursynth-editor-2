@@ -78,9 +78,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="CrChannelButton">
+     <widget class="QPushButton" name="CbChannelButton">
       <property name="text">
-       <string>Cr</string>
+       <string>Cb</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -91,9 +91,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="CbChannelButton">
+     <widget class="QPushButton" name="CrChannelButton">
       <property name="text">
-       <string>Cb</string>
+       <string>Cr</string>
       </property>
       <property name="checkable">
        <bool>true</bool>

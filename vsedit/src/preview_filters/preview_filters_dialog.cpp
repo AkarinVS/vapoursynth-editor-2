@@ -95,7 +95,6 @@ void PreviewFiltersDialog::slotUpdateChannels(int a_id)
 {
     QAbstractButton * channelsBtn = m_pChannelsButtonGroup->button(a_id);
     channelsBtn->setChecked(true);
-    qDebug() << "checked id is: " << m_pChannelsButtonGroup->checkedId();
 
     m_previewFiltersMap["channels"] = a_id;
     slotSendPreviewFiltersMapSignal();

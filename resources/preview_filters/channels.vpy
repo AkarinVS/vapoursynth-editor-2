@@ -1,3 +1,4 @@
+
 eval("{c}")
 clip = vs.get_output()
 clip_yuv16 = core.resize.Bicubic(clip, format=vs.YUV444P16)
