@@ -102,6 +102,7 @@ const char ACTION_ID_UNCOMMENT_SELECTION[] = "uncomment_selection";
 const char ACTION_ID_REPLACE_TAB_WITH_SPACES[] = "replace_tab_with_spaces";
 const char ACTION_ID_SHOW_BOOKMARK_MANAGER[] = "show_bookmark_manager";
 const char ACTION_ID_SHOW_FRAME_INFO_DIALOG[] = "show_frame_info_dialog";
+const char ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG[] = "show_preview_filters_dialog";
 const char ACTION_ID_TIMELINE_LOAD_CHAPTERS[] = "timeline_load_chapters";
 const char ACTION_ID_TIMELINE_CLEAR_BOOKMARKS[] = "timeline_clear_bookmarks";
 const char ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME[] =

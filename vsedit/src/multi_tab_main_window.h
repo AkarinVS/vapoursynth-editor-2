@@ -24,6 +24,7 @@ class EncodeDialog;
 class TemplatesDialog;
 class PreviewAdvancedSettingsDialog;
 class FrameInfoDialog;
+class PreviewFiltersDialog;
 class FindDialog;
 class JobServerWatcherSocket;
 
@@ -39,6 +40,16 @@ struct EditorPreview {
     QString tabName;
     int tabNumber;
     int group;
+    QMap<QString, int> previewFilters;
+
+    EditorPreview():
+        editor(nullptr), previewArea(nullptr), processor(nullptr), bookmarkModel(nullptr),
+        scriptName(""), scriptFilePath(""), lastTimeLineFrameIndex(), lastZoomRatio(1),
+        tabName(""), tabNumber(-1), group(-1), previewFilters({{"channels", -2}})
+    {}
+
+    ~EditorPreview()
+    {}
 };
 
 struct ClipProp {
@@ -109,6 +120,7 @@ private:
     FindDialog * m_pFindDialog;
     PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
     BookmarkManagerDialog * m_pBookmarkManagerDialog;
+    PreviewFiltersDialog * m_pPreviewFiltersDialog;
 
     JobServerWatcherSocket * m_pJobServerWatcherSocket;
 
@@ -135,6 +147,7 @@ private:
     void createFindDialog();   
     void createFrameInfoDialog();
     void createBookmarkManager();
+    void createPreviewFilters();
 
     void setTabSignals(); // setup signals between editor and previewArea
     void setTimeLineSignals();
@@ -161,6 +174,8 @@ private:
 
     void setUpZoomPanel();
 
+    QString createPreviewFilterScript(const QString &a_script, const QMap<QString, int>&);
+
     QFlags<QTextDocument::FindFlag> extractFindFlags(const QMap<QString, bool> & a_flagsMap);
 
     double YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane,
@@ -176,7 +191,6 @@ private:
     QMenu * m_pTabBarContectMenu;
 
     /* MenuBar menus and actions */
-//    QAction * m_pActionNewScript;
     QAction * m_pActionNewTab;
     QAction * m_pActionOpenScript;
     QAction * m_pActionCloseTab;
@@ -213,6 +227,7 @@ private:
     QAction * m_pActionExit;
     QAction * m_pActionShowBookmarkManager;
     QAction * m_pActionShowFrameInfoDialog;
+    QAction * m_pActionShowPreivewFiltersDialog;
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
@@ -308,6 +323,7 @@ private slots:
     void slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads);
     void slotShowFrameInfoDialog(bool a_visible);
     void slotShowBookmarkManager(bool a_visible);
+    void slotShowPreviewFiltersDialog(bool a_visible);
 
     void slotZoomModeChanged();
     void slotZoomRatioChanged(double a_zoomRatio);
@@ -318,10 +334,15 @@ private slots:
     void slotCallAdvancedSettingsDialog();
     void slotPasteShownFrameNumberIntoScript();
 
+    /* preview filters */
+    void slotUpdateTabPreviewFilters(QMap<QString, int>);
+
     void slotPlay(bool a_play);
     void slotSetPlayFPSLimit();
 
     void slotUpdateFramePropsString(const QString & a_framePropsString);
+
+//    void slotPreviewFiltersChanged();
 
     /* editor */
     void slotEditorUndo();
@@ -387,6 +408,8 @@ private slots:
 signals:
 
     void signalTabNameChanged(const QString &a_oldName, const QString &a_newName);
+
+    void signalUpdatePreviewFiltersDisplay(const QMap<QString,int> &);
 
 };
 

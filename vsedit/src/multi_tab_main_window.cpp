@@ -4,6 +4,7 @@
 #include "preview/frame_info_dialog.h"
 #include "preview/preview_advanced_settings_dialog.h"
 #include "preview/frame_painter.h"
+#include "preview_filters/preview_filters_dialog.h"
 #include "../../common-src/qt_widgets_subclasses/collapse_expand_widget.h"
 #include "../../common-src/log/vs_editor_log.h"
 #include "../../common-src/vapoursynth/vapoursynth_script_processor.h"
@@ -80,6 +81,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pActionToggleComment(nullptr)
   , m_pActionShowBookmarkManager(nullptr)
   , m_pActionShowFrameInfoDialog(nullptr)
+  , m_pActionShowPreivewFiltersDialog(nullptr)
   , m_playing(false)
   , m_closingApp(false)
   , m_closingTab(false)
@@ -94,6 +96,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createTemplatesDialog();
     createAdvancedSettingsDialog();
     createFindDialog();
+    createPreviewFilters();
 
     createGarbageCollection();
     slotCreateTab();
@@ -120,6 +123,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createBenchmarkDialog();
     createEncodeDialog();
     createFrameInfoDialog();
+
     createJobServerWatcher();
 
     connect(m_ui->displayModeToggleButton, &QPushButton::clicked,
@@ -211,6 +215,13 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     // update frame properties for frame info dialog
     connect(ep.processor, &ScriptProcessor::signalUpdateFramePropsString,
         this, &MultiTabMainWindow::slotUpdateFramePropsString);
+
+    // recieve preview filter changed signal and copy it to the object's property, then run preview script
+    connect(m_pPreviewFiltersDialog, &PreviewFiltersDialog::signalPreviewFiltersChanged,
+            this, &MultiTabMainWindow::slotUpdateTabPreviewFilters);
+
+    connect(this, &MultiTabMainWindow::signalUpdatePreviewFiltersDisplay,
+            m_pPreviewFiltersDialog, &PreviewFiltersDialog::slotUpdateDisplay);
 
     // autocomplete feature in editor
     ep.editor->setPluginsList(m_vsPluginsList);
@@ -409,6 +420,14 @@ void MultiTabMainWindow::createBookmarkManager()
             this, &MultiTabMainWindow::slotSaveBookmarksToFile);
 }
 
+void MultiTabMainWindow::createPreviewFilters()
+{
+    m_pPreviewFiltersDialog = new PreviewFiltersDialog(m_pSettingsManager, this);
+
+    connect(m_pPreviewFiltersDialog, &PreviewFiltersDialog::signalDialogHidden,
+            this, [=](){ m_pActionShowPreivewFiltersDialog->setChecked(false);});
+}
+
 void MultiTabMainWindow::setTimeLineSignals()
 {
     connect(m_ui->timeLineView, &TimeLineView::signalFrameChanged, // frame change
@@ -499,6 +518,8 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotShowBookmarkManager(bool))},
         {&m_pActionShowFrameInfoDialog, ACTION_ID_SHOW_FRAME_INFO_DIALOG, true,
             this, SLOT(slotShowFrameInfoDialog(bool))},
+        {&m_pActionShowPreivewFiltersDialog, ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG, true,
+            this, SLOT(slotShowPreviewFiltersDialog(bool))},
 
         {&m_pActionAbout, ACTION_ID_ABOUT, false,
             this, SLOT(slotAbout())},
@@ -678,10 +699,16 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     m_pActionShowBookmarkManager->setIconText("BM");
     m_ui->bookmarkManagerButton->setDefaultAction(m_pActionShowBookmarkManager);
     m_ui->bookmarkManagerButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+
     m_pActionShowFrameInfoDialog->setIconText("FI");
     pWindowMenu->addAction(m_pActionShowFrameInfoDialog);
     m_ui->frameInfoButton->setDefaultAction(m_pActionShowFrameInfoDialog);
     m_ui->frameInfoButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+
+    m_pActionShowPreivewFiltersDialog->setIconText("PF");
+    pWindowMenu->addAction(m_pActionShowPreivewFiltersDialog);
+    m_ui->previewFiltersButton->setDefaultAction(m_pActionShowPreivewFiltersDialog);
+    m_ui->previewFiltersButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
 
 //------------------------------------------------------------------------------
 
@@ -989,6 +1016,38 @@ void MultiTabMainWindow::setUpZoomPanel()
             this, &MultiTabMainWindow::slotZoomRatioChanged);
 }
 
+QString MultiTabMainWindow::createPreviewFilterScript(const QString &a_script, const QMap<QString, int>& a_filtersMap)
+{
+    if (a_filtersMap.isEmpty()) return a_script;
+
+    QRegularExpression reScriptOutput("(?smi)^[().\\w]+\\.set_output\\(\\)(?!.*^[().\\w]+\\.set_output\\(\\))");
+    QString scriptChain = "";
+
+    if (a_filtersMap["channels"] > -1) {
+        QFile file(":/preview_filters/channels.vpy"); // read from resource file
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        scriptChain = file.readAll();
+
+        QRegularExpressionMatch match = reScriptOutput.match(a_script);
+        if (!match.hasMatch()) {
+            qDebug() << "no match or clip output function changed, check vs doc";
+        } else {
+            QString clipOutputString = match.captured(0); // get last capture of set_output
+            scriptChain.prepend(a_script); // prepend editor script to filter script
+
+            QRegularExpression reClipPlaceHolder("{c}");
+            scriptChain.replace(reClipPlaceHolder, clipOutputString);
+
+            QRegularExpression rePlanePlaceHolder("{x}");
+            scriptChain.replace(rePlanePlaceHolder, QVariant(a_filtersMap["channels"]).toString());
+        }
+    } else {
+        return a_script;
+    }
+
+    return scriptChain;
+}
+
 QFlags<QTextDocument::FindFlag> MultiTabMainWindow::extractFindFlags(const QMap<QString, bool> &a_flags)
 {
     QFlags<QTextDocument::FindFlag> findFlags;
@@ -1102,10 +1161,7 @@ bool MultiTabMainWindow::slotRemoveTab(int a_index)
     else
         currentTabIndex = m_ui->previewTabWidget->currentIndex();
 
-    // cleanup cache from processor
-    ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
     QString scriptName = m_pEditorPreviewVector[currentTabIndex].scriptName;
-    processor->cleanUpOnClose();
 
     // remove script from compare group
     for (auto &group : m_compareGroupList) {
@@ -1260,6 +1316,10 @@ void MultiTabMainWindow::slotChangeScriptTab(int a_index)
 
         m_ui->timeLineView->centerSliderOnCurrentFrame();
 
+        /* send signal to update preview filters button */
+        QMap<QString,int> previewFilters = m_pEditorPreviewVector[a_index].previewFilters;
+        emit signalUpdatePreviewFiltersDisplay(previewFilters);
+
         slotSetPlayFPSLimit();
 
         m_pStatusBarWidget->show();
@@ -1299,7 +1359,11 @@ void MultiTabMainWindow::slotPreviewScript()
 
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
 
-    if (processor->previewScript(script, scriptName)) {
+    /* create preview filters script */
+    QMap<QString,int> previewFilters = m_pEditorPreviewVector[currentIndex].previewFilters;
+    QString scriptChain = createPreviewFilterScript(script, previewFilters);
+
+    if (processor->previewScript(scriptChain, scriptName)) {
         if (!m_ui->timeLineView->isEnabled())
             m_ui->timeLineView->setEnabled(true);
 
@@ -1440,6 +1504,11 @@ void MultiTabMainWindow::slotShowBookmarkManager(bool a_visible)
     m_pBookmarkManagerDialog->setVisible(a_visible);
 }
 
+void MultiTabMainWindow::slotShowPreviewFiltersDialog(bool a_visible)
+{
+    m_pPreviewFiltersDialog->setVisible(a_visible);
+}
+
 void MultiTabMainWindow::slotZoomModeChanged()
 {
     int currentIndex = m_ui->scriptTabWidget->currentIndex();
@@ -1476,7 +1545,6 @@ void MultiTabMainWindow::slotZoomModeChanged()
         int zoomModeIndex = m_ui->zoomModeComboBox->findData(int(zoomMode));
         m_ui->zoomModeComboBox->setCurrentIndex(zoomModeIndex);
     }
-
 
     bool fixedRatio(zoomMode == ZoomMode::FixedRatio);
     m_ui->zoomRatioSpinBox->setEnabled(fixedRatio);
@@ -1702,6 +1770,22 @@ void MultiTabMainWindow::slotPasteShownFrameNumberIntoScript()
     ScriptEditor * editor =  m_pEditorPreviewVector[currentTabIndex].editor;
     int frameShown = processor->currentFrame();
     editor->insertPlainText(QVariant(frameShown).toString());
+}
+
+void MultiTabMainWindow::slotUpdateTabPreviewFilters(QMap<QString, int> a_filtersMap)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    QMap<QString,int> pf = m_pEditorPreviewVector[currentTabIndex].previewFilters;
+
+    ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
+
+    if (processor->script().isEmpty()) return;
+
+    // if preview filters changed, update it and reload script to take affect
+    if (pf != a_filtersMap) {
+        m_pEditorPreviewVector[currentTabIndex].previewFilters = a_filtersMap;
+        slotPreviewScript();
+    }
 }
 
 void MultiTabMainWindow::slotPlay(bool a_play)

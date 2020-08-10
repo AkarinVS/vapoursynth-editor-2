@@ -169,7 +169,7 @@ RCC_DIR = $${PROJECT_DIRECTORY}/generated/rcc
 
 #TRANSLATIONS
 
-RESOURCES = $${COMMON_DIRECTORY}/resources/vsedit.qrc
+RESOURCES += $${COMMON_DIRECTORY}/resources/vsedit.qrc
 
 FORMS += $${COMMON_DIRECTORY}/common-src/log/styled_log_view_settings_dialog.ui \
     ../../vsedit/src/multi_tab_main_window.ui
@@ -185,6 +185,7 @@ FORMS += $${PROJECT_DIRECTORY}/src/frame_consumers/encode_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/script_editor/find_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.ui
+FORMS += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/main_window.ui
 FORMS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.ui
 
@@ -251,6 +252,7 @@ HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/drop_file_category_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.h
+HEADERS += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/main_window.h
 HEADERS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.h
 
@@ -315,6 +317,7 @@ SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/drop_file_category_model.c
 SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.cpp
+SOURCES += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main.cpp

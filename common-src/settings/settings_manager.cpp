@@ -14,6 +14,7 @@ const char MAIN_WINDOW_GEOMETRY_KEY[] = "main_window_geometry";
 const char PREVIEW_DIALOG_GEOMETRY_KEY[] = "prewiew_dialog_geometry";
 const char BOOKMARK_MANAGER_DIALOG_GEOMETRY_KEY[] = "bookmark_manager_dialog_geometry";
 const char FRAME_INFO_DIALOG_GEOMETRY_KEY[] = "frame_info_dialog_geometry";
+const char PREVIEW_FILTERS_DIALOG_GEOMETRY_KEY[] = "preview_filters_dialog_geometry";
 const char JOB_SERVER_WATCHER_GEOMETRY_KEY[] = "job_server_watcher_geometry";
 const char MAIN_WINDOW_MAXIMIZED_KEY[] = "main_window_maximized";
 const char PREVIEW_DIALOG_MAXIMIZED_KEY[] = "preview_dialog_maximized";
@@ -197,6 +198,8 @@ void SettingsManager::initializeStandardActions()
             QIcon(":bookmark_manager.png"), QKeySequence()},
         {ACTION_ID_SHOW_FRAME_INFO_DIALOG, tr("Frame Info"),
             QIcon(":frame_info.png"), QKeySequence()},
+        {ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG, tr("Preview Filters"),
+            QIcon(":preview_filters.png"), QKeySequence()},
         {ACTION_ID_TIMELINE_LOAD_CHAPTERS, tr("Load chapters"),
 			QIcon(":load.png"), QKeySequence()},
         {ACTION_ID_TIMELINE_CLEAR_BOOKMARKS, tr("Clear bookmarks"),
@@ -536,6 +539,18 @@ QByteArray SettingsManager::getFrameInfoDialogGeometry() const
 bool SettingsManager::setFrameInfoDialogGeometry(const QByteArray & a_frameInfoDialogGeometry)
 {
     return setValue(FRAME_INFO_DIALOG_GEOMETRY_KEY, a_frameInfoDialogGeometry);
+}
+
+//==============================================================================
+
+QByteArray SettingsManager::getPreviewFiltersDialogGeometry() const
+{
+    return value(PREVIEW_FILTERS_DIALOG_GEOMETRY_KEY).toByteArray();
+}
+
+bool SettingsManager::setPreviewFiltersDialogGeometry(const QByteArray & a_previewFiltersDialogGeometry)
+{
+    return setValue(PREVIEW_FILTERS_DIALOG_GEOMETRY_KEY, a_previewFiltersDialogGeometry);
 }
 
 //==============================================================================

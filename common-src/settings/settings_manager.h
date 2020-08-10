@@ -85,6 +85,11 @@ public:
 
     bool setFrameInfoDialogGeometry(const QByteArray & a_frameInfoDialogGeometry);
 
+    QByteArray getPreviewFiltersDialogGeometry() const;
+
+    bool setPreviewFiltersDialogGeometry(const QByteArray & a_previewFiltersDialogGeometry);
+
+
 	QByteArray getJobServerWatcherGeometry() const;
 
 	bool setJobServerWatcherGeometry(const QByteArray & a_geometry);
