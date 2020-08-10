@@ -630,8 +630,10 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
         m_pActionToggleComment
     };
 
-    for(QAction * pAction : editorActions)
+    for(QAction * pAction : editorActions) {
+        pAction->setShortcutContext(Qt::WidgetWithChildrenShortcut); // need this to override window's shortcut
         pEditMenu->addAction(pAction);
+    }
 
     pEditMenu->addSeparator();
     pEditMenu->addAction(m_pActionTemplates);

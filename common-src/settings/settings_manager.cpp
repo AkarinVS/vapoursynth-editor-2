@@ -104,8 +104,6 @@ void SettingsManager::initializeStandardActions()
 {
 	m_standardActions =
 	{
-//        {ACTION_ID_NEW_SCRIPT, tr("New script"), QIcon(":new.png"),
-//			QKeySequence::New},
         {ACTION_ID_NEW_TAB, tr("New tab"), QIcon(":new.png"),
             QKeySequence::New},
         {ACTION_ID_OPEN_SCRIPT, tr("Open script"), QIcon(":load.png"),
