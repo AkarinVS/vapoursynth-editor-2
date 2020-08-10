@@ -142,17 +142,18 @@ void PreviewArea::keyPressEvent(QKeyEvent * a_pEvent)
 		return;
 	}
 
-	int key = a_pEvent->key();
-	int wantedKeys[] = {Qt::Key_Left, Qt::Key_Right, Qt::Key_Up, Qt::Key_Down,
-		Qt::Key_PageUp, Qt::Key_PageDown, Qt::Key_Home, Qt::Key_End};
-	int * pKeysEnd = wantedKeys + sizeof(wantedKeys) / sizeof(*wantedKeys);
-	if(pKeysEnd != std::find(wantedKeys, pKeysEnd, key))
-	{
-		a_pEvent->ignore();
-		return;
-	}
+    int key = a_pEvent->key();
 
-	QScrollArea::keyPressEvent(a_pEvent);
+    if (key == Qt::Key_Left)
+        emit signalKeyPressed(Qt::Key_Left);
+    else if (key == Qt::Key_Right)
+        emit signalKeyPressed(Qt::Key_Right);
+    else if (key == Qt::Key_Home)
+        emit signalKeyPressed(Qt::Key_Home);
+    else if (key == Qt::Key_End)
+        emit signalKeyPressed(Qt::Key_End);
+    else
+        QScrollArea::keyPressEvent(a_pEvent);
 }
 
 // END OF void PreviewArea::keyPressEvent(QKeyEvent * a_pEvent)

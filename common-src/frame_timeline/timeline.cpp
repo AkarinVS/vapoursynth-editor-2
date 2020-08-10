@@ -224,6 +224,11 @@ void TimeLine::setStep(int a_step)
     m_step = a_step;
 }
 
+int TimeLine::maxFrame()
+{
+    return m_maxFrame;
+}
+
 // END OF void TimeLine::setStep(int a_step)
 //==============================================================================
 

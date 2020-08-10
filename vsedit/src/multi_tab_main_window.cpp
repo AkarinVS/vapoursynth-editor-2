@@ -212,6 +212,10 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     connect(ep.previewArea, &PreviewArea::signalMouseRightButtonReleased,
         this, &MultiTabMainWindow::slotPreviewAreaMouseRightButtonReleased);
 
+    // connect keypress in preview area to timeline
+    connect(ep.previewArea, &PreviewArea::signalKeyPressed,
+        m_ui->timeLineView , &TimeLineView::slotPreviewAreaKeyPressed);
+
     // update frame properties for frame info dialog
     connect(ep.processor, &ScriptProcessor::signalUpdateFramePropsString,
         this, &MultiTabMainWindow::slotUpdateFramePropsString);

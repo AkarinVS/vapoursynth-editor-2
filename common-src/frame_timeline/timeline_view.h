@@ -65,25 +65,26 @@ public slots:
     void slotGoToPreviousBookmark();
     void slotGoToNextBookmark();
 
+    void slotPreviewAreaKeyPressed(Qt::Key a_enumKey);
+
 private slots:
 
     void slotFrameChangedHandler(int a_frame);
 
 private:
 
-    QGraphicsScene *scene;
-    Slider *slider;
-    TimeLine *timeLine;
-
-//    int m_maxFrame;
+    QGraphicsScene * m_pScene;
+    Slider * m_pSlider;
+    TimeLine * m_pTimeLine;
 
     bool m_playing;
-
     bool m_mousePressed;
 
 protected:
 
-    void mousePressEvent(QMouseEvent * a_event) override;
+    void keyPressEvent(QKeyEvent *a_pEvent) override;
+
+    void mousePressEvent(QMouseEvent * a_pEvent) override;
 
     void mouseReleaseEvent (QMouseEvent * a_pEvent) override;
 

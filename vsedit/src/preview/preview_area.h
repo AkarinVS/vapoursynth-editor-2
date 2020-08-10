@@ -48,6 +48,7 @@ protected:
 
 signals:
 
+    void signalKeyPressed(Qt::Key a_enumKey);
 	void signalSizeChanged();
 	void signalCtrlWheel(QPoint a_angleDelta);
 	void signalMouseMiddleButtonReleased();

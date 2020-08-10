@@ -54,6 +54,7 @@ public:
 
     void setStep(int a_step);
 
+    int maxFrame();
 
     /**** original ****/
     int frame() const;
