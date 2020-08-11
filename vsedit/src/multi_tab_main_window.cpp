@@ -85,6 +85,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_playing(false)
   , m_closingApp(false)
   , m_closingTab(false)
+  , m_rightClickedTab(-1)
 
   , m_pGeometrySaveTimer(nullptr)
 {
@@ -771,6 +772,7 @@ void MultiTabMainWindow::createContextMenuActionsAndMenus()
 void MultiTabMainWindow::createTabBarContextMenuActions()
 {
     m_pTabBarContectMenu = new QMenu(this);
+    m_pTabBarContectMenu->addAction(m_pActionCloseTab);
 
     connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarRightClicked,
             this, &MultiTabMainWindow::slotTabBarContextMenu);
@@ -1198,6 +1200,10 @@ bool MultiTabMainWindow::slotRemoveTab(int a_index)
     m_closingTab = true;
 
     int currentTabIndex;
+    if (m_rightClickedTab > -1) {
+        currentTabIndex = m_rightClickedTab; // if triggerred from right click tab action
+        m_rightClickedTab = -1;
+    } else
     if (a_index > -1)
         currentTabIndex = a_index; // if trigger from middle click
     else
@@ -1454,7 +1460,8 @@ void MultiTabMainWindow::slotPreviewScript()
 }
 
 void MultiTabMainWindow::slotTabBarContextMenu(int a_tabIndex)
-{
+{    
+    m_rightClickedTab = a_tabIndex;
     m_pTabBarContectMenu->popup(QCursor::pos());
 }
 

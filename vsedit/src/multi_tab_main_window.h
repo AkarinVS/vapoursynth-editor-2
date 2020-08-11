@@ -294,6 +294,7 @@ private:
     QList<int> m_tabNumberList;
     bool m_closingApp;
     bool m_closingTab;
+    int m_rightClickedTab;
 
     QTimer * m_pGeometrySaveTimer;
     QByteArray m_windowGeometry;
