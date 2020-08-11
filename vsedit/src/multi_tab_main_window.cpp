@@ -449,90 +449,110 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
         QAction ** ppAction;
         const char * id;
         bool checkable;
+        QVariant data;
         QObject * pObjectToConnect;
         const char * slotToConnect;
     };
 
     ActionToCreate actionsToCreate[] =
     {
-        {&m_pActionNewTab, ACTION_ID_NEW_TAB, false,
+        {&m_pActionNewTab, ACTION_ID_NEW_TAB, false, NULL,
             this, SLOT(slotCreateTab())},
-        {&m_pActionOpenScript, ACTION_ID_OPEN_SCRIPT, false,
+        {&m_pActionOpenScript, ACTION_ID_OPEN_SCRIPT, false, NULL,
             this, SLOT(slotOpenScript())},
-        {&m_pActionCloseTab, ACTION_ID_CLOSE_TAB, false,
+        {&m_pActionCloseTab, ACTION_ID_CLOSE_TAB, false, NULL,
             this, SLOT(slotRemoveTab())},
-        {&m_pActionCloseAllTabs, ACTION_ID_CLOSE_ALL_TABS, false,
+        {&m_pActionCloseAllTabs, ACTION_ID_CLOSE_ALL_TABS, false, NULL,
             this, SLOT(slotRemoveAllTabs())},
-        {&m_pActionSaveScript, ACTION_ID_SAVE_SCRIPT, false,
+        {&m_pActionSaveScript, ACTION_ID_SAVE_SCRIPT, false, NULL,
             this, SLOT(slotSaveScript())},
-        {&m_pActionSaveScriptAs, ACTION_ID_SAVE_SCRIPT_AS, false,
+        {&m_pActionSaveScriptAs, ACTION_ID_SAVE_SCRIPT_AS, false, NULL,
             this, SLOT(slotSaveScriptAs())},
-        {&m_pActionExit, ACTION_ID_EXIT, false,
+        {&m_pActionExit, ACTION_ID_EXIT, false, NULL,
             this, SLOT(close())},
-        {&m_pActionUndo, ACTION_ID_UNDO, false,
+        {&m_pActionUndo, ACTION_ID_UNDO, false, NULL,
             this, SLOT(slotEditorUndo())},
-        {&m_pActionRedo, ACTION_ID_REDO, false,
+        {&m_pActionRedo, ACTION_ID_REDO, false, NULL,
             this, SLOT(slotEditorRedo())},
-        {&m_pActionCut, ACTION_ID_CUT, false,
+        {&m_pActionCut, ACTION_ID_CUT, false, NULL,
             this, SLOT(slotEditorCut())},
-        {&m_pActionCopy, ACTION_ID_COPY, false,
+        {&m_pActionCopy, ACTION_ID_COPY, false, NULL,
             this, SLOT(slotEditorCopy())},
-        {&m_pActionPaste, ACTION_ID_PASTE, false,
+        {&m_pActionPaste, ACTION_ID_PASTE, false, NULL,
             this, SLOT(slotEditorPaste())},
-        {&m_pActionSelectAll, ACTION_ID_SELECT_ALL, false,
+        {&m_pActionSelectAll, ACTION_ID_SELECT_ALL, false, NULL,
             this, SLOT(slotEditorSelectAll())},
-        {&m_pActionCopyToNewTab, ACTION_ID_COPY_TO_NEW_TAB, false,
+        {&m_pActionCopyToNewTab, ACTION_ID_COPY_TO_NEW_TAB, false, NULL,
             this, SLOT(slotEditorCopyToNewTab())},
-        {&m_pActionFind, ACTION_ID_FIND, false,
+        {&m_pActionFind, ACTION_ID_FIND, false, NULL,
             this, SLOT(slotOpenFind())},
-        {&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION, false,
+        {&m_pActionDuplicateSelection, ACTION_ID_DUPLICATE_SELECTION, false, NULL,
             this, SLOT(slotDuplicateSelection())},
-        {&m_pActionReplaceTabWithSpaces, ACTION_ID_REPLACE_TAB_WITH_SPACES, false,
+        {&m_pActionReplaceTabWithSpaces, ACTION_ID_REPLACE_TAB_WITH_SPACES, false, NULL,
             this, SLOT(slotReplaceTabWithSpaces())},
-        {&m_pActionAutocomplete, ACTION_ID_AUTOCOMPLETE, false,
+        {&m_pActionAutocomplete, ACTION_ID_AUTOCOMPLETE, false, NULL,
             this, SLOT(slotComplete())},
-        {&m_pActionMoveTextBlockUp, ACTION_ID_MOVE_TEXT_BLOCK_UP, false,
+        {&m_pActionMoveTextBlockUp, ACTION_ID_MOVE_TEXT_BLOCK_UP, false, NULL,
             this, SLOT(slotMoveTextBlockUp())},
-        {&m_pActionMoveTextBlockDown, ACTION_ID_MOVE_TEXT_BLOCK_DOWN, false,
+        {&m_pActionMoveTextBlockDown, ACTION_ID_MOVE_TEXT_BLOCK_DOWN, false, NULL,
             this, SLOT(slotMoveTextBlockDown())},
-        {&m_pActionToggleComment, ACTION_ID_TOGGLE_COMMENT, false,
+        {&m_pActionToggleComment, ACTION_ID_TOGGLE_COMMENT, false, NULL,
             this, SLOT(slotToggleComment())},
-
-        {&m_pActionTemplates, ACTION_ID_TEMPLATES, false,
+        {&m_pActionTemplates, ACTION_ID_TEMPLATES, false, NULL,
             this, SLOT(slotTemplates())},
-        {&m_pActionSettings, ACTION_ID_SETTINGS, false,
+        {&m_pActionSettings, ACTION_ID_SETTINGS, false, NULL,
             m_pSettingsDialog, SLOT(slotCall())},
-        {&m_pActionPreview, ACTION_ID_PREVIEW, false,
+
+        {&m_pActionChangeToTab1, ACTION_ID_CHANGE_TO_TAB_1, false, 0,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab2, ACTION_ID_CHANGE_TO_TAB_2, false, 1,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab3, ACTION_ID_CHANGE_TO_TAB_3, false, 2,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab4, ACTION_ID_CHANGE_TO_TAB_4, false, 3,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab5, ACTION_ID_CHANGE_TO_TAB_5, false, 4,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab6, ACTION_ID_CHANGE_TO_TAB_6, false, 5,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab7, ACTION_ID_CHANGE_TO_TAB_7, false, 6,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab8, ACTION_ID_CHANGE_TO_TAB_8, false, 7,
+            this, SLOT(slotChangeTabByAction())},
+        {&m_pActionChangeToTab9, ACTION_ID_CHANGE_TO_TAB_9, false, 8,
+            this, SLOT(slotChangeTabByAction())},
+
+        {&m_pActionPreview, ACTION_ID_PREVIEW, false, NULL,
             this, SLOT(slotPreviewScript())},
-        {&m_pActionCheckScript, ACTION_ID_CHECK_SCRIPT, false,
+        {&m_pActionCheckScript, ACTION_ID_CHECK_SCRIPT, false, NULL,
             this, SLOT(slotCheckScript())},
-        {&m_pActionBenchmark, ACTION_ID_BENCHMARK, false,
+        {&m_pActionBenchmark, ACTION_ID_BENCHMARK, false, NULL,
             this, SLOT(slotBenchmark())},
-        {&m_pActionEncode, ACTION_ID_CLI_ENCODE, false,
+        {&m_pActionEncode, ACTION_ID_CLI_ENCODE, false, NULL,
             this, SLOT(slotEncode())},
-        {&m_pActionEnqueueEncodeJob, ACTION_ID_ENQUEUE_ENCODE_JOB, false,
+        {&m_pActionEnqueueEncodeJob, ACTION_ID_ENQUEUE_ENCODE_JOB, false, NULL,
             this, SLOT(slotEnqueueEncodeJob())},
-        {&m_pActionJobs, ACTION_ID_JOBS, false,
+        {&m_pActionJobs, ACTION_ID_JOBS, false, NULL,
             this, SLOT(slotJobs())},
-        {&m_pActionFrameToClipboard, ACTION_ID_FRAME_TO_CLIPBOARD, false,
+        {&m_pActionFrameToClipboard, ACTION_ID_FRAME_TO_CLIPBOARD, false, NULL,
             this, SLOT(slotFrameToClipboard())},
-        {&m_pActionSaveSnapshot, ACTION_ID_SAVE_SNAPSHOT, false,
+        {&m_pActionSaveSnapshot, ACTION_ID_SAVE_SNAPSHOT, false, NULL,
             this, SLOT(slotSaveSnapshot())},
-        {&m_pActionShowBookmarkManager, ACTION_ID_SHOW_BOOKMARK_MANAGER, true,
+        {&m_pActionShowBookmarkManager, ACTION_ID_SHOW_BOOKMARK_MANAGER, true, NULL,
             this, SLOT(slotShowBookmarkManager(bool))},
-        {&m_pActionShowFrameInfoDialog, ACTION_ID_SHOW_FRAME_INFO_DIALOG, true,
+        {&m_pActionShowFrameInfoDialog, ACTION_ID_SHOW_FRAME_INFO_DIALOG, true, NULL,
             this, SLOT(slotShowFrameInfoDialog(bool))},
-        {&m_pActionShowPreivewFiltersDialog, ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG, true,
+        {&m_pActionShowPreivewFiltersDialog, ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG, true, NULL,
             this, SLOT(slotShowPreviewFiltersDialog(bool))},
 
-        {&m_pActionAbout, ACTION_ID_ABOUT, false,
+        {&m_pActionAbout, ACTION_ID_ABOUT, false, NULL,
             this, SLOT(slotAbout())},
 
-        {&m_pActionSetZoomModeNoZoom, ACTION_ID_SET_ZOOM_MODE_NO_ZOOM, true,
+        {&m_pActionSetZoomModeNoZoom, ACTION_ID_SET_ZOOM_MODE_NO_ZOOM, true, NULL,
             this, SLOT(slotZoomModeChanged())},
-        {&m_pActionSetZoomModeFixedRatio, ACTION_ID_SET_ZOOM_MODE_FIXED_RATIO, true,
+        {&m_pActionSetZoomModeFixedRatio, ACTION_ID_SET_ZOOM_MODE_FIXED_RATIO, true, NULL,
             this, SLOT(slotZoomModeChanged())},
-        {&m_pActionSetZoomModeFitToFrame, ACTION_ID_SET_ZOOM_MODE_FIT_TO_FRAME, true,
+        {&m_pActionSetZoomModeFitToFrame, ACTION_ID_SET_ZOOM_MODE_FIT_TO_FRAME, true, NULL,
             this, SLOT(slotZoomModeChanged())},
 
 
@@ -551,9 +571,9 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 //        {&m_pActionPasteCropSnippetIntoScript,
 //         ACTION_ID_PASTE_CROP_SNIPPET_INTO_SCRIPT,
 //         false, SLOT(slotPasteCropSnippetIntoScript())},
-        {&m_pActionAdvancedSettingsDialog, ACTION_ID_ADVANCED_PREVIEW_SETTINGS, false,
+        {&m_pActionAdvancedSettingsDialog, ACTION_ID_ADVANCED_PREVIEW_SETTINGS, false, NULL,
             this, SLOT(slotCallAdvancedSettingsDialog())},
-        {&m_pActionPlay, ACTION_ID_PLAY, true,
+        {&m_pActionPlay, ACTION_ID_PLAY, true, NULL,
             this, SLOT(slotPlay(bool))},
 //        {&m_pActionLoadChapters, ACTION_ID_TIMELINE_LOAD_CHAPTERS,
 //         false, SLOT(slotLoadChapters())},
@@ -571,7 +591,7 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 //        {&m_pActionGoToNextBookmark, ACTION_ID_TIMELINE_GO_TO_NEXT_BOOKMARK,
 //         false, SLOT(slotGoToNextBookmark())},
         {&m_pActionPasteShownFrameNumberIntoScript,
-            ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT, false,
+            ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT, false, NULL,
             this, SLOT(slotPasteShownFrameNumberIntoScript())},
     };
 
@@ -581,7 +601,12 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             item.id, this);
         *item.ppAction = pAction;
         pAction->setCheckable(item.checkable);
+        if (item.data != NULL) {
+            pAction->setData(item.data);
+        }
+
         m_settableActionsList.push_back(pAction);
+
         const char * signal =
                 item.checkable ? SIGNAL(toggled(bool)) : SIGNAL(triggered());
         connect(*item.ppAction, signal, item.pObjectToConnect, item.slotToConnect);
@@ -720,6 +745,17 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 
     QMenu * pHelpMenu = m_ui->menuBar->addMenu(tr("Help"));
     pHelpMenu->addAction(m_pActionAbout);
+
+    /* add number key switch tab actions*/
+    addAction(m_pActionChangeToTab1);
+    addAction(m_pActionChangeToTab2);
+    addAction(m_pActionChangeToTab3);
+    addAction(m_pActionChangeToTab4);
+    addAction(m_pActionChangeToTab5);
+    addAction(m_pActionChangeToTab6);
+    addAction(m_pActionChangeToTab7);
+    addAction(m_pActionChangeToTab8);
+    addAction(m_pActionChangeToTab9);
 }
 
 void MultiTabMainWindow::createContextMenuActionsAndMenus()
@@ -2371,6 +2407,21 @@ bool MultiTabMainWindow::slotOpenScript()
 void MultiTabMainWindow::slotTemplates()
 {
     m_pTemplatesDialog->call();
+}
+
+void MultiTabMainWindow::slotChangeTabByAction()
+{
+    QAction* action = qobject_cast<QAction*>(sender());
+    if (!action) {
+        return;
+    }
+
+    if (!action->data().isNull()) {
+        int tabIndex = action->data().toInt();
+
+        if (tabIndex > m_ui->scriptTabWidget->count() - 1) return;
+        slotChangeScriptTab(tabIndex);
+    }
 }
 
 // END OF void MainWindow::slotTemplates()

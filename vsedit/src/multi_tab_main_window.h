@@ -218,6 +218,17 @@ private:
 
     QAction * m_pActionTemplates;
     QAction * m_pActionSettings;
+
+    QAction * m_pActionChangeToTab1;
+    QAction * m_pActionChangeToTab2;
+    QAction * m_pActionChangeToTab3;
+    QAction * m_pActionChangeToTab4;
+    QAction * m_pActionChangeToTab5;
+    QAction * m_pActionChangeToTab6;
+    QAction * m_pActionChangeToTab7;
+    QAction * m_pActionChangeToTab8;
+    QAction * m_pActionChangeToTab9;
+
     QAction * m_pActionPreview;
     QAction * m_pActionCheckScript;
     QAction * m_pActionBenchmark;
@@ -384,6 +395,8 @@ private slots:
     bool slotOpenScript();
 
     void slotTemplates();
+
+    void slotChangeTabByAction();
 
     void slotCheckScript();
     void slotBenchmark();
