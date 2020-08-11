@@ -726,6 +726,7 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 //------------------------------------------------------------------------------
 
     QMenu * pWindowMenu = m_ui->menuBar->addMenu(tr("Window"));
+    pWindowMenu->addAction(m_ui->scriptEditorDockWidget->toggleViewAction());
     pWindowMenu->addAction(m_ui->ToolsDockWidget->toggleViewAction());
     pWindowMenu->addAction(m_pActionShowBookmarkManager);
     m_pActionShowBookmarkManager->setIconText("BM");

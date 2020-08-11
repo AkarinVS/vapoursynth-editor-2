@@ -327,17 +327,20 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QDockWidget::title { text-align: center; }</string>
+   </property>
    <property name="floating">
     <bool>false</bool>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string/>
+    <string>Script Editor</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -354,6 +357,9 @@
        </property>
        <property name="documentMode">
         <bool>true</bool>
+       </property>
+       <property name="tabsClosable">
+        <bool>false</bool>
        </property>
        <property name="tabBarAutoHide">
         <bool>false</bool>
