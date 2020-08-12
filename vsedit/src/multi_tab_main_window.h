@@ -37,6 +37,7 @@ struct EditorPreview {
     QString scriptFilePath;
     int lastTimeLineFrameIndex;
     int lastZoomRatio;
+    QPair<int,int> previewScrollBarPos;
     QString tabName;
     int tabNumber;
     int group;
@@ -45,7 +46,7 @@ struct EditorPreview {
     EditorPreview():
         editor(nullptr), previewArea(nullptr), processor(nullptr), bookmarkModel(nullptr),
         scriptName(""), scriptFilePath(""), lastTimeLineFrameIndex(), lastZoomRatio(1),
-        tabName(""), tabNumber(-1), group(-1), previewFilters({{"channels", -2}})
+        previewScrollBarPos(), tabName(""), tabNumber(-1), group(-1), previewFilters({{"channels", -2}})
     {}
 
     ~EditorPreview()
@@ -345,6 +346,7 @@ private slots:
     void slotPreviewAreaMouseRightButtonReleased();
     void slotCallAdvancedSettingsDialog();
     void slotPasteShownFrameNumberIntoScript();
+    void slotSavePreviewScrollBarPos(const QPair<int, int>&);
 
     /* preview filters */
     void slotUpdateTabPreviewFilters(QMap<QString, int>);

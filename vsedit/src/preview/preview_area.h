@@ -28,6 +28,8 @@ public:
 
     void setPixmap(const QPixmap & a_pixmap, const qreal a_ratio);
 
+    void setPreviewScrollBarPos(const QPair<int,int>&);
+
     void checkMouseOverPreview(const QPoint & a_globalMousePos);      
 
 public slots:
@@ -54,6 +56,7 @@ signals:
 	void signalMouseMiddleButtonReleased();
 	void signalMouseRightButtonReleased();
     void signalMouseOverPoint(float a_normX, float a_normY);
+    void signalPreviewScrollBarsPosChanged(const QPair<int, int>&);
 
 private:
 

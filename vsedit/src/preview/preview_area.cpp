@@ -59,6 +59,12 @@ void PreviewArea::setPixmap(const QPixmap & a_pixmap, const qreal a_ratio)
     m_pFramePainter->drawFrame(a_pixmap);
 }
 
+void PreviewArea::setPreviewScrollBarPos(const QPair<int, int> &a_posPair)
+{
+    horizontalScrollBar()->setValue(a_posPair.first);
+    verticalScrollBar()->setValue(a_posPair.second);
+}
+
 // END OF void PreviewArea::setPixmap(const QPixmap & a_pixmap)
 //==============================================================================
 
@@ -202,8 +208,12 @@ void PreviewArea::mouseMoveEvent(QMouseEvent * a_pEvent)
         QPoint newFramePainterPos = m_lastFramePainterPos +
             posDifference;
 
-        horizontalScrollBar()->setValue(-newFramePainterPos.x());
-        verticalScrollBar()->setValue(-newFramePainterPos.y());
+        int scrollBarHorizontalPos = -newFramePainterPos.x();
+        int scrollBarVerticalPos = -newFramePainterPos.y();
+
+        emit signalPreviewScrollBarsPosChanged(QPair(scrollBarHorizontalPos, scrollBarVerticalPos));
+        horizontalScrollBar()->setValue(scrollBarHorizontalPos);
+        verticalScrollBar()->setValue(scrollBarVerticalPos);
 
         drawScrollNavigator();
         a_pEvent->accept();

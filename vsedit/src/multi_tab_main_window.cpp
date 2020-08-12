@@ -217,6 +217,10 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     connect(ep.previewArea, &PreviewArea::signalKeyPressed,
         m_ui->timeLineView , &TimeLineView::slotPreviewAreaKeyPressed);
 
+    // store preview scroll bar position for group
+    connect(ep.previewArea, &PreviewArea::signalPreviewScrollBarsPosChanged,
+        this, &MultiTabMainWindow::slotSavePreviewScrollBarPos);
+
     // update frame properties for frame info dialog
     connect(ep.processor, &ScriptProcessor::signalUpdateFramePropsString,
         this, &MultiTabMainWindow::slotUpdateFramePropsString);
@@ -1296,16 +1300,20 @@ void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_righ
     // save timeline frame number and zoom ratio from last tab
     int currentFrame = processor->currentFrame();
     int currentZoomRatio = m_ui->timeLineView->zoomFactor();
+    QPair<int,int> currentPreviewScrollBarPos =
+            m_pEditorPreviewVector[a_leftTabIndex].previewScrollBarPos;
 
     /* check to see if current and next tab are in same group */
     int leftClipGroup = m_pEditorPreviewVector[a_leftTabIndex].group;
     int rightClipGroup = m_pEditorPreviewVector[a_rightTabIndex].group;
 
-    /* if same group, copy current frame index and zoom ratio of left clip to right clip */
+    /* if same group, copy current frame index, zoom ratio and
+     * scroll bar pos of left clip to right clip */
     if (leftClipGroup == rightClipGroup) {
 
         m_pEditorPreviewVector[a_rightTabIndex].lastTimeLineFrameIndex = currentFrame;
         m_pEditorPreviewVector[a_rightTabIndex].lastZoomRatio = currentZoomRatio;
+        m_pEditorPreviewVector[a_rightTabIndex].previewScrollBarPos = currentPreviewScrollBarPos;
 
         if (processor->isPlaying()) {
             processor->slotPlay(false);
@@ -1318,6 +1326,7 @@ void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_righ
             if (ep.group == leftClipGroup) {
                 ep.lastTimeLineFrameIndex = currentFrame;
                 ep.lastZoomRatio = currentZoomRatio;
+                ep.previewScrollBarPos = currentPreviewScrollBarPos;
             }
         }
 
@@ -1346,12 +1355,18 @@ void MultiTabMainWindow::slotChangeScriptTab(int a_index)
 
         int savedFrame = m_pEditorPreviewVector[a_index].lastTimeLineFrameIndex;
         int savedZoomRatio = m_pEditorPreviewVector[a_index].lastZoomRatio;
+        QPair<int,int> savedPreviewScrollBarPos = m_pEditorPreviewVector[a_index].previewScrollBarPos;
 
         /* reset time line and set last saved frame and zoomfactor */
         const VSVideoInfo * vsVideoInfo = processor->vsVideoInfo(); // retrieve numFrames and fps
 
         slotSetTimeLineAndIndicator(vsVideoInfo->numFrames, vsVideoInfo->fpsNum, vsVideoInfo->fpsDen);
         m_ui->timeLineView->setZoomFactor(savedZoomRatio);
+
+        /* resume frame zoom ratio and scroll bar position */
+        setPreviewPixmap();
+        PreviewArea * previewArea = m_pEditorPreviewVector[a_index].previewArea;
+        previewArea->setPreviewScrollBarPos(savedPreviewScrollBarPos);
 
         if (m_playing) {
             processor->slotGotoFrame(m_currentPlayingFrame);
@@ -1598,9 +1613,6 @@ void MultiTabMainWindow::slotZoomModeChanged()
 
     bool fixedRatio(zoomMode == ZoomMode::FixedRatio);
     m_ui->zoomRatioSpinBox->setEnabled(fixedRatio);
-//    bool noZoom = (zoomMode == ZoomMode::NoZoom);
-//	m_ui.scaleModeComboBox->setEnabled(!noZoom);
-//	m_pMenuZoomScaleModes->setEnabled(!noZoom);
     m_pSettingsManager->setZoomMode(zoomMode);
 
     setPreviewPixmap();
@@ -1820,6 +1832,15 @@ void MultiTabMainWindow::slotPasteShownFrameNumberIntoScript()
     ScriptEditor * editor =  m_pEditorPreviewVector[currentTabIndex].editor;
     int frameShown = processor->currentFrame();
     editor->insertPlainText(QVariant(frameShown).toString());
+}
+
+void MultiTabMainWindow::slotSavePreviewScrollBarPos(const QPair<int,int> &a_posPair)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
+    if (processor->script().isEmpty()) return;
+
+    m_pEditorPreviewVector[currentTabIndex].previewScrollBarPos = a_posPair;
 }
 
 void MultiTabMainWindow::slotUpdateTabPreviewFilters(QMap<QString, int> a_filtersMap)
