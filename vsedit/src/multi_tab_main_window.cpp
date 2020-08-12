@@ -5,6 +5,7 @@
 #include "preview/preview_advanced_settings_dialog.h"
 #include "preview/frame_painter.h"
 #include "preview_filters/preview_filters_dialog.h"
+#include "selection_tools/selection_tools_dialog.h"
 #include "../../common-src/qt_widgets_subclasses/collapse_expand_widget.h"
 #include "../../common-src/log/vs_editor_log.h"
 #include "../../common-src/vapoursynth/vapoursynth_script_processor.h"
@@ -42,6 +43,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pEncodeDialog(nullptr)
   , m_pTemplatesDialog(nullptr)
   , m_pAdvancedSettingsDialog(nullptr)
+  , m_pSelectionToolsDialog(nullptr)
 
   , m_pPreviewContextMenu(nullptr)
   , m_pActionFrameToClipboard(nullptr)
@@ -51,23 +53,12 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pActionSetZoomModeNoZoom(nullptr)
   , m_pActionSetZoomModeFixedRatio(nullptr)
   , m_pActionSetZoomModeFitToFrame(nullptr)
-  , m_pActionToggleTimeLinePanel(nullptr)
-//  , m_pMenuTimeLineModes(nullptr)
-  , m_pActionGroupTimeLineModes(nullptr)
-//  , m_pActionSetTimeLineModeTime(nullptr)
-//  , m_pActionSetTimeLineModeFrames(nullptr)
   , m_pActionTimeStepForward(nullptr)
   , m_pActionTimeStepBack(nullptr)
   , m_pActionPasteCropSnippetIntoScript(nullptr)
   , m_pActionAdvancedSettingsDialog(nullptr)
-  , m_pActionToggleColorPicker(nullptr)
   , m_pActionPlay(nullptr)
-//  , m_pActionLoadChapters(nullptr)
-//  , m_pActionClearBookmarks(nullptr)
 //  , m_pActionBookmarkCurrentFrame(nullptr)
-//  , m_pActionUnbookmarkCurrentFrame(nullptr)
-//  , m_pActionGoToPreviousBookmark(nullptr)
-//  , m_pActionGoToNextBookmark(nullptr)
   , m_pActionPasteShownFrameNumberIntoScript(nullptr)
 
   , m_pActionFind(nullptr)
@@ -82,6 +73,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
   , m_pActionShowBookmarkManager(nullptr)
   , m_pActionShowFrameInfoDialog(nullptr)
   , m_pActionShowPreivewFiltersDialog(nullptr)
+  , m_pActionShowSelectionToolsDialog(nullptr)
   , m_playing(false)
   , m_closingApp(false)
   , m_closingTab(false)
@@ -98,6 +90,7 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createAdvancedSettingsDialog();
     createFindDialog();
     createPreviewFilters();
+    createSelectionToolsDialog();
 
     createGarbageCollection();
     slotCreateTab();
@@ -256,7 +249,7 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     if (a_tabName.isEmpty()) {
         ep.tabNumber = newTabNumber;
         m_tabNumberList.append(newTabNumber);
-        tabName = "Untitiled-" + QVariant(newTabNumber).toString();
+        tabName = "Untitled-" + QVariant(newTabNumber).toString();
     } else {
         tabName = a_tabName;
     }
@@ -437,6 +430,11 @@ void MultiTabMainWindow::createPreviewFilters()
             this, [=](){ m_pActionShowPreivewFiltersDialog->setChecked(false);});
 }
 
+void MultiTabMainWindow::createSelectionToolsDialog()
+{
+    m_pSelectionToolsDialog = new SelectionToolsDialog(this);
+}
+
 void MultiTabMainWindow::setTimeLineSignals()
 {
     connect(m_ui->timeLineView, &TimeLineView::signalFrameChanged, // frame change
@@ -549,6 +547,8 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotShowFrameInfoDialog(bool))},
         {&m_pActionShowPreivewFiltersDialog, ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG, true, NULL,
             this, SLOT(slotShowPreviewFiltersDialog(bool))},
+        {&m_pActionShowSelectionToolsDialog, ACTION_ID_SHOW_SELECTION_TOOLS_DIALOG, true, NULL,
+            this, SLOT(slotShowSelectionToolsDialog(bool))},
 
         {&m_pActionAbout, ACTION_ID_ABOUT, false, NULL,
             this, SLOT(slotAbout())},
@@ -563,12 +563,6 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
 
 //        {&m_pActionToggleCropPanel, ACTION_ID_TOGGLE_CROP_PANEL,
 //         true, SLOT(slotToggleCropPanelVisible(bool))},
-//        {&m_pActionToggleTimeLinePanel, ACTION_ID_TOGGLE_TIMELINE_PANEL,
-//         true, SLOT(slotToggleTimeLinePanelVisible(bool))},
-//        {&m_pActionSetTimeLineModeTime, ACTION_ID_SET_TIMELINE_MODE_TIME,
-//         true, SLOT(slotTimeLineModeChanged())},
-//        {&m_pActionSetTimeLineModeFrames, ACTION_ID_SET_TIMELINE_MODE_FRAMES,
-//         true, SLOT(slotTimeLineModeChanged())},
 //        {&m_pActionTimeStepForward, ACTION_ID_TIME_STEP_FORWARD,
 //         false, SLOT(slotTimeStepForward())},
 //        {&m_pActionTimeStepBack, ACTION_ID_TIME_STEP_BACK,
@@ -580,21 +574,9 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotCallAdvancedSettingsDialog())},
         {&m_pActionPlay, ACTION_ID_PLAY, true, NULL,
             this, SLOT(slotPlay(bool))},
-//        {&m_pActionLoadChapters, ACTION_ID_TIMELINE_LOAD_CHAPTERS,
-//         false, SLOT(slotLoadChapters())},
-//        {&m_pActionClearBookmarks, ACTION_ID_TIMELINE_CLEAR_BOOKMARKS,
-//         false, SLOT(slotClearBookmarks())},
 //        {&m_pActionBookmarkCurrentFrame,
 //         ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME,
 //         false, SLOT(slotBookmarkCurrentFrame())},
-//        {&m_pActionUnbookmarkCurrentFrame,
-//         ACTION_ID_TIMELINE_UNBOOKMARK_CURRENT_FRAME,
-//         false, SLOT(slotUnbookmarkCurrentFrame())},
-//        {&m_pActionGoToPreviousBookmark,
-//         ACTION_ID_TIMELINE_GO_TO_PREVIOUS_BOOKMARK,
-//         false, SLOT(slotGoToPreviousBookmark())},
-//        {&m_pActionGoToNextBookmark, ACTION_ID_TIMELINE_GO_TO_NEXT_BOOKMARK,
-//         false, SLOT(slotGoToNextBookmark())},
         {&m_pActionPasteShownFrameNumberIntoScript,
             ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT, false, NULL,
             this, SLOT(slotPasteShownFrameNumberIntoScript())},
@@ -747,6 +729,11 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     m_ui->previewFiltersButton->setDefaultAction(m_pActionShowPreivewFiltersDialog);
     m_ui->previewFiltersButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
 
+    m_pActionShowSelectionToolsDialog->setIconText("ST");
+    pWindowMenu->addAction(m_pActionShowSelectionToolsDialog);
+    m_ui->selectionToolsButton->setDefaultAction(m_pActionShowSelectionToolsDialog);
+    m_ui->selectionToolsButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+
 //------------------------------------------------------------------------------
 
     QMenu * pHelpMenu = m_ui->menuBar->addMenu(tr("Help"));
@@ -770,8 +757,6 @@ void MultiTabMainWindow::createContextMenuActionsAndMenus()
     m_pPreviewContextMenu->addAction(m_pActionFrameToClipboard);
     m_pPreviewContextMenu->addAction(m_pActionSaveSnapshot);
     m_pPreviewContextMenu->addAction(m_pActionPasteShownFrameNumberIntoScript);
-
-    //        m_pPreviewContextMenu->addAction(m_pActionSaveBookmarkToFile);
 }
 
 void MultiTabMainWindow::createTabBarContextMenuActions()
@@ -1572,6 +1557,11 @@ void MultiTabMainWindow::slotShowBookmarkManager(bool a_visible)
 void MultiTabMainWindow::slotShowPreviewFiltersDialog(bool a_visible)
 {
     m_pPreviewFiltersDialog->setVisible(a_visible);
+}
+
+void MultiTabMainWindow::slotShowSelectionToolsDialog(bool a_visible)
+{
+    m_pSelectionToolsDialog->setVisible(a_visible);
 }
 
 void MultiTabMainWindow::slotZoomModeChanged()

@@ -112,16 +112,9 @@ const char ACTION_ID_REPLACE_TAB_WITH_SPACES[] = "replace_tab_with_spaces";
 const char ACTION_ID_SHOW_BOOKMARK_MANAGER[] = "show_bookmark_manager";
 const char ACTION_ID_SHOW_FRAME_INFO_DIALOG[] = "show_frame_info_dialog";
 const char ACTION_ID_SHOW_PREVIEW_FILTERS_DIALOG[] = "show_preview_filters_dialog";
-const char ACTION_ID_TIMELINE_LOAD_CHAPTERS[] = "timeline_load_chapters";
-const char ACTION_ID_TIMELINE_CLEAR_BOOKMARKS[] = "timeline_clear_bookmarks";
+const char ACTION_ID_SHOW_SELECTION_TOOLS_DIALOG[] = "show_selection_tools_dialog";
 const char ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME[] =
 	"timeline_bookmark_current_frame";
-const char ACTION_ID_TIMELINE_UNBOOKMARK_CURRENT_FRAME[] =
-	"timeline_unbookmark_current_frame";
-const char ACTION_ID_TIMELINE_GO_TO_PREVIOUS_BOOKMARK[] =
-	"timeline_go_to_previous_bookmark";
-const char ACTION_ID_TIMELINE_GO_TO_NEXT_BOOKMARK[] =
-	"timeline_go_to_next_bookmark";
 const char ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT[] =
 	"paste_shown_frame_number_into_script";
 const char ACTION_ID_SAVE_BOOKMARK_TO_FILE[] = "save_bookmark_to_file";

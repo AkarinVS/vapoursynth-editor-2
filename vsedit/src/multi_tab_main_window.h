@@ -26,6 +26,7 @@ class PreviewAdvancedSettingsDialog;
 class FrameInfoDialog;
 class PreviewFiltersDialog;
 class FindDialog;
+class SelectionToolsDialog;
 class JobServerWatcherSocket;
 
 struct EditorPreview {
@@ -122,6 +123,7 @@ private:
     PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
     BookmarkManagerDialog * m_pBookmarkManagerDialog;
     PreviewFiltersDialog * m_pPreviewFiltersDialog;
+    SelectionToolsDialog * m_pSelectionToolsDialog;
 
     JobServerWatcherSocket * m_pJobServerWatcherSocket;
 
@@ -149,6 +151,7 @@ private:
     void createFrameInfoDialog();
     void createBookmarkManager();
     void createPreviewFilters();
+    void createSelectionToolsDialog();
 
     void setTabSignals(); // setup signals between editor and previewArea
     void setTimeLineSignals();
@@ -162,7 +165,7 @@ private:
     /* Toolbar */
     QToolBar * mainToolBar;
 
-    /* menu actions */
+    /* menu functions */
     bool saveScriptToFile(const QString& a_filePath);
     bool loadScriptFromFile(const QString& a_filePath);
     bool safeToCloseFile();
@@ -240,12 +243,13 @@ private:
     QAction * m_pActionShowBookmarkManager;
     QAction * m_pActionShowFrameInfoDialog;
     QAction * m_pActionShowPreivewFiltersDialog;
+    QAction * m_pActionShowSelectionToolsDialog;
+
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
 
     QMenu * m_pMenuRecentScripts;
-
 
     /* context menus and actions */
     QMenu * m_pPreviewContextMenu;
@@ -257,25 +261,13 @@ private:
     QAction * m_pActionSetZoomModeFixedRatio;
     QAction * m_pActionSetZoomModeFitToFrame;
     QAction * m_pActionToggleCropPanel;
-    QAction * m_pActionToggleTimeLinePanel;
-    QMenu * m_pMenuTimeLineModes;
-    QActionGroup * m_pActionGroupTimeLineModes;
-//    QAction * m_pActionSetTimeLineModeTime;
-//    QAction * m_pActionSetTimeLineModeFrames;
     QAction * m_pActionTimeStepForward;
     QAction * m_pActionTimeStepBack;
     QAction * m_pActionPasteCropSnippetIntoScript;
     QAction * m_pActionAdvancedSettingsDialog;
-    QAction * m_pActionToggleColorPicker;
     QAction * m_pActionPlay;
-    QAction * m_pActionLoadChapters;
-    QAction * m_pActionClearBookmarks;
     QAction * m_pActionBookmarkCurrentFrame;
-    QAction * m_pActionUnbookmarkCurrentFrame;
-    QAction * m_pActionGoToPreviousBookmark;
-    QAction * m_pActionGoToNextBookmark;
     QAction * m_pActionPasteShownFrameNumberIntoScript;
-    QAction * m_pActionSaveBookmarkToFile;
 
     std::map<QString, ZoomMode> m_actionIDToZoomModeMap;
 
@@ -337,6 +329,7 @@ private slots:
     void slotShowFrameInfoDialog(bool a_visible);
     void slotShowBookmarkManager(bool a_visible);
     void slotShowPreviewFiltersDialog(bool a_visible);
+    void slotShowSelectionToolsDialog(bool a_visible);
 
     void slotZoomModeChanged();
     void slotZoomRatioChanged(double a_zoomRatio);
