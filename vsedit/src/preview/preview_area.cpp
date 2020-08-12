@@ -173,8 +173,8 @@ void PreviewArea::wheelEvent(QWheelEvent * a_pEvent)
 		a_pEvent->ignore();
 		return;
 	}
-
-	QScrollArea::wheelEvent(a_pEvent);
+    a_pEvent->ignore();
+//	QScrollArea::wheelEvent(a_pEvent);
 }
 
 // END OF void PreviewArea::wheelEvent(QWheelEvent * a_pEvent)
