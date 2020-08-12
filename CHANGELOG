@@ -1,5 +1,26 @@
 Vapoursynth Editor 2
 
+r2: [2020-08-12]
+- Disabled mouse scroll to scroll a zommed preview because it doesn't make sense to be only able to scroll one axis
+- Preview zoom in scroll bar position are remembered for similar clips in a group
+- Fixed preview zoom raito not having immediate effect when change tabs
+- Script window can be hidden and restore now
+- Added close tab action when right click on tab
+- Added shortcuts to switch tab by number keys, available keys are 1-9
+- Fixed all editor shortcut keys
+- Arrow key navigation from time line and preview area works now
+- A new preview filters feature leveraging vs script to assist preview
+- Preview filters can be chained
+- Per frame properties can be display in frame info dialog now
+- Added menu options to toggle the Tools widget and its dialogs
+- Added a copy script to new tab function
+- Added right click and middle click signal to the tabwidget
+- Added middle click close tab function
+- Added the basic editor copy/paste actions to the menu options
+- A find and replace function for the editor
+- PreviewArea now uses QPainter for frame drawing instead of QPixmap, which greatly improves performance for zooming
+- Zoom ratio cap increases to 25x
+
 r1: [2020-07-30]
 - Fixed webp saving in wrong image quality. Image formats now save with their own quality parameters instead of sharing one single parameter
 - All remaining menu and context menu functions of the original have been transferred
