@@ -15,6 +15,8 @@ public:
     explicit ScriptProcessor(SettingsManager * a_pSettingsManager,
                         VSScriptLibrary * a_pVSScriptLibrary, QWidget * a_pParent = nullptr);
 
+    ~ScriptProcessor() override;
+
     virtual void setScriptName(const QString & a_scriptName) override;
 
     const VSVideoInfo * vsVideoInfo();
@@ -86,6 +88,8 @@ signals:
     void signalSetCurrentFrame();
 
     void signalFrameChanged(int a_frame);
+
+    void signalRollBackFrame(int a_frame);
 
     void signalUpdateFrameTimeIndicators(int a_frameIndex, const QTime &a_time);
 

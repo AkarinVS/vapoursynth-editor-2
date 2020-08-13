@@ -871,31 +871,6 @@ QString SettingsManager::getTabText() const
 
 //==============================================================================
 
-bool SettingsManager::getRememberLastPreviewFrame() const
-{
-	return value(REMEMBER_LAST_PREVIEW_FRAME_KEY,
-		DEFAULT_REMEMBER_LAST_PREVIEW_FRAME).toBool();
-}
-
-bool SettingsManager::setRememberLastPreviewFrame(bool a_remember)
-{
-	return setValue(REMEMBER_LAST_PREVIEW_FRAME_KEY, a_remember);
-}
-
-//==============================================================================
-
-int SettingsManager::getLastPreviewFrame() const
-{
-	return value(LAST_PREVIEW_FRAME_KEY, DEFAULT_LAST_PREVIEW_FRAME).toInt();
-}
-
-bool SettingsManager::setLastPreviewFrame(int a_frameNumber)
-{
-	return setValue(LAST_PREVIEW_FRAME_KEY, a_frameNumber);
-}
-
-//==============================================================================
-
 QString SettingsManager::getDefaultNewScriptTemplate()
 {
 	return QString(

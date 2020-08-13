@@ -24,7 +24,11 @@ ScriptProcessor::ScriptProcessor(SettingsManager * a_pSettingsManager,
     m_pPlayTimer->setSingleShot(true);   
 
     connect(m_pPlayTimer, SIGNAL(timeout()),
-        this, SLOT(slotProcessPlayQueue()));
+            this, SLOT(slotProcessPlayQueue()));
+}
+
+ScriptProcessor::~ScriptProcessor()
+{    
 }
 
 void ScriptProcessor::setScriptName(const QString &a_scriptName)
@@ -34,8 +38,7 @@ void ScriptProcessor::setScriptName(const QString &a_scriptName)
 
 const VSVideoInfo * ScriptProcessor::vsVideoInfo()
 {
-    const VSVideoInfo * cpVideoInfo = m_cpVideoInfo;
-    return cpVideoInfo;
+    return m_cpVideoInfo;
 }
 
 void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, const VSFrameRef *a_cpPreviewFrameRef)
@@ -79,8 +82,6 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
     if(!initialized)
         return false;
 
-//    setTitle();
-
     int lastFrameNumber = m_cpVideoInfo->numFrames - 1;
 
     // emit signal to setup timeline and range of spinbox
@@ -98,7 +99,6 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
     if(m_frameExpected > lastFrameNumber)
         m_frameExpected = lastFrameNumber;
 
-//    resetCropSpinBoxes();
     setScriptName(a_scriptName);
 
 //    if(m_pSettingsManager->getPreviewDialogMaximized())
@@ -113,7 +113,7 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
 void ScriptProcessor::cleanUpOnClose()
 {
     stopAndCleanUp();
-    m_pVapourSynthScriptProcessor->finalize();
+
 }
 
 void ScriptProcessor::showFrameFromTimeLine(int a_frameNumber)
@@ -135,27 +135,8 @@ void ScriptProcessor::stopAndCleanUp()
 {
     slotPlay(false);
 
-//	if(m_ui.cropCheckButton->isChecked())
-//		m_ui.cropCheckButton->click();
-
-//	bool rememberLastPreviewFrame =
-//		m_pSettingsManager->getRememberLastPreviewFrame();
-//	if(rememberLastPreviewFrame && (!scriptName().isEmpty()) &&
-//		(m_frameShown > -1))
-//		m_pSettingsManager->setLastPreviewFrame(m_frameShown);
-
     m_frameShown = -1;
     m_framePixmap = QPixmap();
-    // Replace shown image with a blank one of the same dimension:
-    // -helps to keep the scrolling position when refreshing the script;
-    // -leaves the image blank on sudden error;
-    // -creates a blinking effect indicating the script is being refreshed.
-//	const QPixmap * pPreviewPixmap = m_ui.previewArea->pixmap();
-//	int pixmapWidth = pPreviewPixmap->width();
-//	int pixmapHeight = pPreviewPixmap->height();
-//	QPixmap blackPixmap(pixmapWidth, pixmapHeight);
-//	blackPixmap.fill(Qt::black);
-//	m_ui.previewArea->setPixmap(blackPixmap);
 
     if(m_cpFrameRef)
     {
@@ -237,48 +218,38 @@ void ScriptProcessor::slotReceiveFrame(int a_frameNumber, int a_outputIndex, con
 
 }
 
-//void PreviewTab::slotFrameRequestDiscarded(int a_frameNumber, int a_outputIndex, const QString &a_reason)
-//{
-//    (void)a_outputIndex;
-//    (void)a_reason;
-
-//    if(m_playing)
-//    {
-//        slotPlay(false);
-//    }
-//    else
-//    {
-//        if(a_frameNumber != m_frameExpected)
-//            return;
-
-//        if(m_frameShown == -1)
-//        {
-//            if(m_frameExpected == 0)
-//            {
-//                // Nowhere to roll back
-////				m_ui.frameNumberSlider->setFrame(0);
-//                m_ui.timeLineView->setFrame(0);
-//                m_ui.frameNumberSpinBox->setValue(0);
-//                m_ui.frameStatusLabel->setPixmap(m_errorPixmap);
-//            }
-//            else
-//                slotShowFrame(0);
-//            return;
-//        }
-
-//        m_frameExpected = m_frameShown;
-//        m_ui.frameNumberSlider->setFrame(m_frameShown);
-//        m_ui.timeLineView->setFrame(m_frameShown);
-//        m_ui.frameNumberSpinBox->setValue(m_frameShown);
-//        m_ui.frameStatusLabel->setPixmap(m_readyPixmap);
-//    }
-
-//}
-
-
 void ScriptProcessor::slotFrameRequestDiscarded(int a_frameNumber, int a_outputIndex, const QString &a_reason)
 {
+    (void)a_outputIndex;
+    (void)a_reason;
 
+    if(m_playing)
+    {
+        slotPlay(false);
+    }
+    else
+    {
+        qDebug() << "roll back frame";
+        if(a_frameNumber != m_frameExpected)
+            return;
+
+        if(m_frameShown == -1)
+        {
+            if(m_frameExpected == 0)
+            {
+                // Nowhere to roll back
+                emit signalRollBackFrame(0);
+//                m_ui.frameStatusLabel->setPixmap(m_errorPixmap);
+            }
+            else
+                slotShowFrame(0);
+            return;
+        }
+
+        m_frameExpected = m_frameShown;
+        emit signalRollBackFrame(m_frameShown);
+//        m_ui.frameStatusLabel->setPixmap(m_readyPixmap);
+    }
 }
 
 void ScriptProcessor::slotProcessPlayQueue()
@@ -400,22 +371,12 @@ void ScriptProcessor::slotShowFrame(int a_frameNumber)
         return;
     requestingFrame = true;
 
-
     bool requested = requestShowFrame(a_frameNumber); // request to output frame
     if(requested)
     {
         m_frameExpected = a_frameNumber;
-
 //		m_ui.frameStatusLabel->setPixmap(m_busyPixmap);
     }
-    // if requested frame failed, send last success requested frame
-
-    /* sends signal to update frame/time indicators */
-//    double fps = double(m_cpVideoInfo->fpsNum) / double(m_cpVideoInfo->fpsDen);
-//    int milliSeconds = int((double(m_frameExpected) / fps) * 1000);
-//    QTime time = QTime::fromMSecsSinceStartOfDay(milliSeconds);
-
-//    emit signalUpdateFrameTimeIndicators(m_frameExpected, time);
 
     requestingFrame = false;
 }

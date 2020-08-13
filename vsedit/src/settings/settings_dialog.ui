@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="settingsTabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="commonSettingsTab">
       <attribute name="title">
@@ -229,13 +229,6 @@
           </spacer>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="rememberLastPreviewFrameCheckBox">
-         <property name="text">
-          <string>Remember last previewed frame on exit</string>
-         </property>
-        </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="alwaysKeepCurrentFrameCheckBox">

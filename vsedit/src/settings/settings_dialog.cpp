@@ -140,11 +140,8 @@ void SettingsDialog::slotCall()
 		m_pSettingsManager->getHighlightSelectionMatches());
 	m_ui.highlightSelectionMatchesMinLengthSpinBox->setValue(
 		m_pSettingsManager->getHighlightSelectionMatchesMinLength());
-	m_ui.rememberLastPreviewFrameCheckBox->setChecked(
-		m_pSettingsManager->getRememberLastPreviewFrame());
 	m_ui.alwaysKeepCurrentFrameCheckBox->setChecked(
 		m_pSettingsManager->getAlwaysKeepCurrentFrame());
-
 
     BookmarkSavingFormat savedFormat = m_pSettingsManager->getBookmarkSavingFormat();
 
@@ -417,8 +414,6 @@ void SettingsDialog::slotApply()
 		m_ui.highlightSelectionMatchesCheckBox->isChecked());
 	m_pSettingsManager->setHighlightSelectionMatchesMinLength(
 		m_ui.highlightSelectionMatchesMinLengthSpinBox->value());
-	m_pSettingsManager->setRememberLastPreviewFrame(
-		m_ui.rememberLastPreviewFrameCheckBox->isChecked());
 	m_pSettingsManager->setAlwaysKeepCurrentFrame(
 		m_ui.alwaysKeepCurrentFrameCheckBox->isChecked());
 

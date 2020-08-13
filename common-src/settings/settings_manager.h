@@ -184,14 +184,6 @@ public:
 
 	QString getTabText() const;
 
-	bool getRememberLastPreviewFrame() const;
-
-	bool setRememberLastPreviewFrame(bool a_remember);
-
-	int getLastPreviewFrame() const;
-
-	bool setLastPreviewFrame(int a_frameNumber);
-
 	QString getDefaultNewScriptTemplate();
 
 	QString getNewScriptTemplate();

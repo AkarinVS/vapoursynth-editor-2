@@ -184,6 +184,10 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     connect(ep.processor, &ScriptProcessor::signalFrameChanged, // frame change
             this, &MultiTabMainWindow::slotTimeLineFrameChanged);
 
+    // signal to roll back frame when a frame request is discarded, update timeline
+    connect(ep.processor, &ScriptProcessor::signalRollBackFrame,
+            m_ui->timeLineView, &TimeLineView::setFrame);
+
     connect(ep.processor, &ScriptProcessor::signalWriteLogMessage,
         this, QOverload<int, const QString &>::of(&MultiTabMainWindow::slotWriteLogMessage));
 
