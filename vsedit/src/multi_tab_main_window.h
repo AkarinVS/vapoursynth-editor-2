@@ -384,6 +384,10 @@ private slots:
     void slotLoadChapterFile(QFile & a_file);
     void slotSaveBookmarksToFile();
 
+    /* selection tool dialog */
+    void slotSendPixmapToSelectionCanvas();
+    void slotPasteSelectionPointsToScript(const QString&);
+
     /* slot for menu actions */
     void slotNewScript();
     bool slotSaveScript();

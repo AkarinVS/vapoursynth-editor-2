@@ -437,6 +437,15 @@ void MultiTabMainWindow::createPreviewFilters()
 void MultiTabMainWindow::createSelectionToolsDialog()
 {
     m_pSelectionToolsDialog = new SelectionToolsDialog(this);
+
+    connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalLoadPixmapRequested,
+            this, &MultiTabMainWindow::slotSendPixmapToSelectionCanvas);
+
+    connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalDialogHidden,
+            this, [=](){ m_pActionShowSelectionToolsDialog->setChecked(false);});
+
+    connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalPasteSelectionPointsString,
+            this, &MultiTabMainWindow::slotPasteSelectionPointsToScript);
 }
 
 void MultiTabMainWindow::setTimeLineSignals()
@@ -2333,6 +2342,26 @@ void MultiTabMainWindow::slotSaveBookmarksToFile()
         }
     }
 
+}
+
+void MultiTabMainWindow::slotSendPixmapToSelectionCanvas()
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
+
+    if (processor->script().isEmpty()) return;
+
+    QPixmap framePixmap = processor->framePixmap();
+    if(framePixmap.isNull()) return;
+
+    m_pSelectionToolsDialog->setFramePixmap(framePixmap);
+}
+
+void MultiTabMainWindow::slotPasteSelectionPointsToScript(const QString &a_pointString)
+{
+    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
+    ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
+    editor->insertPlainText(a_pointString);
 }
 
 void MultiTabMainWindow::slotNewScript()
