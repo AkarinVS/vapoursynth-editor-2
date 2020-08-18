@@ -229,7 +229,6 @@ void ScriptProcessor::slotFrameRequestDiscarded(int a_frameNumber, int a_outputI
     }
     else
     {
-        qDebug() << "roll back frame";
         if(a_frameNumber != m_frameExpected)
             return;
 

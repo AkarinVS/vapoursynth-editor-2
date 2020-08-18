@@ -2,6 +2,10 @@
 
 #include "../../../common-src/settings/settings_manager.h"
 
+#include <QTextStream>
+#include <QRegularExpressionMatch>
+#include <QRegularExpression>
+
 //==============================================================================
 
 ThemeElementsModel::ThemeElementsModel(SettingsManager * a_pSettingsManager, QString a_themeName,

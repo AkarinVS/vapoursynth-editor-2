@@ -23,6 +23,8 @@
 #include <QDir>
 #include <QMenu>
 #include <algorithm>
+#include <QRegularExpression>
+#include <QTextStream>
 
 ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	QPlainTextEdit(a_pParent)
@@ -92,7 +94,7 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 
 ScriptEditor::~ScriptEditor()
 {
-
+    delete m_pSyntaxHighlighter;
 }
 
 // END OF ScriptEditor::~ScriptEditor()

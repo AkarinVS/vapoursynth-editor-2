@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include <QStandardPaths>
+#include <QTextStream>
 
 //==============================================================================
 

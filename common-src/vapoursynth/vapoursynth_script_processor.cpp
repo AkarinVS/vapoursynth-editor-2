@@ -132,7 +132,7 @@ bool VapourSynthScriptProcessor::initialize(const QString& a_script,
 	m_script = a_script;
 	m_scriptName = a_scriptName;
 
-	m_error.clear();
+	m_error.clear();    
 	m_initialized = true;
 
 	sendFrameQueueChangeSignal();
@@ -170,7 +170,7 @@ bool VapourSynthScriptProcessor::finalize()
 		m_pVSScript = nullptr;
 	}
 
-	m_cpVSAPI = nullptr;
+    m_cpVSAPI = nullptr;
 
 	m_script.clear();
 	m_scriptName.clear();
@@ -956,7 +956,6 @@ void VapourSynthScriptProcessor::printFrameProps(const VSFrameRef * a_cpFrame)
 {
     QString message = tr("Frame properties:\n%1")
 		.arg(framePropsString(a_cpFrame));
-    qDebug() << message;
 	emit signalWriteLogMessage(mtDebug, message);
 }
 
