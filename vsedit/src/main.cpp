@@ -1,4 +1,3 @@
-#include "main_window.h"
 #include "multi_tab_main_window.h"
 
 #include "../../common-src/log/vs_editor_log.h"

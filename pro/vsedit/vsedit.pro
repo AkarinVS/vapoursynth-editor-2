@@ -186,7 +186,6 @@ FORMS += $${PROJECT_DIRECTORY}/src/script_editor/find_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/selection_tools/selection_tools_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.ui
 FORMS += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.ui
-FORMS += $${PROJECT_DIRECTORY}/src/main_window.ui
 FORMS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.ui
 
 HEADERS += $${COMMON_DIRECTORY}/common-src/helpers.h
@@ -255,7 +254,6 @@ HEADERS += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.h
 HEADERS += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.h
-HEADERS += $${PROJECT_DIRECTORY}/src/main_window.h
 HEADERS += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.h
 
 SOURCES += $${COMMON_DIRECTORY}/common-src/helpers.cpp
@@ -322,7 +320,6 @@ SOURCES += $${PROJECT_DIRECTORY}/src/script_templates/templates_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_manager_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.cpp
-SOURCES += $${PROJECT_DIRECTORY}/src/main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/multi_tab_main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main.cpp
 

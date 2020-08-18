@@ -31,7 +31,7 @@ TemplatesDialog::TemplatesDialog(SettingsManager * a_pSettingsManager,
 		"as a list of wildcards, separated by semicolons without spaces.\n"
 		"In the template below use tokens: ");
 	QStringList tokenInfoList;
-	std::vector<vsedit::VariableToken> variables =
+        QVector<vsedit::VariableToken> variables =
 		m_ui.dropFileCategoryTemplateEdit->variables();
 	for(const vsedit::VariableToken & variable : variables)
 		tokenInfoList += QString("%1 - %2").arg(variable.token)
