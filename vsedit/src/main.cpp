@@ -1,4 +1,4 @@
-#include "multi_tab_main_window.h"
+#include "main_window.h"
 
 #include "../../common-src/log/vs_editor_log.h"
 
@@ -7,8 +7,7 @@
 Q_DECLARE_OPAQUE_POINTER(const VSFrameRef *)
 Q_DECLARE_OPAQUE_POINTER(VSNodeRef *)
 
-//MainWindow * pMainWindow = nullptr;
-MultiTabMainWindow * pMainWindow = nullptr;
+MainWindow * pMainWindow = nullptr;
 
 void handleQtMessage(QtMsgType a_type, const QMessageLogContext & a_context,
 	const QString & a_message)
@@ -74,8 +73,7 @@ int main(int argc, char *argv[])
 	qRegisterMetaType<const VSFrameRef *>("const VSFrameRef *");
 	qRegisterMetaType<VSNodeRef *>("VSNodeRef *");
 
-//    pMainWindow = new MainWindow();
-    pMainWindow = new MultiTabMainWindow();
+    pMainWindow = new MainWindow();
 //    qInstallMessageHandler(handleQtMessage);
 	pMainWindow->show();
 	int exitCode = application.exec();

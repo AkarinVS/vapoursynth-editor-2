@@ -1,5 +1,5 @@
-#include "multi_tab_main_window.h"
-#include "ui_multi_tab_main_window.h"
+#include "main_window.h"
+#include "ui_main_window.h"
 #include "preview/script_processor.h"
 #include "preview/frame_info_dialog.h"
 #include "preview/preview_advanced_settings_dialog.h"
@@ -32,9 +32,9 @@
 #include <QImageWriter>
 #include <QFlags>
 
-MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
+MainWindow::MainWindow(QWidget *a_pParent) :
     QMainWindow(a_pParent),
-    m_ui(new Ui::MultiTabMainWindow)
+    m_ui(new Ui::MainWindow)
   , m_pSettingsManager(nullptr)
   , m_pVSScriptLibrary(nullptr)  
   , m_pVapourSynthPluginsManager(nullptr)  
@@ -121,13 +121,13 @@ MultiTabMainWindow::MultiTabMainWindow(QWidget *a_pParent) :
     createJobServerWatcher();
 
     connect(m_ui->displayModeToggleButton, &QPushButton::clicked,
-            this, &MultiTabMainWindow::slotTimeLineDisplayModeChanged);
+            this, &MainWindow::slotTimeLineDisplayModeChanged);
 
     connect(m_ui->frameNumberIndicatorSpinBox, QOverload<int>::of(&GenericSpinBox::valueChanged),
-            this, &MultiTabMainWindow::slotShowFrameFromTimeLine);
+            this, &MainWindow::slotShowFrameFromTimeLine);
 }
 
-MultiTabMainWindow::~MultiTabMainWindow()
+MainWindow::~MainWindow()
 {
     delete m_ui;
 
@@ -140,7 +140,7 @@ MultiTabMainWindow::~MultiTabMainWindow()
     destroyOrphanQObjects();
 }
 
-void MultiTabMainWindow::closeEvent(QCloseEvent *a_pEvent)
+void MainWindow::closeEvent(QCloseEvent *a_pEvent)
 {
     m_closingApp = true;
     if (!slotRemoveAllTabs())
@@ -154,7 +154,7 @@ void MultiTabMainWindow::closeEvent(QCloseEvent *a_pEvent)
     QMainWindow::closeEvent(a_pEvent);
 }
 
-void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
+void MainWindow::slotCreateTab(const QString & a_tabName,
                             const QString & a_scriptFilePath, const QString & a_scriptText)
 {
     EditorPreview ep;
@@ -166,37 +166,37 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     ep.bookmarkModel = new BookmarkModel();
 
     connect(ep.processor, &ScriptProcessor::signalSetTimeLineAndIndicator,
-            this, &MultiTabMainWindow::slotSetTimeLineAndIndicator);
+            this, &MainWindow::slotSetTimeLineAndIndicator);
 
     // retrieve frame from processor and send it to preview area
     connect(ep.processor, &ScriptProcessor::signalSetCurrentFrame,
-            this, &MultiTabMainWindow::setPreviewPixmap);
+            this, &MainWindow::setPreviewPixmap);
 
     // resize pixmap when zoom mode = fitToFrame and previewArea size change
     connect(ep.previewArea, &PreviewArea::signalSizeChanged,
-            this, &MultiTabMainWindow::slotPreviewAreaSizeChanged);
+            this, &MainWindow::slotPreviewAreaSizeChanged);
 
     // signal to update status bar queue state icons
     connect(ep.processor, &ScriptProcessor::signalFrameQueueStateChanged,
-            this, &MultiTabMainWindow::slotUpdateStatusBarQueueState);
+            this, &MainWindow::slotUpdateStatusBarQueueState);
 
     // signal for playback framechange
     connect(ep.processor, &ScriptProcessor::signalFrameChanged, // frame change
-            this, &MultiTabMainWindow::slotTimeLineFrameChanged);
+            this, &MainWindow::slotTimeLineFrameChanged);
 
     // signal to roll back frame when a frame request is discarded, update timeline
     connect(ep.processor, &ScriptProcessor::signalRollBackFrame,
             m_ui->timeLineView, &TimeLineView::setFrame);
 
     connect(ep.processor, &ScriptProcessor::signalWriteLogMessage,
-        this, QOverload<int, const QString &>::of(&MultiTabMainWindow::slotWriteLogMessage));
+        this, QOverload<int, const QString &>::of(&MainWindow::slotWriteLogMessage));
 
     // signal for file drop load
     connect(ep.editor, &ScriptEditor::signalScriptFileDropped,
-            this, &MultiTabMainWindow::slotScriptFileDropped);
+            this, &MainWindow::slotScriptFileDropped);
 
     connect(ep.editor, &ScriptEditor::textChanged,
-            this, &MultiTabMainWindow::slotEditorTextChanged);
+            this, &MainWindow::slotEditorTextChanged);
 
     // signal for inserting snippet to editor
     connect(m_pTemplatesDialog, &TemplatesDialog::signalPasteCodeSnippet,
@@ -204,11 +204,11 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
 
     // eyedropper
     connect(ep.previewArea, &PreviewArea::signalMouseOverPoint,
-        this, &MultiTabMainWindow::slotPreviewAreaMouseOverPoint);
+        this, &MainWindow::slotPreviewAreaMouseOverPoint);
 
     // connect for preview right click context menu
     connect(ep.previewArea, &PreviewArea::signalMouseRightButtonReleased,
-        this, &MultiTabMainWindow::slotPreviewAreaMouseRightButtonReleased);
+        this, &MainWindow::slotPreviewAreaMouseRightButtonReleased);
 
     // connect keypress in preview area to timeline
     connect(ep.previewArea, &PreviewArea::signalKeyPressed,
@@ -216,17 +216,17 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
 
     // store preview scroll bar position for group
     connect(ep.previewArea, &PreviewArea::signalPreviewScrollBarsPosChanged,
-        this, &MultiTabMainWindow::slotSavePreviewScrollBarPos);
+        this, &MainWindow::slotSavePreviewScrollBarPos);
 
     // update frame properties for frame info dialog
     connect(ep.processor, &ScriptProcessor::signalUpdateFramePropsString,
-        this, &MultiTabMainWindow::slotUpdateFramePropsString);
+        this, &MainWindow::slotUpdateFramePropsString);
 
     // recieve preview filter changed signal and copy it to the object's property, then run preview script
     connect(m_pPreviewFiltersDialog, &PreviewFiltersDialog::signalPreviewFiltersChanged,
-            this, &MultiTabMainWindow::slotUpdateTabPreviewFilters);
+            this, &MainWindow::slotUpdateTabPreviewFilters);
 
-    connect(this, &MultiTabMainWindow::signalUpdatePreviewFiltersDisplay,
+    connect(this, &MainWindow::signalUpdatePreviewFiltersDisplay,
             m_pPreviewFiltersDialog, &PreviewFiltersDialog::slotUpdateDisplay);
 
     // autocomplete feature in editor
@@ -274,19 +274,19 @@ void MultiTabMainWindow::slotCreateTab(const QString & a_tabName,
     m_ui->scriptTabWidget->setCurrentIndex(tabCount-1);
 }
 
-void MultiTabMainWindow::setTabSignals()
+void MainWindow::setTabSignals()
 {
     connect(m_ui->scriptTabWidget, &GenericTabWidget::signalAboutToChanged,
-            this, &MultiTabMainWindow::slotSaveTabBeforeChanged);
+            this, &MainWindow::slotSaveTabBeforeChanged);
     connect(m_ui->scriptTabWidget, &GenericTabWidget::currentChanged,
-            this, &MultiTabMainWindow::slotChangeScriptTab);
+            this, &MainWindow::slotChangeScriptTab);
     connect(m_ui->previewTabWidget, &GenericTabWidget::currentChanged,
-            this, &MultiTabMainWindow::slotChangePreviewTab);
-    connect(this, &MultiTabMainWindow::signalTabNameChanged,
+            this, &MainWindow::slotChangePreviewTab);
+    connect(this, &MainWindow::signalTabNameChanged,
             m_pBookmarkManagerDialog, &BookmarkManagerDialog::slotUpdateScriptName);
 }
 
-void MultiTabMainWindow::createSettingDialog()
+void MainWindow::createSettingDialog()
 {
     m_pSettingsManager = new SettingsManager(this);
     m_pSettingsDialog = new SettingsDialog(m_pSettingsManager, nullptr);
@@ -295,25 +295,25 @@ void MultiTabMainWindow::createSettingDialog()
     m_vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
 
     connect(m_pVSScriptLibrary, &VSScriptLibrary::signalWriteLogMessage,
-        this, QOverload<int, const QString &>::of(&MultiTabMainWindow::slotWriteLogMessage));
+        this, QOverload<int, const QString &>::of(&MainWindow::slotWriteLogMessage));
 
     connect(m_pSettingsDialog, &SettingsDialog::signalSettingsChanged,
-            this, &MultiTabMainWindow::slotSettingsChanged);
+            this, &MainWindow::slotSettingsChanged);
 }
 
-void MultiTabMainWindow::createAdvancedSettingsDialog()
+void MainWindow::createAdvancedSettingsDialog()
 {
     m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
         m_pSettingsManager, this);
 }
 
-void MultiTabMainWindow::createTemplatesDialog()
+void MainWindow::createTemplatesDialog()
 {
     m_pTemplatesDialog = new TemplatesDialog(m_pSettingsManager, this);
     m_pTemplatesDialog->setPluginsList(m_vsPluginsList);
 }
 
-void MultiTabMainWindow::createBenchmarkDialog()
+void MainWindow::createBenchmarkDialog()
 {
     m_pBenchmarkDialog = new ScriptBenchmarkDialog(m_pSettingsManager, m_pVSScriptLibrary);
     connect(m_pBenchmarkDialog,
@@ -321,7 +321,7 @@ void MultiTabMainWindow::createBenchmarkDialog()
             this, SLOT(slotWriteLogMessage(int, const QString &)));
 }
 
-void MultiTabMainWindow::createEncodeDialog()
+void MainWindow::createEncodeDialog()
 {
     m_pEncodeDialog = new EncodeDialog(m_pSettingsManager, m_pVSScriptLibrary);
     connect(m_pEncodeDialog,
@@ -329,7 +329,7 @@ void MultiTabMainWindow::createEncodeDialog()
             this, SLOT(slotWriteLogMessage(const QString &, const QString &)));
 }
 
-void MultiTabMainWindow::createJobServerWatcher()
+void MainWindow::createJobServerWatcher()
 {
     m_pJobServerWatcherSocket = new JobServerWatcherSocket(this);
     connect(m_pJobServerWatcherSocket,
@@ -337,7 +337,7 @@ void MultiTabMainWindow::createJobServerWatcher()
         this, SLOT(slotWriteLogMessage(const QString &, const QString &)));
 }
 
-void MultiTabMainWindow::createViewLog()
+void MainWindow::createViewLog()
 {
 //    m_ui->collapseExpandWidget = new CollapseExpandWidget();
     m_ui->collapseExpandWidget->setTitle("");
@@ -354,7 +354,7 @@ void MultiTabMainWindow::createViewLog()
     m_logView->loadSettings();
 }
 
-void MultiTabMainWindow::createMainToolBar()
+void MainWindow::createMainToolBar()
 {
     mainToolBar = addToolBar(tr("Toolbar"));
     mainToolBar->setMovable(false);
@@ -372,21 +372,21 @@ void MultiTabMainWindow::createMainToolBar()
     mainToolBar->addAction(m_pActionBenchmark);
 }
 
-void MultiTabMainWindow::createFindDialog()
+void MainWindow::createFindDialog()
 {
     m_pFindDialog = new FindDialog(this);
 
     connect(m_pFindDialog, &FindDialog::signalFindText,
-            this, &MultiTabMainWindow::slotEditorFindText);
+            this, &MainWindow::slotEditorFindText);
 
     connect(m_pFindDialog, &FindDialog::signalReplaceText,
-            this, &MultiTabMainWindow::slotEditorReplaceText);
+            this, &MainWindow::slotEditorReplaceText);
 
     connect(m_pFindDialog, &FindDialog::signalReplaceAllText,
-            this, &MultiTabMainWindow::slotReplaceAllText);
+            this, &MainWindow::slotReplaceAllText);
 }
 
-void MultiTabMainWindow::createFrameInfoDialog()
+void MainWindow::createFrameInfoDialog()
 {
     m_pFrameInfoDialog = new FrameInfoDialog(m_pSettingsManager ,this);
 
@@ -394,7 +394,7 @@ void MultiTabMainWindow::createFrameInfoDialog()
             this, [=](){ m_pActionShowFrameInfoDialog->setChecked(false);});
 }
 
-void MultiTabMainWindow::createBookmarkManager()
+void MainWindow::createBookmarkManager()
 {
     m_pBookmarkManagerDialog = new BookmarkManagerDialog(m_pSettingsManager, this);
 
@@ -402,31 +402,31 @@ void MultiTabMainWindow::createBookmarkManager()
             this, [=](){ m_pActionShowBookmarkManager->setChecked(false);});
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalScriptBookmarkChanged,
-            this, &MultiTabMainWindow::slotSetScriptBookmark);
+            this, &MainWindow::slotSetScriptBookmark);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalAddButtonPressed,
-            this, &MultiTabMainWindow::slotAddBookmark);
+            this, &MainWindow::slotAddBookmark);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalRemoveBookmark,
-            this, &MultiTabMainWindow::slotRemoveBookmark);
+            this, &MainWindow::slotRemoveBookmark);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalGotoBookmark,
-            this, &MultiTabMainWindow::slotGoToBookmark);
+            this, &MainWindow::slotGoToBookmark);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalClearBookmark,
-            this, &MultiTabMainWindow::slotClearBookmark);
+            this, &MainWindow::slotClearBookmark);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalLoadBookmarkFile,
-            this, &MultiTabMainWindow::slotLoadBookmarkFile);
+            this, &MainWindow::slotLoadBookmarkFile);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalLoadChapterFile,
-            this, &MultiTabMainWindow::slotLoadChapterFile);
+            this, &MainWindow::slotLoadChapterFile);
 
     connect(m_pBookmarkManagerDialog, &BookmarkManagerDialog::signalSaveBookmarksToFile,
-            this, &MultiTabMainWindow::slotSaveBookmarksToFile);
+            this, &MainWindow::slotSaveBookmarksToFile);
 }
 
-void MultiTabMainWindow::createPreviewFilters()
+void MainWindow::createPreviewFilters()
 {
     m_pPreviewFiltersDialog = new PreviewFiltersDialog(m_pSettingsManager, this);
 
@@ -434,31 +434,31 @@ void MultiTabMainWindow::createPreviewFilters()
             this, [=](){ m_pActionShowPreivewFiltersDialog->setChecked(false);});
 }
 
-void MultiTabMainWindow::createSelectionToolsDialog()
+void MainWindow::createSelectionToolsDialog()
 {
     m_pSelectionToolsDialog = new SelectionToolsDialog(this);
 
     connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalLoadPixmapRequested,
-            this, &MultiTabMainWindow::slotSendPixmapToSelectionCanvas);
+            this, &MainWindow::slotSendPixmapToSelectionCanvas);
 
     connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalDialogHidden,
             this, [=](){ m_pActionShowSelectionToolsDialog->setChecked(false);});
 
     connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalPasteSelectionPointsString,
-            this, &MultiTabMainWindow::slotPasteSelectionPointsToScript);
+            this, &MainWindow::slotPasteSelectionPointsToScript);
 }
 
-void MultiTabMainWindow::setTimeLineSignals()
+void MainWindow::setTimeLineSignals()
 {
     connect(m_ui->timeLineView, &TimeLineView::signalFrameChanged, // frame change
-            this, &MultiTabMainWindow::slotTimeLineFrameChanged);
+            this, &MainWindow::slotTimeLineFrameChanged);
     connect(m_ui->timeLineView, &TimeLineView::signalJumpToFrame,
-            this, &MultiTabMainWindow::slotJumpPlayFromTimeLine);
+            this, &MainWindow::slotJumpPlayFromTimeLine);
     connect(m_ui->timeLineView, &TimeLineView::signalHoverTime,
-            this, &MultiTabMainWindow::slotUpdateHoverTimeIndicator);
+            this, &MainWindow::slotUpdateHoverTimeIndicator);
 }
 
-void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
+void MainWindow::createMenuActionsAndContextMenuActions()
 {
     struct ActionToCreate
     {
@@ -764,7 +764,7 @@ void MultiTabMainWindow::createMenuActionsAndContextMenuActions()
     addAction(m_pActionChangeToTab9);
 }
 
-void MultiTabMainWindow::createContextMenuActionsAndMenus()
+void MainWindow::createContextMenuActionsAndMenus()
 {
     m_pPreviewContextMenu = new QMenu(this);
     m_pPreviewContextMenu->addAction(m_pActionFrameToClipboard);
@@ -772,26 +772,26 @@ void MultiTabMainWindow::createContextMenuActionsAndMenus()
     m_pPreviewContextMenu->addAction(m_pActionPasteShownFrameNumberIntoScript);
 }
 
-void MultiTabMainWindow::createTabBarContextMenuActions()
+void MainWindow::createTabBarContextMenuActions()
 {
     m_pTabBarContectMenu = new QMenu(this);
     m_pTabBarContectMenu->addAction(m_pActionCloseTab);
 
     connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarRightClicked,
-            this, &MultiTabMainWindow::slotTabBarContextMenu);
+            this, &MainWindow::slotTabBarContextMenu);
 
     connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarMiddleClicked,
-            this, &MultiTabMainWindow::slotRemoveTab);
+            this, &MainWindow::slotRemoveTab);
 }
 
-void MultiTabMainWindow::createStatusBar()
+void MainWindow::createStatusBar()
 {
     m_pStatusBarWidget = new ScriptStatusBarWidget();
     m_ui->statusBar->addPermanentWidget(m_pStatusBarWidget, 1);
     m_pStatusBarWidget->hide(); // hide by default
 }
 
-void MultiTabMainWindow::setPlaybackPanel()
+void MainWindow::setPlaybackPanel()
 {
     m_ui->playButton->setDefaultAction(m_pActionPlay);
 //    m_ui.timeStepForwardButton->setDefaultAction(m_pActionTimeStepForward);
@@ -843,10 +843,10 @@ void MultiTabMainWindow::setPlaybackPanel()
         this, SLOT(slotSetPlayFPSLimit()));
 
     connect(m_ui->playFpsLimitLineEdit, &QLineEdit::editingFinished,
-        this, &MultiTabMainWindow::slotSetPlayFPSLimit);
+        this, &MainWindow::slotSetPlayFPSLimit);
 }
 
-bool MultiTabMainWindow::saveScriptToFile(const QString &a_filePath)
+bool MainWindow::saveScriptToFile(const QString &a_filePath)
 {
     if(a_filePath.isEmpty())
         return false;
@@ -893,7 +893,7 @@ bool MultiTabMainWindow::saveScriptToFile(const QString &a_filePath)
     return true;
 }
 
-bool MultiTabMainWindow::loadScriptFromFile(const QString &a_filePath)
+bool MainWindow::loadScriptFromFile(const QString &a_filePath)
 {
     if(a_filePath.isEmpty())
         return false;
@@ -929,7 +929,7 @@ bool MultiTabMainWindow::loadScriptFromFile(const QString &a_filePath)
     return true;
 }
 
-bool MultiTabMainWindow::safeToCloseFile()
+bool MainWindow::safeToCloseFile()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
@@ -977,7 +977,7 @@ bool MultiTabMainWindow::safeToCloseFile()
 
 }
 
-bool MultiTabMainWindow::IsScriptOpened(const QString &a_filePath)
+bool MainWindow::IsScriptOpened(const QString &a_filePath)
 {
     auto pred = [a_filePath](const EditorPreview item) {
         return item.scriptFilePath == a_filePath;
@@ -993,7 +993,7 @@ bool MultiTabMainWindow::IsScriptOpened(const QString &a_filePath)
     return false;
 }
 
-void MultiTabMainWindow::setCurrentScriptFilePath(const QString & a_filePath)
+void MainWindow::setCurrentScriptFilePath(const QString & a_filePath)
 {
     if(m_currentTabScriptFilePath == a_filePath)
         return;
@@ -1003,7 +1003,7 @@ void MultiTabMainWindow::setCurrentScriptFilePath(const QString & a_filePath)
     fillRecentScriptsMenu();
 }
 
-void MultiTabMainWindow::loadStartUpScript()
+void MainWindow::loadStartUpScript()
 {
     slotNewScript();
 
@@ -1018,7 +1018,7 @@ void MultiTabMainWindow::loadStartUpScript()
     }
 }
 
-void MultiTabMainWindow::fillRecentScriptsMenu()
+void MainWindow::fillRecentScriptsMenu()
 {
     m_pMenuRecentScripts->clear();
     QStringList recentSciptsList = m_pSettingsManager->getRecentFilesList();
@@ -1034,7 +1034,7 @@ void MultiTabMainWindow::fillRecentScriptsMenu()
     }
 }
 
-void MultiTabMainWindow::setUpZoomPanel()
+void MainWindow::setUpZoomPanel()
 {
     m_ui->zoomRatioSpinBox->setLocale(QLocale("C"));
 
@@ -1057,13 +1057,13 @@ void MultiTabMainWindow::setUpZoomPanel()
     m_ui->zoomRatioSpinBox->setValue(zoomRatio);
 
     connect(m_ui->zoomModeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MultiTabMainWindow::slotZoomModeChanged);
+            this, &MainWindow::slotZoomModeChanged);
 
     connect(m_ui->zoomRatioSpinBox, QOverload<double>::of(&ZoomRatioSpinBox::valueChanged),
-            this, &MultiTabMainWindow::slotZoomRatioChanged);
+            this, &MainWindow::slotZoomRatioChanged);
 }
 
-QString MultiTabMainWindow::createPreviewFilterScript(const QString &a_script, const QMap<QString, int>& a_filtersMap)
+QString MainWindow::createPreviewFilterScript(const QString &a_script, const QMap<QString, int>& a_filtersMap)
 {
     if (a_filtersMap.isEmpty()) return a_script;
 
@@ -1095,7 +1095,7 @@ QString MultiTabMainWindow::createPreviewFilterScript(const QString &a_script, c
     return scriptChain;
 }
 
-QFlags<QTextDocument::FindFlag> MultiTabMainWindow::extractFindFlags(const QMap<QString, bool> &a_flags)
+QFlags<QTextDocument::FindFlag> MainWindow::extractFindFlags(const QMap<QString, bool> &a_flags)
 {
     QFlags<QTextDocument::FindFlag> findFlags;
     QMapIterator<QString, bool> i(a_flags);
@@ -1110,7 +1110,7 @@ QFlags<QTextDocument::FindFlag> MultiTabMainWindow::extractFindFlags(const QMap<
     return findFlags;
 }
 
-double MultiTabMainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane, const VSAPI *a_cpVSAPI, const VSFrameRef *a_cpFrameRef)
+double MainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane, const VSAPI *a_cpVSAPI, const VSFrameRef *a_cpFrameRef)
 {
     Q_ASSERT(a_cpVSAPI);
 
@@ -1162,15 +1162,15 @@ double MultiTabMainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane
     return value;
 }
 
-void MultiTabMainWindow::createGeometrySaveTimer()
+void MainWindow::createGeometrySaveTimer()
 {
     m_pGeometrySaveTimer = new QTimer(this);
     m_pGeometrySaveTimer->setInterval(DEFAULT_WINDOW_GEOMETRY_SAVE_DELAY);
     connect(m_pGeometrySaveTimer, &QTimer::timeout,
-            this, &MultiTabMainWindow::slotSaveGeometry);
+            this, &MainWindow::slotSaveGeometry);
 }
 
-void MultiTabMainWindow::createGarbageCollection()
+void MainWindow::createGarbageCollection()
 {
     m_orphanQObjects =
     {
@@ -1184,7 +1184,7 @@ void MultiTabMainWindow::createGarbageCollection()
     };
 }
 
-void MultiTabMainWindow::destroyOrphanQObjects()
+void MainWindow::destroyOrphanQObjects()
 {
     for(QObject ** ppObject : m_orphanQObjects)
     {
@@ -1197,7 +1197,7 @@ void MultiTabMainWindow::destroyOrphanQObjects()
     }
 }
 
-bool MultiTabMainWindow::slotRemoveTab(int a_index)
+bool MainWindow::slotRemoveTab(int a_index)
 {
     if (!safeToCloseFile()) return false;
     m_closingTab = true;
@@ -1260,7 +1260,7 @@ bool MultiTabMainWindow::slotRemoveTab(int a_index)
     return true;
 }
 
-bool MultiTabMainWindow::slotRemoveAllTabs()
+bool MainWindow::slotRemoveAllTabs()
 {
     int tabCount = m_ui->scriptTabWidget->count();
     int totalIndex = tabCount - 1;
@@ -1271,7 +1271,7 @@ bool MultiTabMainWindow::slotRemoveAllTabs()
     return false;
 }
 
-void MultiTabMainWindow::slotChangePreviewTab(int a_index)
+void MainWindow::slotChangePreviewTab(int a_index)
 {
     int currentIndex = m_ui->scriptTabWidget->currentIndex();
     if (currentIndex != a_index)
@@ -1286,7 +1286,7 @@ void MultiTabMainWindow::slotChangePreviewTab(int a_index)
 
 }
 
-void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex)
+void MainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabIndex)
 {
     ScriptProcessor *processor = m_pEditorPreviewVector[a_leftTabIndex].processor;
     QString script = processor->script();
@@ -1333,7 +1333,7 @@ void MultiTabMainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_righ
     }
 }
 
-void MultiTabMainWindow::slotChangeScriptTab(int a_index)
+void MainWindow::slotChangeScriptTab(int a_index)
 {    
     int currentIndex = m_ui->previewTabWidget->currentIndex();
     if (currentIndex != a_index)
@@ -1408,7 +1408,7 @@ void MultiTabMainWindow::slotChangeScriptTab(int a_index)
     m_closingTab = false;
 }
 
-void MultiTabMainWindow::slotPreviewScript()
+void MainWindow::slotPreviewScript()
 {
     int tabCount = m_ui->scriptTabWidget->count();
     if (tabCount < 1)
@@ -1473,19 +1473,19 @@ void MultiTabMainWindow::slotPreviewScript()
     }
 }
 
-void MultiTabMainWindow::slotTabBarContextMenu(int a_tabIndex)
+void MainWindow::slotTabBarContextMenu(int a_tabIndex)
 {    
     m_rightClickedTab = a_tabIndex;
     m_pTabBarContectMenu->popup(QCursor::pos());
 }
 
-void MultiTabMainWindow::slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen)
+void MainWindow::slotSetTimeLineAndIndicator(int a_numFrames, int64_t a_fpsNum, int64_t a_fpsDen)
 {
     m_ui->frameNumberIndicatorSpinBox->setMaximum(a_numFrames);
     m_ui->timeLineView->slotSetTimeLine(a_numFrames, a_fpsNum, a_fpsDen);
 }
 
-void MultiTabMainWindow::slotTimeLineDisplayModeChanged()
+void MainWindow::slotTimeLineDisplayModeChanged()
 {
     TimeLine::DisplayMode timeLineDisplayMode = TimeLine::DisplayMode::Frames;
 
@@ -1499,7 +1499,7 @@ void MultiTabMainWindow::slotTimeLineDisplayModeChanged()
     m_ui->timeLineView->setDisplayMode(timeLineDisplayMode);
 }
 
-void MultiTabMainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
+void MainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
 {
     if (m_pEditorPreviewVector.count() < 1) return;
     // retrieve procceor of current script, and pass in frame to showframe
@@ -1526,7 +1526,7 @@ void MultiTabMainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
 }
 
 
-void MultiTabMainWindow::slotJumpPlayFromTimeLine(int a_frameNumber)
+void MainWindow::slotJumpPlayFromTimeLine(int a_frameNumber)
 {
     int currentIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
@@ -1534,50 +1534,50 @@ void MultiTabMainWindow::slotJumpPlayFromTimeLine(int a_frameNumber)
     processor->slotJumpPlay(a_frameNumber);
 }
 
-void MultiTabMainWindow::slotUpdateFrameTimeIndicators(int a_frameNumber, const QTime &a_time)
+void MainWindow::slotUpdateFrameTimeIndicators(int a_frameNumber, const QTime &a_time)
 {
     m_ui->timeLineView->setFrame(a_frameNumber);
     m_ui->frameTimeTimeEdit->setTime(a_time);
 }
 
-void MultiTabMainWindow::slotUpdateHoverTimeIndicator(const QTime &a_time)
+void MainWindow::slotUpdateHoverTimeIndicator(const QTime &a_time)
 {
     m_ui->hoverTimeTimeEdit->setTime(a_time);
 }
 
-void MultiTabMainWindow::slotTimeLineFrameChanged(int a_frameNumber)
+void MainWindow::slotTimeLineFrameChanged(int a_frameNumber)
 {
     /* catch frame change signal from timeline
      * and pass to frame number indicator */
     m_ui->frameNumberIndicatorSpinBox->setValue(a_frameNumber);
 }
 
-void MultiTabMainWindow::slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads)
+void MainWindow::slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads)
 {
     m_pStatusBarWidget->setQueueState(a_framesInQueue, a_frameInProcess, a_maxThreads);
 }
 
-void MultiTabMainWindow::slotShowFrameInfoDialog(bool a_visible)
+void MainWindow::slotShowFrameInfoDialog(bool a_visible)
 {
     m_pFrameInfoDialog->setVisible(a_visible);
 }
 
-void MultiTabMainWindow::slotShowBookmarkManager(bool a_visible)
+void MainWindow::slotShowBookmarkManager(bool a_visible)
 {
     m_pBookmarkManagerDialog->setVisible(a_visible);
 }
 
-void MultiTabMainWindow::slotShowPreviewFiltersDialog(bool a_visible)
+void MainWindow::slotShowPreviewFiltersDialog(bool a_visible)
 {
     m_pPreviewFiltersDialog->setVisible(a_visible);
 }
 
-void MultiTabMainWindow::slotShowSelectionToolsDialog(bool a_visible)
+void MainWindow::slotShowSelectionToolsDialog(bool a_visible)
 {
     m_pSelectionToolsDialog->setVisible(a_visible);
 }
 
-void MultiTabMainWindow::slotZoomModeChanged()
+void MainWindow::slotZoomModeChanged()
 {
     int currentIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
@@ -1622,14 +1622,14 @@ void MultiTabMainWindow::slotZoomModeChanged()
     changingZoomMode = false;
 }
 
-void MultiTabMainWindow::slotZoomRatioChanged(double a_zoomRatio)
+void MainWindow::slotZoomRatioChanged(double a_zoomRatio)
 {
     if (m_pEditorPreviewVector.count() < 1) return;
     setPreviewPixmap();
     m_pSettingsManager->setZoomRatio(a_zoomRatio);
 }
 
-void MultiTabMainWindow::setPreviewPixmap()
+void MainWindow::setPreviewPixmap()
 {
     if (m_ui->previewTabWidget->count() < 1) return;
     if (m_pEditorPreviewVector.count() < 1) return;
@@ -1704,14 +1704,14 @@ void MultiTabMainWindow::setPreviewPixmap()
     previewArea->setPixmap(framePixmap, ratio);
 }
 
-void MultiTabMainWindow::slotPreviewAreaSizeChanged()
+void MainWindow::slotPreviewAreaSizeChanged()
 {
     ZoomMode zoomMode = ZoomMode (m_ui->zoomModeComboBox->currentData().toInt());
     if(zoomMode == ZoomMode::FitToFrame)
         setPreviewPixmap();
 }
 
-void MultiTabMainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
+void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 {
     if(!m_pFrameInfoDialog->isVisible())
         return;
@@ -1818,17 +1818,17 @@ void MultiTabMainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_no
 
 }
 
-void MultiTabMainWindow::slotPreviewAreaMouseRightButtonReleased()
+void MainWindow::slotPreviewAreaMouseRightButtonReleased()
 {
     m_pPreviewContextMenu->popup(QCursor::pos());
 }
 
-void MultiTabMainWindow::slotCallAdvancedSettingsDialog()
+void MainWindow::slotCallAdvancedSettingsDialog()
 {
     m_pAdvancedSettingsDialog->slotCall();
 }
 
-void MultiTabMainWindow::slotPasteShownFrameNumberIntoScript()
+void MainWindow::slotPasteShownFrameNumberIntoScript()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -1837,7 +1837,7 @@ void MultiTabMainWindow::slotPasteShownFrameNumberIntoScript()
     editor->insertPlainText(QVariant(frameShown).toString());
 }
 
-void MultiTabMainWindow::slotSavePreviewScrollBarPos(const QPair<int,int> &a_posPair)
+void MainWindow::slotSavePreviewScrollBarPos(const QPair<int,int> &a_posPair)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -1846,7 +1846,7 @@ void MultiTabMainWindow::slotSavePreviewScrollBarPos(const QPair<int,int> &a_pos
     m_pEditorPreviewVector[currentTabIndex].previewScrollBarPos = a_posPair;
 }
 
-void MultiTabMainWindow::slotUpdateTabPreviewFilters(QMap<QString, int> a_filtersMap)
+void MainWindow::slotUpdateTabPreviewFilters(QMap<QString, int> a_filtersMap)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     QMap<QString,int> pf = m_pEditorPreviewVector[currentTabIndex].previewFilters;
@@ -1862,7 +1862,7 @@ void MultiTabMainWindow::slotUpdateTabPreviewFilters(QMap<QString, int> a_filter
     }
 }
 
-void MultiTabMainWindow::slotPlay(bool a_play)
+void MainWindow::slotPlay(bool a_play)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -1882,7 +1882,7 @@ void MultiTabMainWindow::slotPlay(bool a_play)
     m_ui->timeLineView->setPlay(playing); // passing the flag into timeline
 }
 
-void MultiTabMainWindow::slotSetPlayFPSLimit()
+void MainWindow::slotSetPlayFPSLimit()
 {
     if (!m_ui->playFpsLimitLineEdit->isReadOnly()) {
         m_ui->playFpsLimitLineEdit->setReadOnly(true);
@@ -1941,7 +1941,7 @@ void MultiTabMainWindow::slotSetPlayFPSLimit()
 
 }
 
-void MultiTabMainWindow::slotUpdateFramePropsString(const QString &a_framePropsString)
+void MainWindow::slotUpdateFramePropsString(const QString &a_framePropsString)
 {
     if(!m_pFrameInfoDialog->isVisible())
         return;
@@ -1949,49 +1949,49 @@ void MultiTabMainWindow::slotUpdateFramePropsString(const QString &a_framePropsS
     m_pFrameInfoDialog->setFramePropsString(a_framePropsString);
 }
 
-void MultiTabMainWindow::slotEditorUndo()
+void MainWindow::slotEditorUndo()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->undo();
 }
 
-void MultiTabMainWindow::slotEditorRedo()
+void MainWindow::slotEditorRedo()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->redo();
 }
 
-void MultiTabMainWindow::slotEditorCut()
+void MainWindow::slotEditorCut()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->cut();
 }
 
-void MultiTabMainWindow::slotEditorCopy()
+void MainWindow::slotEditorCopy()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->copy();
 }
 
-void MultiTabMainWindow::slotEditorPaste()
+void MainWindow::slotEditorPaste()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->paste();
 }
 
-void MultiTabMainWindow::slotEditorSelectAll()
+void MainWindow::slotEditorSelectAll()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->selectAll();
 }
 
-void MultiTabMainWindow::slotEditorCopyToNewTab()
+void MainWindow::slotEditorCopyToNewTab()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
@@ -2002,54 +2002,54 @@ void MultiTabMainWindow::slotEditorCopyToNewTab()
     slotCreateTab("", "", text);
 }
 
-void MultiTabMainWindow::slotOpenFind()
+void MainWindow::slotOpenFind()
 {
     m_pFindDialog->show();
 }
 
-void MultiTabMainWindow::slotDuplicateSelection()
+void MainWindow::slotDuplicateSelection()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotDuplicateSelection();
 }
 
-void MultiTabMainWindow::slotReplaceTabWithSpaces()
+void MainWindow::slotReplaceTabWithSpaces()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotReplaceTabWithSpaces();
 }
 
-void MultiTabMainWindow::slotComplete()
+void MainWindow::slotComplete()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotComplete();
 }
 
-void MultiTabMainWindow::slotMoveTextBlockUp()
+void MainWindow::slotMoveTextBlockUp()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotMoveTextBlockUp();
 }
 
-void MultiTabMainWindow::slotMoveTextBlockDown()
+void MainWindow::slotMoveTextBlockDown()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotMoveTextBlockDown();
 }
 
-void MultiTabMainWindow::slotToggleComment()
+void MainWindow::slotToggleComment()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->slotToggleComment();
 }
 
-void MultiTabMainWindow::slotEditorFindText(const QString &a_text, const QMap <QString, bool> & a_flagsMap)
+void MainWindow::slotEditorFindText(const QString &a_text, const QMap <QString, bool> & a_flagsMap)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor *editor = m_pEditorPreviewVector[currentTabIndex].editor;
@@ -2059,7 +2059,7 @@ void MultiTabMainWindow::slotEditorFindText(const QString &a_text, const QMap <Q
     editor->slotFind(a_text, findFlags, a_flagsMap[FIND_ID_REGEX]);
 }
 
-void MultiTabMainWindow::slotEditorReplaceText(const QString & a_findText, const QString & a_replaceText,
+void MainWindow::slotEditorReplaceText(const QString & a_findText, const QString & a_replaceText,
                                                const QMap<QString, bool> & a_flagsMap)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
@@ -2070,7 +2070,7 @@ void MultiTabMainWindow::slotEditorReplaceText(const QString & a_findText, const
     editor->slotReplace(a_findText, a_replaceText, findFlags, a_flagsMap[FIND_ID_REGEX]);
 }
 
-void MultiTabMainWindow::slotReplaceAllText(const QString & a_findText, const QString & a_replaceText,
+void MainWindow::slotReplaceAllText(const QString & a_findText, const QString & a_replaceText,
                                             const QMap<QString, bool> & a_flagsMap)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
@@ -2082,11 +2082,11 @@ void MultiTabMainWindow::slotReplaceAllText(const QString & a_findText, const QS
 
 }
 
-void MultiTabMainWindow::slotUpdateScriptBookmarkList()
+void MainWindow::slotUpdateScriptBookmarkList()
 {
 }
 
-void MultiTabMainWindow::slotSetScriptBookmark(const QString & a_text)
+void MainWindow::slotSetScriptBookmark(const QString & a_text)
 {
 //    if (a_index < 0) return;
 
@@ -2108,7 +2108,7 @@ void MultiTabMainWindow::slotSetScriptBookmark(const QString & a_text)
     }
 }
 
-void MultiTabMainWindow::slotAddBookmark()
+void MainWindow::slotAddBookmark()
 {
     // get current frame and add to bookmark model
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
@@ -2126,7 +2126,7 @@ void MultiTabMainWindow::slotAddBookmark()
     bookmarkModel->addBookmark(currentFrame, timeInMilli);
 }
 
-void MultiTabMainWindow::slotRemoveBookmark(QModelIndex a_index)
+void MainWindow::slotRemoveBookmark(QModelIndex a_index)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2137,7 +2137,7 @@ void MultiTabMainWindow::slotRemoveBookmark(QModelIndex a_index)
     bookmarkModel->removeBookmark(a_index);
 }
 
-void MultiTabMainWindow::slotGoToBookmark(const QModelIndex a_modelIndex)
+void MainWindow::slotGoToBookmark(const QModelIndex a_modelIndex)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2152,7 +2152,7 @@ void MultiTabMainWindow::slotGoToBookmark(const QModelIndex a_modelIndex)
     m_ui->timeLineView->setFrame(frameIndex);
 }
 
-void MultiTabMainWindow::slotClearBookmark()
+void MainWindow::slotClearBookmark()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2162,7 +2162,7 @@ void MultiTabMainWindow::slotClearBookmark()
     bookmarkModel->clearAll();
 }
 
-void MultiTabMainWindow::slotLoadBookmarkFile(QFile & a_file)
+void MainWindow::slotLoadBookmarkFile(QFile & a_file)
 {
     slotClearBookmark();
 
@@ -2193,7 +2193,7 @@ void MultiTabMainWindow::slotLoadBookmarkFile(QFile & a_file)
     }
 }
 
-void MultiTabMainWindow::slotLoadChapterFile(QFile & a_file)
+void MainWindow::slotLoadChapterFile(QFile & a_file)
 {
     slotClearBookmark();
 
@@ -2259,7 +2259,7 @@ void MultiTabMainWindow::slotLoadChapterFile(QFile & a_file)
 
 }
 
-void MultiTabMainWindow::slotSaveBookmarksToFile()
+void MainWindow::slotSaveBookmarksToFile()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     BookmarkModel * bookmarkModel = m_pEditorPreviewVector[currentTabIndex].bookmarkModel;
@@ -2344,7 +2344,7 @@ void MultiTabMainWindow::slotSaveBookmarksToFile()
 
 }
 
-void MultiTabMainWindow::slotSendPixmapToSelectionCanvas()
+void MainWindow::slotSendPixmapToSelectionCanvas()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2357,14 +2357,14 @@ void MultiTabMainWindow::slotSendPixmapToSelectionCanvas()
     m_pSelectionToolsDialog->setFramePixmap(framePixmap);
 }
 
-void MultiTabMainWindow::slotPasteSelectionPointsToScript(const QString &a_pointString)
+void MainWindow::slotPasteSelectionPointsToScript(const QString &a_pointString)
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
     editor->insertPlainText(a_pointString);
 }
 
-void MultiTabMainWindow::slotNewScript()
+void MainWindow::slotNewScript()
 {
     if(!safeToCloseFile())
         return;
@@ -2387,7 +2387,7 @@ void MultiTabMainWindow::slotNewScript()
 // END OF void MainWindow::slotNewScript()
 //==============================================================================
 
-bool MultiTabMainWindow::slotSaveScript()
+bool MainWindow::slotSaveScript()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
@@ -2407,7 +2407,7 @@ bool MultiTabMainWindow::slotSaveScript()
 // END OF bool MainWindow::slotSaveScript()
 //==============================================================================
 
-bool MultiTabMainWindow::slotSaveScriptAs()
+bool MainWindow::slotSaveScriptAs()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     QString storedFilePath = m_pEditorPreviewVector[currentTabIndex].scriptFilePath;
@@ -2438,10 +2438,10 @@ bool MultiTabMainWindow::slotSaveScriptAs()
     return false;
 }
 
-// END OF bool MultiTabMainWindow::slotSaveScriptAs()
+// END OF bool MainWindow::slotSaveScriptAs()
 //==============================================================================
 
-bool MultiTabMainWindow::slotOpenScript()
+bool MainWindow::slotOpenScript()
 {
     QFileInfo fileInfo(m_pSettingsManager->getLastUsedPath());
     QString offeredPath = fileInfo.absoluteDir().path();
@@ -2456,12 +2456,12 @@ bool MultiTabMainWindow::slotOpenScript()
 // END OF bool MainWindow::slotOpenScript()
 //==============================================================================
 
-void MultiTabMainWindow::slotTemplates()
+void MainWindow::slotTemplates()
 {
     m_pTemplatesDialog->call();
 }
 
-void MultiTabMainWindow::slotChangeTabByAction()
+void MainWindow::slotChangeTabByAction()
 {
     QAction* action = qobject_cast<QAction*>(sender());
     if (!action) {
@@ -2479,7 +2479,7 @@ void MultiTabMainWindow::slotChangeTabByAction()
 // END OF void MainWindow::slotTemplates()
 //==============================================================================
 
-void MultiTabMainWindow::slotCheckScript()
+void MainWindow::slotCheckScript()
 {
     VapourSynthScriptProcessor tempProcessor(m_pSettingsManager, m_pVSScriptLibrary, this);
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
@@ -2503,7 +2503,7 @@ void MultiTabMainWindow::slotCheckScript()
 // END OF void MainWindow::slotCheckScript()
 //==============================================================================
 
-void MultiTabMainWindow::slotBenchmark()
+void MainWindow::slotBenchmark()
 {
     if(m_pBenchmarkDialog->busy())
     {
@@ -2525,7 +2525,7 @@ void MultiTabMainWindow::slotBenchmark()
 // END OF void MainWindow::slotBenchmark()
 //==============================================================================
 
-void MultiTabMainWindow::slotEncode()
+void MainWindow::slotEncode()
 {
     if(m_pEncodeDialog->busy())
     {
@@ -2546,7 +2546,7 @@ void MultiTabMainWindow::slotEncode()
 // END OF void MainWindow::slotEncode()
 //==============================================================================
 
-void MultiTabMainWindow::slotEnqueueEncodeJob()
+void MainWindow::slotEnqueueEncodeJob()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     QString storedFilePath = m_pEditorPreviewVector[currentTabIndex].scriptFilePath;
@@ -2566,7 +2566,7 @@ void MultiTabMainWindow::slotEnqueueEncodeJob()
 // END OF void MainWindow::slotEnqueueEncodeJob()
 //==============================================================================
 
-void MultiTabMainWindow::slotJobs()
+void MainWindow::slotJobs()
 {
     m_pJobServerWatcherSocket->sendMessage(WMSG_SHOW_WINDOW);
 }
@@ -2574,7 +2574,7 @@ void MultiTabMainWindow::slotJobs()
 // END OF void MainWindow::slotJobs()
 //==============================================================================
 
-void MultiTabMainWindow::slotFrameToClipboard()
+void MainWindow::slotFrameToClipboard()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2587,7 +2587,7 @@ void MultiTabMainWindow::slotFrameToClipboard()
     pClipboard->setPixmap(framePixmap);
 }
 
-void MultiTabMainWindow::slotSaveSnapshot()
+void MainWindow::slotSaveSnapshot()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
@@ -2666,10 +2666,10 @@ void MultiTabMainWindow::slotSaveSnapshot()
 
 }
 
-// END OF void MultiTabMainWindow::slotFrameToClipboard()
+// END OF void MainWindow::slotFrameToClipboard()
 //==============================================================================
 
-void MultiTabMainWindow::slotAbout()
+void MainWindow::slotAbout()
 {
     QResource aboutResource(":readme");
     QByteArray aboutData(reinterpret_cast<const char*>(aboutResource.data()),
@@ -2678,7 +2678,7 @@ void MultiTabMainWindow::slotAbout()
     QMessageBox::about(this, VAPOURSYNTH_EDITOR_NAME, aboutString);
 }
 
-void MultiTabMainWindow::slotChangeWindowTitle(const QString & a_title)
+void MainWindow::slotChangeWindowTitle(const QString & a_title)
 {
     if (m_pEditorPreviewVector.count() < 1) return;
 
@@ -2689,7 +2689,7 @@ void MultiTabMainWindow::slotChangeWindowTitle(const QString & a_title)
 // END OF void MainWindow::slotChangeWindowTitle()
 //==============================================================================
 
-void MultiTabMainWindow::slotEditorTextChanged()
+void MainWindow::slotEditorTextChanged()
 {
     if (m_pEditorPreviewVector.count() < 1) return;
 
@@ -2717,7 +2717,7 @@ void MultiTabMainWindow::slotEditorTextChanged()
 // END OF void MainWindow::slotEditorTextChanged()
 //==============================================================================
 
-void MultiTabMainWindow::slotOpenRecentScriptActionTriggered()
+void MainWindow::slotOpenRecentScriptActionTriggered()
 {
     QAction * pAction = qobject_cast<QAction *>(sender());
     if(pAction == nullptr)
@@ -2727,7 +2727,7 @@ void MultiTabMainWindow::slotOpenRecentScriptActionTriggered()
     loadScriptFromFile(pAction->data().toString());
 }
 
-void MultiTabMainWindow::slotSettingsChanged()
+void MainWindow::slotSettingsChanged()
 {
     QKeySequence hotkey;
     for(QAction * pAction : m_settableActionsList)
@@ -2749,7 +2749,7 @@ void MultiTabMainWindow::slotSettingsChanged()
 
 }
 
-void MultiTabMainWindow::slotScriptFileDropped(const QString &a_filePath, bool *a_pHandled)
+void MainWindow::slotScriptFileDropped(const QString &a_filePath, bool *a_pHandled)
 {
     *a_pHandled = true;
 
@@ -2759,7 +2759,7 @@ void MultiTabMainWindow::slotScriptFileDropped(const QString &a_filePath, bool *
     loadScriptFromFile(a_filePath);
 }
 
-void MultiTabMainWindow::slotSaveGeometry()
+void MainWindow::slotSaveGeometry()
 {
     m_pGeometrySaveTimer->stop();
     m_pSettingsManager->setMainWindowGeometry(m_windowGeometry);
@@ -2768,7 +2768,7 @@ void MultiTabMainWindow::slotSaveGeometry()
 // END OF bool MainWindow::safeToCloseFile()
 //==============================================================================
 
-void MultiTabMainWindow::slotWriteLogMessage(int a_messageType,
+void MainWindow::slotWriteLogMessage(int a_messageType,
     const QString & a_message)
 {
     QString style = vsMessageTypeToStyleName(a_messageType);
@@ -2779,7 +2779,7 @@ void MultiTabMainWindow::slotWriteLogMessage(int a_messageType,
 //		const QString & a_message)
 //==============================================================================
 
-void MultiTabMainWindow::slotWriteLogMessage(const QString & a_message,
+void MainWindow::slotWriteLogMessage(const QString & a_message,
     const QString & a_style)
 {
     m_logView->addEntry(a_message, a_style);

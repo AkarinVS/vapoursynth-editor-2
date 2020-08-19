@@ -1,5 +1,5 @@
-#ifndef MULTI_TAB_MAIN_WINDOW_H
-#define MULTI_TAB_MAIN_WINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include "../../common-src/settings/settings_manager.h"
 #include "../../common-src/vapoursynth/vs_script_library.h"
@@ -14,7 +14,7 @@
 #include <QMainWindow>
 
 namespace Ui {
-class MultiTabMainWindow;
+class MainWindow;
 }
 
 class ScriptProcessor;
@@ -82,13 +82,13 @@ typedef QVector<ClipItem> CompareGroup;
 /* operator implementation to compare clip item.properties for grouping */
 inline bool operator==(const ClipProp& lhs, const ClipProp& rhs);
 
-class MultiTabMainWindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MultiTabMainWindow(QWidget *a_pParent = nullptr);
-    ~MultiTabMainWindow() override;
+    explicit MainWindow(QWidget *a_pParent = nullptr);
+    ~MainWindow() override;
 
     VSEditorLog * m_logView;
 
@@ -104,7 +104,7 @@ protected:
 
 
 private:
-    Ui::MultiTabMainWindow *m_ui;
+    Ui::MainWindow *m_ui;
 
     SettingsManager * m_pSettingsManager;
 
@@ -426,4 +426,4 @@ signals:
 
 };
 
-#endif // MULTI_TAB_MAIN_WINDOW_H
+#endif // MAIN_WINDOW_H
