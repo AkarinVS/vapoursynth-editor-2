@@ -21,6 +21,8 @@ public:
 
 	bool setPortableMode(bool a_portableMod);
 
+    QString getSettingsFileDir();
+
 	//----------------------------------------------------------------------
 
 	QStringList getVapourSynthLibraryPaths() const;

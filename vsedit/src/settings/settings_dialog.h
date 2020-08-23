@@ -70,6 +70,8 @@ private slots:
 
     void slotCancel();
 
+    void slotOpenSettingsFileDir();
+
 	void slotAddVSLibraryPath();
 
 	void slotRemoveVSLibraryPath();

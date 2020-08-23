@@ -15,6 +15,7 @@
 #include <QRandomGenerator>
 #include <QStandardPaths>
 #include <QTextStream>
+#include <QDesktopServices>
 
 //==============================================================================
 
@@ -58,8 +59,11 @@ SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
     m_ui.themePresetCopyWidget->setVisible(false);
     loadThemePresets();
 
+    connect(m_ui.settingsFileDirButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotOpenSettingsFileDir);
+
     // signal for theme preset
-    connect(m_ui. copyThemePresetButton, &QPushButton::clicked,
+    connect(m_ui.copyThemePresetButton, &QPushButton::clicked,
             this, &SettingsDialog::slotShowThemePresetCopyWidget);
     connect(m_ui.cancelThemePresetCopyButton, &QPushButton::clicked,
             this, &SettingsDialog::slotCancelThemePresetCopy);
@@ -473,6 +477,12 @@ void SettingsDialog::slotApply()
 void SettingsDialog::slotCancel()
 {
     loadThemePresets();
+}
+
+void SettingsDialog::slotOpenSettingsFileDir()
+{
+    QString settingsFileDir = m_pSettingsManager->getSettingsFileDir();
+    QDesktopServices::openUrl(settingsFileDir);
 }
 
 // END OF void SettingsDialog::slotCancel()

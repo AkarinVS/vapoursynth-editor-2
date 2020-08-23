@@ -178,7 +178,12 @@ QVariant SettingsManagerCore::value(const QString & a_key,
 bool SettingsManagerCore::setValue(const QString & a_key,
 	const QVariant & a_value)
 {
-	return setValueInGroup(COMMON_GROUP, a_key, a_value);
+    return setValueInGroup(COMMON_GROUP, a_key, a_value);
+}
+
+QString SettingsManagerCore::getSettingsFileDir()
+{
+    return m_settingsFilePath.replace(SETTINGS_FILE_NAME, "");
 }
 
 //==============================================================================
