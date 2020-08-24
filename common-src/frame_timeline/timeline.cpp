@@ -29,7 +29,7 @@ TimeLine::~TimeLine()
 
 QRectF TimeLine::boundingRect() const
 {    
-    return QRectF(0, 0, m_viewWidth, 40);
+    return QRectF(0, 0, m_viewWidth - 2, 40); // -2 to remove border
 }
 
 // END OF QRectF TimeLine::boundingRect() const
