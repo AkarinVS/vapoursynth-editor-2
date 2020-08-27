@@ -28,8 +28,6 @@ public:
 
     bool previewScript(const QString& a_script, const QString& a_scriptName);
 
-    void cleanUpOnClose();
-
     void showFrameFromTimeLine(int a_frameNumber);
 
     void showFrameFromFrameIndicator(int a_frameNumber);

@@ -1247,7 +1247,7 @@ bool MainWindow::slotRemoveTab(int a_index)
 
     delete m_pEditorPreviewVector[currentTabIndex].processor;
 //    delete m_pEditorPreviewVector[currentTabIndex].editor;
-//    delete m_pEditorPreviewVector[currentTabIndex].previewArea;
+    delete m_pEditorPreviewVector[currentTabIndex].previewArea;
     delete m_pEditorPreviewVector[currentTabIndex].bookmarkModel;
 
     m_pEditorPreviewVector.remove(currentTabIndex); // remove widgets from vector

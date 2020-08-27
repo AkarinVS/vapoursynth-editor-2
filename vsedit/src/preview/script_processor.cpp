@@ -29,6 +29,7 @@ ScriptProcessor::ScriptProcessor(SettingsManager * a_pSettingsManager,
 
 ScriptProcessor::~ScriptProcessor()
 {    
+    stopAndCleanUp();
 }
 
 void ScriptProcessor::setScriptName(const QString &a_scriptName)
@@ -108,12 +109,6 @@ bool ScriptProcessor::previewScript(const QString &a_script, const QString &a_sc
 
     slotShowFrame(m_frameExpected);
     return true;
-}
-
-void ScriptProcessor::cleanUpOnClose()
-{
-    stopAndCleanUp();
-
 }
 
 void ScriptProcessor::showFrameFromTimeLine(int a_frameNumber)
