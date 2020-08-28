@@ -55,8 +55,8 @@ void BookmarkManagerDialog::moveEvent(QMoveEvent *a_pEvent)
 void BookmarkManagerDialog::hideEvent(QHideEvent *a_pEvent)
 {    
     emit signalDialogHidden();
-    QDialog::hideEvent(a_pEvent);
     saveGeometryDelayed();
+    QDialog::hideEvent(a_pEvent);    
 }
 
 void BookmarkManagerDialog::setWindowGeometry()

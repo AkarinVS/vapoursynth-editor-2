@@ -324,7 +324,9 @@ private slots:
     void slotJumpPlayFromTimeLine(int a_frameNumber);
     void slotUpdateFrameTimeIndicators(int a_frameNumber, const QTime &a_time); // update frame spinbox and time edit
     void slotUpdateHoverTimeIndicator(const QTime &a_time);
-    void slotTimeLineFrameChanged(int a_frame);
+    void slotTimeLineFrameChanged(int a_frameNumber);
+
+    void slotProcessorFrameChanged(int a_frameNumber);
 
     void slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads);
     void slotShowFrameInfoDialog(bool a_visible);

@@ -78,7 +78,6 @@ public slots:
     void slotUpdateScriptBookmarkSelection(QString &a_scriptName);
     void slotUpdateScriptName(const QString &a_oldName, const QString &a_newName);
 
-
 private slots:
 
     void slotSendRemoveBookmarkSignal();

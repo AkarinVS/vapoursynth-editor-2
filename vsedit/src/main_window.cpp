@@ -182,7 +182,7 @@ void MainWindow::slotCreateTab(const QString & a_tabName,
 
     // signal for playback framechange
     connect(ep.processor, &ScriptProcessor::signalFrameChanged, // frame change
-            this, &MainWindow::slotTimeLineFrameChanged);
+            this, &MainWindow::slotProcessorFrameChanged);
 
     // signal to roll back frame when a frame request is discarded, update timeline
     connect(ep.processor, &ScriptProcessor::signalRollBackFrame,
@@ -1153,7 +1153,7 @@ double MainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane, const 
             vsedit::FP16 half;
             half.u = ((uint16_t *)cpLine)[x];
             vsedit::FP32 single = vsedit::halfToSingle(half);
-            value = (double)single.f;
+            value = double(single.f);
         }
         else if(cpFormat->bytesPerSample == 4)
             value = (double)((float *)cpLine)[x];
@@ -1174,13 +1174,13 @@ void MainWindow::createGarbageCollection()
 {
     m_orphanQObjects =
     {
-        (QObject **)&m_pSettingsDialog,
-        (QObject **)&m_pBenchmarkDialog,
-        (QObject **)&m_pEncodeDialog,
-        (QObject **)&m_pTemplatesDialog,
-        (QObject **)&m_pFrameInfoDialog,
-        (QObject **)&m_pAdvancedSettingsDialog,
-        (QObject **)&m_pBookmarkManagerDialog
+        reinterpret_cast<QObject **>(&m_pSettingsDialog),
+        reinterpret_cast<QObject **>(&m_pBenchmarkDialog),
+        reinterpret_cast<QObject **>(&m_pEncodeDialog),
+        reinterpret_cast<QObject **>(&m_pTemplatesDialog),
+        reinterpret_cast<QObject **>(&m_pFrameInfoDialog),
+        reinterpret_cast<QObject **>(&m_pAdvancedSettingsDialog),
+        reinterpret_cast<QObject **>(&m_pBookmarkManagerDialog)
     };
 }
 
@@ -1330,6 +1330,8 @@ void MainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabInde
 
         m_playing = false;
         processor->slotPlay(m_playing);
+        m_pActionPlay->setChecked(m_playing);
+        m_pActionPlay->setIcon(m_iconPlay);
     }
 }
 
@@ -1506,7 +1508,6 @@ void MainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
     if (m_pEditorPreviewVector.count() < 1) return;
     // retrieve procceor of current script, and pass in frame to showframe
     int currentIndex = m_ui->scriptTabWidget->currentIndex();
-
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
 
     if (processor->script().isEmpty()) return;
@@ -1548,9 +1549,13 @@ void MainWindow::slotUpdateHoverTimeIndicator(const QTime &a_time)
 
 void MainWindow::slotTimeLineFrameChanged(int a_frameNumber)
 {
-    /* catch frame change signal from timeline
-     * and pass to frame number indicator */
     m_ui->frameNumberIndicatorSpinBox->setValue(a_frameNumber);
+}
+
+void MainWindow::slotProcessorFrameChanged(int a_frameNumber)
+{
+    if (a_frameNumber == m_ui->timeLineView->frame()) return;
+    m_ui->timeLineView->setFrame(a_frameNumber);
 }
 
 void MainWindow::slotUpdateStatusBarQueueState(size_t a_framesInQueue, size_t a_frameInProcess, size_t a_maxThreads)

@@ -51,10 +51,9 @@ void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, cons
 
     QString framePropsString = m_pVapourSynthScriptProcessor->framePropsString(m_cpFrameRef);
     emit signalUpdateFramePropsString(framePropsString); // send frame properties string
-    emit signalSetCurrentFrame(framePixmap); // receiver can grab framePixmap
+    emit signalSetCurrentFrame(framePixmap); // send framePixmap to preview area
 
     m_cpVSAPI->freeFrame(a_cpPreviewFrameRef);
-
 }
 
 const VSFrameRef *ScriptProcessor::frameRef()
@@ -304,7 +303,6 @@ void ScriptProcessor::slotProcessPlayQueue()
     }
 
     m_processingPlayQueue = false;
-
 }
 
 bool ScriptProcessor::slotPlay(bool a_play)
