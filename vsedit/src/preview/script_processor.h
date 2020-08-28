@@ -21,7 +21,6 @@ public:
 
     const VSVideoInfo * vsVideoInfo();
 
-    QPixmap framePixmap();
     const VSFrameRef *frameRef();
 
     int currentFrame();
@@ -46,7 +45,6 @@ protected:
     QPixmap pixmapFromCompatBGR32(const VSFrameRef * a_cpFrameRef);
 
     const VSFrameRef * m_cpFrameRef;
-    QPixmap m_framePixmap;
 
     bool m_playing;
     bool m_processingPlayQueue;
@@ -83,7 +81,7 @@ signals:
 
     void signalSetTimeLineAndIndicator(int a_numFrame, int64_t a_fpsNum, int64_t a_fpsDen);
 
-    void signalSetCurrentFrame();
+    void signalSetCurrentFrame(const QPixmap &a_framePixmap);
 
     void signalFrameChanged(int a_frame);
 

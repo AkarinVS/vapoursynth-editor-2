@@ -43,7 +43,7 @@ PreviewArea::~PreviewArea()
 // END OF PreviewArea::~PreviewArea()
 //==============================================================================
 
-QPixmap PreviewArea::pixmap()
+QPixmap *PreviewArea::framePixmap()
 {
     return m_pFramePainter->pixmap();
 }
@@ -59,6 +59,15 @@ void PreviewArea::setPixmap(const QPixmap & a_pixmap, const qreal a_ratio)
     m_pFramePainter->drawFrame(a_pixmap);
 }
 
+void PreviewArea::setZoomRatio(const double a_ratio)
+{
+    QPixmap * framePixmap = m_pFramePainter->pixmap();
+    m_pFramePainter->resize(int(double(framePixmap->width()) * a_ratio),
+                            int(double(framePixmap->height()) * a_ratio));
+
+    m_pFramePainter->setRatio(a_ratio);
+}
+
 void PreviewArea::setPreviewScrollBarPos(const QPair<int, int> &a_posPair)
 {
     horizontalScrollBar()->setValue(a_posPair.first);
@@ -67,7 +76,6 @@ void PreviewArea::setPreviewScrollBarPos(const QPair<int, int> &a_posPair)
 
 // END OF void PreviewArea::setPixmap(const QPixmap & a_pixmap)
 //==============================================================================
-
 
 void PreviewArea::checkMouseOverPreview(const QPoint & a_globalMousePos)
 {
@@ -250,8 +258,8 @@ void PreviewArea::mouseReleaseEvent(QMouseEvent * a_pEvent)
 
 void PreviewArea::drawScrollNavigator()
 {
-    int contentsWidth = m_pFramePainter->pixmap().width();
-    int contentsHeight = m_pFramePainter->pixmap().height();
+    int contentsWidth = m_pFramePainter->pixmap()->width();
+    int contentsHeight = m_pFramePainter->pixmap()->height();
     int viewportX = -m_pFramePainter->x();
     int viewportY = -m_pFramePainter->y();
 	int viewportWidth = viewport()->width();

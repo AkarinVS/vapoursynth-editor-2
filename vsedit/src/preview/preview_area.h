@@ -22,11 +22,13 @@ public:
 
     virtual ~PreviewArea() override;
 
-    QPixmap pixmap() ;
+    QPixmap *framePixmap() ;
 
     FramePainter *m_pFramePainter;
 
-    void setPixmap(const QPixmap & a_pixmap, const qreal a_ratio);
+    void setPixmap(const QPixmap & a_pixmap, const double a_ratio);
+
+    void setZoomRatio(const double a_ratio);
 
     void setPreviewScrollBarPos(const QPair<int,int>&);
 

@@ -47,19 +47,14 @@ void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, cons
     Q_ASSERT(m_cpVSAPI);
     m_cpVSAPI->freeFrame(m_cpFrameRef);
     m_cpFrameRef = a_cpOutputFrameRef;
-    m_framePixmap = pixmapFromCompatBGR32(a_cpPreviewFrameRef);
+    QPixmap framePixmap = pixmapFromCompatBGR32(a_cpPreviewFrameRef);
 
     QString framePropsString = m_pVapourSynthScriptProcessor->framePropsString(m_cpFrameRef);
     emit signalUpdateFramePropsString(framePropsString); // send frame properties string
+    emit signalSetCurrentFrame(framePixmap); // receiver can grab framePixmap
 
     m_cpVSAPI->freeFrame(a_cpPreviewFrameRef);
 
-    emit signalSetCurrentFrame(); // receiver can grab framePixmap
-}
-
-QPixmap ScriptProcessor::framePixmap()
-{
-    return m_framePixmap;
 }
 
 const VSFrameRef *ScriptProcessor::frameRef()
@@ -131,7 +126,6 @@ void ScriptProcessor::stopAndCleanUp()
     slotPlay(false);
 
     m_frameShown = -1;
-    m_framePixmap = QPixmap();
 
     if(m_cpFrameRef)
     {
@@ -354,7 +348,7 @@ void ScriptProcessor::slotShowFrame(int a_frameNumber)
     if(m_playing)
         return;
 
-    if((m_frameShown == a_frameNumber) && (!m_framePixmap.isNull()))
+    if(m_frameShown == a_frameNumber)
         return;
 
     if ((a_frameNumber > m_cpVideoInfo->numFrames) || (a_frameNumber < 0))

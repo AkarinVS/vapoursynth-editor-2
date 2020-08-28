@@ -16,7 +16,7 @@ public:
 
     void setRatio(const double a_ratio);
 
-    QPixmap pixmap();
+    QPixmap *pixmap();
 
 private:
 

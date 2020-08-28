@@ -170,7 +170,7 @@ void MainWindow::slotCreateTab(const QString & a_tabName,
 
     // retrieve frame from processor and send it to preview area
     connect(ep.processor, &ScriptProcessor::signalSetCurrentFrame,
-            this, &MainWindow::setPreviewPixmap);
+            this, &MainWindow::slotSetPreviewPixmap);
 
     // resize pixmap when zoom mode = fitToFrame and previewArea size change
     connect(ep.previewArea, &PreviewArea::signalSizeChanged,
@@ -1362,8 +1362,10 @@ void MainWindow::slotChangeScriptTab(int a_index)
         m_ui->timeLineView->setZoomFactor(savedZoomRatio);
 
         /* resume frame zoom ratio and scroll bar position */
-        setPreviewPixmap();
         PreviewArea * previewArea = m_pEditorPreviewVector[a_index].previewArea;
+        double ratio = currentPreviewZoomRatio();
+        slotZoomRatioChanged(ratio);
+
         previewArea->setPreviewScrollBarPos(savedPreviewScrollBarPos);
 
         if (m_playing) {
@@ -1509,7 +1511,6 @@ void MainWindow::slotShowFrameFromTimeLine(int a_frameNumber)
 
     if (processor->script().isEmpty()) return;
 
-
     /* update frame time indicator from tab change */
     const VSVideoInfo * vsVideoInfo = processor->vsVideoInfo();
     double fps = double(vsVideoInfo->fpsNum) / double(vsVideoInfo->fpsDen);
@@ -1588,7 +1589,7 @@ void MainWindow::slotZoomModeChanged()
         return;
     changingZoomMode = true;
 
-    ZoomMode zoomMode = (ZoomMode)m_ui->zoomModeComboBox->currentData().toInt();
+    ZoomMode zoomMode = ZoomMode(m_ui->zoomModeComboBox->currentData().toInt());
 
     /* context menu update */
     QObject * pSender = sender();
@@ -1618,65 +1619,38 @@ void MainWindow::slotZoomModeChanged()
     m_ui->zoomRatioSpinBox->setEnabled(fixedRatio);
     m_pSettingsManager->setZoomMode(zoomMode);
 
-    setPreviewPixmap();
+    double ratio = currentPreviewZoomRatio();
+    slotZoomRatioChanged(ratio);
+
     changingZoomMode = false;
 }
 
 void MainWindow::slotZoomRatioChanged(double a_zoomRatio)
 {
     if (m_pEditorPreviewVector.count() < 1) return;
-    setPreviewPixmap();
+
+    int currentTabIndex = m_ui->previewTabWidget->currentIndex();
+    PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
+    previewArea->setZoomRatio(a_zoomRatio);
     m_pSettingsManager->setZoomRatio(a_zoomRatio);
 }
 
-void MainWindow::setPreviewPixmap()
-{
-    if (m_ui->previewTabWidget->count() < 1) return;
-    if (m_pEditorPreviewVector.count() < 1) return;
+double MainWindow::currentPreviewZoomRatio() {
+    if (m_pEditorPreviewVector.count() < 1) return false;
 
     int currentTabIndex = m_ui->previewTabWidget->currentIndex();
-    QString script = m_pEditorPreviewVector[currentTabIndex].processor->script();
-
-    if (script.isEmpty()) return; // only run if there is active script
-
-//    if(m_ui.cropPanel->isVisible())
-//	{
-//		int cropLeft = m_ui.cropLeftSpinBox->value();
-//		int cropTop = m_ui.cropTopSpinBox->value();
-//		int cropWidth = m_ui.cropWidthSpinBox->value();
-//		int cropHeight = m_ui.cropHeightSpinBox->value();
-//		QPixmap croppedPixmap = m_framePixmap.copy(cropLeft, cropTop,
-//			cropWidth, cropHeight);
-//		int ratio = m_ui.cropZoomRatioSpinBox->value();
-
-//		if(ratio == 1)
-//		{
-//			m_ui.previewArea->setPixmap(croppedPixmap);
-//			return;
-//		}
-
-//		QPixmap zoomedPixmap = croppedPixmap.scaled(
-//			croppedPixmap.width() * ratio, croppedPixmap.height() * ratio,
-//			Qt::KeepAspectRatio, Qt::FastTransformation);
-//		m_ui.previewArea->setPixmap(zoomedPixmap);
-//		return;
-//	}
-
-    // get pixmap from processor as base
-    QPixmap framePixmap = m_pEditorPreviewVector[currentTabIndex].processor->framePixmap();
     PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
     double ratio = 1.0;
 
     ZoomMode zoomMode = ZoomMode(m_ui->zoomModeComboBox->currentData().toInt());
     if(zoomMode == ZoomMode::NoZoom)
     {
-        previewArea->setPixmap(framePixmap, ratio);
-        return;
+        return ratio;
     }
 
-    QPixmap previewPixmap;
-    int frameWidth = framePixmap.width();
-    int frameHeight = framePixmap.height();
+    QPixmap *previewPixmap = previewArea->framePixmap();
+    int frameWidth = previewPixmap->width();
+    int frameHeight = previewPixmap->height();
 
     double h_ratio = 1.0;
     double w_ratio = 1.0;
@@ -1700,15 +1674,28 @@ void MainWindow::setPreviewPixmap()
             ratio = w_ratio;
         }
     }
+    return ratio;
+}
 
-    previewArea->setPixmap(framePixmap, ratio);
+void MainWindow::slotSetPreviewPixmap(const QPixmap &a_framePixmap)
+{
+    if (m_ui->previewTabWidget->count() < 1) return;
+    if (m_pEditorPreviewVector.count() < 1) return;
+
+    int currentTabIndex = m_ui->previewTabWidget->currentIndex();
+    QString script = m_pEditorPreviewVector[currentTabIndex].processor->script();
+
+    if (script.isEmpty()) return; // only run if there is active script
+
+    PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
+    double ratio = currentPreviewZoomRatio();
+    previewArea->setPixmap(a_framePixmap, ratio);
 }
 
 void MainWindow::slotPreviewAreaSizeChanged()
 {
-    ZoomMode zoomMode = ZoomMode (m_ui->zoomModeComboBox->currentData().toInt());
-    if(zoomMode == ZoomMode::FitToFrame)
-        setPreviewPixmap();
+    double ratio = currentPreviewZoomRatio();
+    slotZoomRatioChanged(ratio);
 }
 
 void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
@@ -1718,6 +1705,8 @@ void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor *processor = m_pEditorPreviewVector[currentTabIndex].processor;
+    PreviewArea *previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
+
     const VSAPI * cpVSAPI = m_pVSScriptLibrary->getVSAPI();
     const VSFrameRef * cpFrameRef = processor->frameRef();
     const VSVideoInfo * cpVideoInfo =  processor->vsVideoInfo();
@@ -1725,7 +1714,7 @@ void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
     if(!cpFrameRef)
         return;
 
-    QPixmap framePixmap = processor->framePixmap();
+    QPixmap *framePixmap = previewArea->framePixmap();
 
     double value1 = 0.0;
     double value2 = 0.0;
@@ -1734,8 +1723,8 @@ void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
     size_t frameX = 0;
     size_t frameY = 0;
 
-    frameX = size_t(float(framePixmap.width()) * a_normX);
-    frameY = size_t(float(framePixmap.height()) * a_normY);
+    frameX = size_t(float(framePixmap->width()) * a_normX);
+    frameY = size_t(float(framePixmap->height()) * a_normY);
 
     int width = cpVSAPI->getFrameWidth(cpFrameRef, 0);
     int height = cpVSAPI->getFrameHeight(cpFrameRef, 0);
@@ -1815,7 +1804,6 @@ void MainWindow::slotPreviewAreaMouseOverPoint(float a_normX, float a_normY)
 
     QString mousePosString = QString("x:%1  y:%2").arg(frameX).arg(frameY);
     m_pFrameInfoDialog->setMousePositionString(mousePosString);
-
 }
 
 void MainWindow::slotPreviewAreaMouseRightButtonReleased()
@@ -2348,13 +2336,14 @@ void MainWindow::slotSendPixmapToSelectionCanvas()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
+    PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
 
     if (processor->script().isEmpty()) return;
 
-    QPixmap framePixmap = processor->framePixmap();
-    if(framePixmap.isNull()) return;
+    QPixmap *framePixmap = previewArea->framePixmap();
+    if(framePixmap->isNull()) return;
 
-    m_pSelectionToolsDialog->setFramePixmap(framePixmap);
+    m_pSelectionToolsDialog->setFramePixmap(*framePixmap);
 }
 
 void MainWindow::slotPasteSelectionPointsToScript(const QString &a_pointString)
@@ -2577,25 +2566,26 @@ void MainWindow::slotJobs()
 void MainWindow::slotFrameToClipboard()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
-    ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
+    PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
 
-    QPixmap framePixmap = processor->framePixmap();
-    if(framePixmap.isNull())
+    QPixmap *framePixmap = previewArea->framePixmap();
+    if(framePixmap->isNull())
         return;
 
     QClipboard * pClipboard = QApplication::clipboard();
-    pClipboard->setPixmap(framePixmap);
+    pClipboard->setPixmap(*framePixmap);
 }
 
 void MainWindow::slotSaveSnapshot()
 {
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
+    PreviewArea * previewArea = m_pEditorPreviewVector[currentTabIndex].previewArea;
 
     int frameShown = processor->currentFrame();
-    QPixmap framePixmap = processor->framePixmap();
+    QPixmap *framePixmap = previewArea->framePixmap();
 
-    if((frameShown < 0) || framePixmap.isNull())
+    if((frameShown < 0) || framePixmap->isNull())
         return;
 
     struct ImageProp {
@@ -2652,7 +2642,7 @@ void MainWindow::slotSaveSnapshot()
     if(!snapshotFilePath.isEmpty())
     {
         int quality = extensionToFilterMap[format].quality;
-        bool success = framePixmap.save(snapshotFilePath, format, quality);
+        bool success = framePixmap->save(snapshotFilePath, format, quality);
         if(success) {
             m_pSettingsManager->setLastSnapshotExtension(suffix);
 //            this->feedbackStatusBar->showMessage("Snapshot saved to "+ snapshotFilePath, 3000);

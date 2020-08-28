@@ -21,14 +21,15 @@ void FramePainter::drawFrame(const QPixmap &a_framePixmap)
     update();
 }
 
-QPixmap FramePainter::pixmap()
+void FramePainter::setRatio(const double a_ratio)
 {
-    return m_framePixmap;
-}
-
-void FramePainter::setRatio(const qreal a_ratio)
-{
-    if (m_ratio != a_ratio)
-        m_ratio = a_ratio;
+    if (m_ratio == a_ratio) return;
+    m_ratio = a_ratio;
     update();
 }
+
+QPixmap *FramePainter::pixmap()
+{
+    return &m_framePixmap;
+}
+

@@ -177,6 +177,7 @@ private:
     void fillRecentScriptsMenu();
 
     void setUpZoomPanel();
+    double currentPreviewZoomRatio();
 
     QString createPreviewFilterScript(const QString &a_script, const QMap<QString, int>&);
 
@@ -333,7 +334,7 @@ private slots:
 
     void slotZoomModeChanged();
     void slotZoomRatioChanged(double a_zoomRatio);
-    void setPreviewPixmap();
+    void slotSetPreviewPixmap(const QPixmap &a_framePixmap);
     void slotPreviewAreaSizeChanged();
     void slotPreviewAreaMouseOverPoint(float a_normX, float a_normY);
     void slotPreviewAreaMouseRightButtonReleased();
