@@ -1,6 +1,15 @@
 Vapoursynth Editor 2
 
-r2: [2020-08-12]
+R3: [2020-08-28]
+- Fixed a bug where frame cache didn't get released when tab was closed
+- Added a button in settings to open the config file folder
+- Fixed missing includes in repo so the project can be rebuild by others
+- A new selection tool to make area selection on a single frame. The selected rectangle can be returned with its control points (coordinates)
+- Finished transferring the frame discarded rollback function
+- Cosmetic adjustment for timeline and bookmark manager
+- Refactored codes and cleaned up some obsolete codes
+
+R2: [2020-08-12]
 - Disabled mouse scroll to scroll a zommed preview because it doesn't make sense to be only able to scroll one axis
 - Preview zoom in scroll bar position are remembered for similar clips in a group
 - Fixed preview zoom raito not having immediate effect when change tabs
@@ -21,7 +30,7 @@ r2: [2020-08-12]
 - PreviewArea now uses QPainter for frame drawing instead of QPixmap, which greatly improves performance for zooming
 - Zoom ratio cap increases to 25x
 
-r1: [2020-07-30]
+R1: [2020-07-30]
 - Fixed webp saving in wrong image quality. Image formats now save with their own quality parameters instead of sharing one single parameter
 - All remaining menu and context menu functions of the original have been transferred
 - Proper closing handler and default auto tab naming for multi tab
