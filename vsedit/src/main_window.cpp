@@ -775,6 +775,7 @@ void MainWindow::createContextMenuActionsAndMenus()
 void MainWindow::createTabBarContextMenuActions()
 {
     m_pTabBarContectMenu = new QMenu(this);
+    m_pTabBarContectMenu->addAction(m_pActionCopyToNewTab);
     m_pTabBarContectMenu->addAction(m_pActionCloseTab);
 
     connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarRightClicked,
