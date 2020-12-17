@@ -33,7 +33,7 @@ VSScriptProcessorDialog::VSScriptProcessorDialog(
 	, m_readyPixmap(":tick.png")
 	, m_busyPixmap(":busy.png")
 	, m_errorPixmap(":cross.png")
-	, m_cachedFramesLimit(100)
+    , m_cachedFramesLimit(1)
 {
 	Q_ASSERT(m_pSettingsManager);
 	Q_ASSERT(m_pVSScriptLibrary);
@@ -56,10 +56,8 @@ VSScriptProcessorDialog::VSScriptProcessorDialog(
 //	connect(m_pVapourSynthScriptProcessor, SIGNAL(signalFinalized()),
 //		this, SLOT(slotScriptProcessorFinalized()));
 	connect(m_pVapourSynthScriptProcessor,
-		SIGNAL(signalDistributeFrame(int, int, const VSFrameRef *,
-			const VSFrameRef *)),
-		this, SLOT(slotReceiveFrame(int, int, const VSFrameRef *,
-			const VSFrameRef *)));
+        SIGNAL(signalDistributeFrame(int, int, const VSFrameRef *, const VSFrameRef *)),
+        this, SLOT(slotReceiveFrame(int, int, const VSFrameRef *, const VSFrameRef *)));
 	connect(m_pVapourSynthScriptProcessor,
 		SIGNAL(signalFrameRequestDiscarded(int, int, const QString &)),
 		this, SLOT(slotFrameRequestDiscarded(int, int, const QString &)));

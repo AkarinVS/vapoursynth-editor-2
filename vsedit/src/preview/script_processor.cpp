@@ -45,11 +45,12 @@ const VSVideoInfo * ScriptProcessor::vsVideoInfo()
 void ScriptProcessor::setCurrentFrame(const VSFrameRef *a_cpOutputFrameRef, const VSFrameRef *a_cpPreviewFrameRef)
 {
     Q_ASSERT(m_cpVSAPI);
-    m_cpVSAPI->freeFrame(m_cpFrameRef);
+    m_cpVSAPI->freeFrame(m_cpFrameRef); // free frame from last reference frame
     m_cpFrameRef = a_cpOutputFrameRef;
     QPixmap framePixmap = pixmapFromCompatBGR32(a_cpPreviewFrameRef);
 
     QString framePropsString = m_pVapourSynthScriptProcessor->framePropsString(m_cpFrameRef);
+
     emit signalUpdateFramePropsString(framePropsString); // send frame properties string
     emit signalSetCurrentFrame(framePixmap); // send framePixmap to preview area
 
@@ -136,7 +137,7 @@ void ScriptProcessor::stopAndCleanUp()
     VSScriptProcessorDialog::stopAndCleanUp();
 }
 
-bool ScriptProcessor::requestShowFrame(int a_frameNumber)
+bool ScriptProcessor::requestFrame(int a_frameNumber)
 {
     if(!m_pVapourSynthScriptProcessor->isInitialized())
         return false;
@@ -174,10 +175,10 @@ QPixmap ScriptProcessor::pixmapFromCompatBGR32(const VSFrameRef *a_cpFrameRef)
     QImage flippedImage = frameImage.mirrored();
     QPixmap framePixmap = QPixmap::fromImage(flippedImage);
     return framePixmap;
-
 }
 
-void ScriptProcessor::slotReceiveFrame(int a_frameNumber, int a_outputIndex, const VSFrameRef *a_cpOutputFrameRef, const VSFrameRef *a_cpPreviewFrameRef)
+void ScriptProcessor::slotReceiveFrame(int a_frameNumber, int a_outputIndex,
+    const VSFrameRef * a_cpOutputFrameRef, const VSFrameRef * a_cpPreviewFrameRef)
 {
     if(!a_cpOutputFrameRef)
         return;
@@ -185,6 +186,7 @@ void ScriptProcessor::slotReceiveFrame(int a_frameNumber, int a_outputIndex, con
     Q_ASSERT(m_cpVSAPI);
     const VSFrameRef * cpOutputFrameRef =
         m_cpVSAPI->cloneFrameRef(a_cpOutputFrameRef);
+
     const VSFrameRef * cpPreviewFrameRef =
         m_cpVSAPI->cloneFrameRef(a_cpPreviewFrameRef);
 
@@ -203,7 +205,6 @@ void ScriptProcessor::slotReceiveFrame(int a_frameNumber, int a_outputIndex, con
 //            m_ui.frameStatusLabel->setPixmap(m_readyPixmap);
         }
     }
-
 }
 
 void ScriptProcessor::slotFrameRequestDiscarded(int a_frameNumber, int a_outputIndex, const QString &a_reason)
@@ -259,9 +260,9 @@ void ScriptProcessor::slotProcessPlayQueue()
 
     while(!m_framesCache.empty())
     {
-        std::list<Frame>::const_iterator it =
-            std::find(m_framesCache.begin(), m_framesCache.end(),
-            referenceFrame);
+        //  find frame in frame cache by frame number
+        auto it = std::find(m_framesCache.begin(), m_framesCache.end(),
+                            referenceFrame);
 
         if(it == m_framesCache.end())
             break;
@@ -294,7 +295,9 @@ void ScriptProcessor::slotProcessPlayQueue()
     nextFrame = (m_lastFrameRequestedForPlay + 1) %
         m_cpVideoInfo->numFrames;
 
-    while(((m_framesInQueue + m_framesInProcess) < m_maxThreads) &&
+    /* request next frame to que */
+    /* capping request queue for frames, bigger number will eat up more memory */
+    while(((m_framesInQueue + m_framesInProcess) < 2) &&
         (m_framesCache.size() <= m_cachedFramesLimit))
     {
         m_pVapourSynthScriptProcessor->requestFrameAsync(nextFrame, 0, true);
@@ -311,7 +314,6 @@ bool ScriptProcessor::slotPlay(bool a_play)
         return true;
 
     m_playing = a_play;
-//    m_pActionPlay->setChecked(m_playing);
 
     if(m_playing)
     {
@@ -320,8 +322,8 @@ bool ScriptProcessor::slotPlay(bool a_play)
     }
     else
     {
-        clearFramesCache();
         m_pVapourSynthScriptProcessor->flushFrameTicketsQueue();
+        clearFramesCache();
     }
 
     return m_playing;
@@ -357,7 +359,7 @@ void ScriptProcessor::slotShowFrame(int a_frameNumber)
         return;
     requestingFrame = true;
 
-    bool requested = requestShowFrame(a_frameNumber); // request to output frame
+    bool requested = requestFrame(a_frameNumber); // request to output frame
     if(requested)
     {
         m_frameExpected = a_frameNumber;

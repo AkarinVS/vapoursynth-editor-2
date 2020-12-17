@@ -11,6 +11,7 @@
 
 //==============================================================================
 
+/* callback function for VSAPI->getFrameAsync() */
 void VS_CC frameReady(void * a_pUserData,
 	const VSFrameRef * a_cpFrameRef, int a_frameNumber,
 	VSNodeRef * a_pNodeRef, const char * a_errorMessage)
@@ -148,18 +149,11 @@ bool VapourSynthScriptProcessor::finalize()
 {
 	m_finalizing = true;
 	bool noFrameTicketsInProcess = flushFrameTicketsQueue();
+
 	if(!noFrameTicketsInProcess)
 		return false;
 
-	for(std::pair<const int, NodePair> & mapItem : m_nodePairForOutputIndex)
-	{
-		NodePair & nodePair = mapItem.second;
-		if(nodePair.pOutputNode)
-			m_cpVSAPI->freeNode(nodePair.pOutputNode);
-		if(nodePair.pPreviewNode)
-			m_cpVSAPI->freeNode(nodePair.pPreviewNode);
-	}
-	m_nodePairForOutputIndex.clear();
+    flushNodePairMap();
 
 	m_cpVideoInfo = nullptr;
 	m_cpCoreInfo = nullptr;
@@ -234,6 +228,7 @@ const VSVideoInfo * VapourSynthScriptProcessor::videoInfo(int a_outputIndex)
 bool VapourSynthScriptProcessor::requestFrameAsync(int a_frameNumber,
 	int a_outputIndex, bool a_needPreview)
 {
+    /* request video node from api, then request frame using video node */
 	if(!m_initialized)
 		return false;
 
@@ -282,12 +277,13 @@ bool VapourSynthScriptProcessor::requestFrameAsync(int a_frameNumber,
 
 bool VapourSynthScriptProcessor::flushFrameTicketsQueue()
 {
-	// Check the processing queue.
+    // add discard flag to all tickets
 	for(FrameTicket & ticket : m_frameTicketsInProcess)
 		ticket.discard = true;
 
 	size_t queueSize = m_frameTicketsQueue.size();
-	m_frameTicketsQueue.clear();
+
+    m_frameTicketsQueue.clear();
 	if(queueSize)
 		sendFrameQueueChangeSignal();
 
@@ -295,6 +291,22 @@ bool VapourSynthScriptProcessor::flushFrameTicketsQueue()
 }
 
 // END OF bool VapourSynthScriptProcessor::flushFrameTicketsQueue()
+//==============================================================================
+
+void VapourSynthScriptProcessor::flushNodePairMap()
+{
+    for(auto &mapItem : m_nodePairMap)
+    {
+        NodePair & nodePair = mapItem.second;
+        if(nodePair.pOutputNode)
+            m_cpVSAPI->freeNode(nodePair.pOutputNode);
+        if(nodePair.pPreviewNode)
+            m_cpVSAPI->freeNode(nodePair.pPreviewNode);
+    }
+    m_nodePairMap.clear();
+}
+
+// END OF bool VapourSynthScriptProcessor::flushNodePairMap()
 //==============================================================================
 
 const QString & VapourSynthScriptProcessor::script() const
@@ -352,12 +364,12 @@ void VapourSynthScriptProcessor::slotResetSettings()
 	else if(m_chromaResamplingFilter == ResamplingFilter::Lanczos)
 	{
 		m_resamplingFilterParameterA =
-			(double)m_pSettingsManager->getLanczosFilterTaps();
+            double(m_pSettingsManager->getLanczosFilterTaps());
 	}
 
 	m_chromaPlacement = m_pSettingsManager->getChromaPlacement();
 
-	for(std::pair<const int, NodePair> & mapItem : m_nodePairForOutputIndex)
+    for(std::pair<const int, NodePair> & mapItem : m_nodePairMap)
 	{
 		NodePair & nodePair = mapItem.second;
 		if(nodePair.pPreviewNode)
@@ -372,6 +384,7 @@ void VapourSynthScriptProcessor::receiveFrame(
 	const VSFrameRef * a_cpFrameRef, int a_frameNumber,
 	VSNodeRef * a_pNodeRef, const QString & a_errorMessage)
 {
+    /* pack received frame into ticket */
 	Q_ASSERT(m_cpVSAPI);
 
 	if(!a_errorMessage.isEmpty())
@@ -383,7 +396,8 @@ void VapourSynthScriptProcessor::receiveFrame(
 
 	FrameTicket ticket(a_frameNumber, -1, nullptr);
 
-	std::vector<FrameTicket>::iterator it = std::find_if(
+    // look up frameTickets cache for matching ticket from the request func
+    auto it = std::find_if(
 		m_frameTicketsInProcess.begin(), m_frameTicketsInProcess.end(),
 		[&](const FrameTicket & a_ticket)
 		{
@@ -392,9 +406,9 @@ void VapourSynthScriptProcessor::receiveFrame(
 				(a_ticket.pPreviewNode == a_pNodeRef)));
 		});
 
+    // this will fire getFrameAsync twice, first to get outputFrame and then previewFrame
 	if(it != m_frameTicketsInProcess.end())
 	{
-		// Save frame references and free node references in ticket at once.
 		if(it->pOutputNode == a_pNodeRef)
 		{
 			it->cpOutputFrameRef = a_cpFrameRef;
@@ -423,8 +437,7 @@ void VapourSynthScriptProcessor::receiveFrame(
 			it->pPreviewNode = nullptr;
 		}
 
-		// Since we nullify the nodes in ticket - we can check if it can be
-		// removed from the queue by checking the nodes.
+        // only ticket with both valid nodes can pass
 		if((it->pOutputNode != nullptr) ||
 			(it->needPreview && (it->pPreviewNode != nullptr)))
 			return;
@@ -437,7 +450,7 @@ void VapourSynthScriptProcessor::receiveFrame(
 	{
         QString warning = tr("Warning: received frame not registered in "
 			"processing. Frame number: %1; Node: %2\n")
-			.arg(a_frameNumber).arg((intptr_t)a_pNodeRef);
+            .arg(a_frameNumber).arg(intptr_t(a_pNodeRef));
 		emit signalWriteLogMessage(mtCritical, warning);
 		m_cpVSAPI->freeFrame(a_cpFrameRef);
 	}
@@ -471,9 +484,11 @@ void VapourSynthScriptProcessor::processFrameTicketsQueue()
 	size_t oldInQueue = m_frameTicketsQueue.size();
 	size_t oldInProcess = m_frameTicketsInProcess.size();
 
-	while(((int)m_frameTicketsInProcess.size() < m_cpCoreInfo->numThreads) &&
-		(!m_frameTicketsQueue.empty()))
-	{
+
+    /* move frame ticket from queue to inProcess */
+    while((int(m_frameTicketsInProcess.size()) < 2) &&
+        (!m_frameTicketsQueue.empty()))
+    {
 		FrameTicket ticket = std::move(m_frameTicketsQueue.front());
 		m_frameTicketsQueue.pop_front();
 
@@ -530,8 +545,9 @@ void VapourSynthScriptProcessor::sendFrameQueueChangeSignal()
 
 bool VapourSynthScriptProcessor::recreatePreviewNode(NodePair & a_nodePair)
 {
-	if(!a_nodePair.pOutputNode)
-		return false;
+    /* request an output node with RGB */
+    if(!a_nodePair.pOutputNode)
+        return false;
 
 	if(!m_cpVSAPI)
 		return false;
@@ -628,7 +644,7 @@ bool VapourSynthScriptProcessor::recreatePreviewNode(NodePair & a_nodePair)
 			Q_ASSERT(false);
 		}
 
-		int matrixStringLength = (int)strlen(matrixInS);
+        int matrixStringLength = int(strlen(matrixInS));
 		m_cpVSAPI->propSetData(pArgumentMap, "matrix_in_s",
 			matrixInS, matrixStringLength, paReplace);
 
@@ -638,9 +654,9 @@ bool VapourSynthScriptProcessor::recreatePreviewNode(NodePair & a_nodePair)
 			const char * transferOut = "2020_10";
 
 			m_cpVSAPI->propSetData(pArgumentMap, "transfer_in_s",
-				transferIn, (int)strlen(transferIn), paReplace);
+                transferIn, int(strlen(transferIn)), paReplace);
 			m_cpVSAPI->propSetData(pArgumentMap, "transfer_s",
-				transferOut, (int)strlen(transferOut), paReplace);
+                transferOut, int(strlen(transferOut)), paReplace);
 		}
 	}
 
@@ -734,11 +750,15 @@ void VapourSynthScriptProcessor::freeFrameTicket(FrameTicket & a_ticket)
 NodePair & VapourSynthScriptProcessor::getNodePair(int a_outputIndex,
 	bool a_needPreview)
 {
-	NodePair & nodePair = m_nodePairForOutputIndex[a_outputIndex];
+    // retrieve two video nodes from vsscript library, outputNode and PreviewNode
+    // outputNode to retrieve general info of the video,
+    // previewNode to convert to RGB for display
+    NodePair & nodePair = m_nodePairMap[a_outputIndex];
 
-	if(!nodePair.pOutputNode)
-	{
-		Q_ASSERT(!nodePair.pPreviewNode);
+    // if outputNode doesn't exist, create one
+    if(!nodePair.pOutputNode)
+    {
+        Q_ASSERT(!nodePair.pPreviewNode);
 
 		nodePair.pOutputNode =
 			m_pVSScriptLibrary->getOutput(m_pVSScript, a_outputIndex);
@@ -751,6 +771,7 @@ NodePair & VapourSynthScriptProcessor::getNodePair(int a_outputIndex,
 		}
 	}
 
+    /* if preview flag is true and no preview in nodepair yet, create one */
 	if(a_needPreview && (!nodePair.pPreviewNode))
 	{
 		bool previewNodeCreated = recreatePreviewNode(nodePair);

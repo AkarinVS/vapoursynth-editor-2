@@ -39,6 +39,8 @@ public:
 
 	bool flushFrameTicketsQueue();
 
+    void flushNodePairMap();
+
 	const QString & script() const;
 
 	const QString & scriptName() const;
@@ -111,8 +113,8 @@ private:
 	const VSCoreInfo * m_cpCoreInfo;
 
 	std::deque<FrameTicket> m_frameTicketsQueue;
-	std::vector<FrameTicket> m_frameTicketsInProcess;
-	std::map<int, NodePair> m_nodePairForOutputIndex;
+    QVector<FrameTicket> m_frameTicketsInProcess;
+    std::map<int, NodePair> m_nodePairMap;
 
 	ResamplingFilter m_chromaResamplingFilter;
 	ChromaPlacement m_chromaPlacement;

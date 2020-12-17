@@ -37,7 +37,7 @@ protected:
 
     virtual void stopAndCleanUp() override;
 
-    bool requestShowFrame(int a_frameNumber);
+    bool requestFrame(int a_frameNumber);
 
     void setCurrentFrame(const VSFrameRef * a_cpOutputFrameRef,
         const VSFrameRef * a_cpPreviewFrameRef);
