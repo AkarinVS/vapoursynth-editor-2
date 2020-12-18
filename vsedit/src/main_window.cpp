@@ -339,14 +339,16 @@ void MainWindow::createJobServerWatcher()
 
 void MainWindow::createViewLog()
 {
-//    m_ui->collapseExpandWidget = new CollapseExpandWidget();
     m_ui->collapseExpandWidget->setTitle("");
     m_ui->collapseExpandWidget->setAnimationDuration(300);
 
     m_logView = new VSEditorLog();
 
     auto * anyLayout = new QVBoxLayout();
+    anyLayout->setSpacing(0);
+    anyLayout->setMargin(0);
     anyLayout->addWidget(m_logView);
+
     m_ui->collapseExpandWidget->setContentLayout(*anyLayout);
 
     m_logView->setName("main_log");
