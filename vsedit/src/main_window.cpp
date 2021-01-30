@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget *a_pParent) :
     createSelectionToolsDialog();
 
     createGarbageCollection();
-    slotCreateTab();
+    slotNewScript();
     setTabSignals();
 
     createLogView();
@@ -154,7 +154,7 @@ void MainWindow::closeEvent(QCloseEvent *a_pEvent)
     QMainWindow::closeEvent(a_pEvent);
 }
 
-void MainWindow::slotCreateTab(const QString & a_tabName,
+void MainWindow::createTab(const QString & a_tabName,
                             const QString & a_scriptFilePath, const QString & a_scriptText)
 {
     EditorPreview ep;
@@ -243,6 +243,8 @@ void MainWindow::slotCreateTab(const QString & a_tabName,
         ep.editor->setModified(false);
     }
 
+    ep.editor->moveCursor(QTextCursor::End);
+
     int newTabNumber;
     // create tab number for editor and preview as flags
     if (m_tabNumberList.count() < 1) {
@@ -276,6 +278,9 @@ void MainWindow::slotCreateTab(const QString & a_tabName,
 
     int tabCount = m_ui->scriptTabWidget->count();
     m_ui->scriptTabWidget->setCurrentIndex(tabCount-1);
+
+    // set focus on editor
+    ep.editor->setFocus();
 }
 
 void MainWindow::setTabSignals()
@@ -479,7 +484,7 @@ void MainWindow::createMenuActionsAndContextMenuActions()
     ActionToCreate actionsToCreate[] =
     {
         {&m_pActionNewTab, ACTION_ID_NEW_TAB, false, QString(),
-            this, SLOT(slotCreateTab())},
+            this, SLOT(slotNewScript())},
         {&m_pActionOpenScript, ACTION_ID_OPEN_SCRIPT, false, QString(),
             this, SLOT(slotOpenScript())},
         {&m_pActionCloseTab, ACTION_ID_CLOSE_TAB, false, QString(),
@@ -931,7 +936,7 @@ bool MainWindow::loadScriptFromFile(const QString &a_filePath)
 
     QFileInfo fi(scriptFile);
     QString fileName = fi.fileName(); // tab name
-    slotCreateTab(fileName, a_filePath, scriptText);
+    createTab(fileName, a_filePath, scriptText);
 
     return true;
 }
@@ -1262,7 +1267,7 @@ bool MainWindow::slotRemoveTab(int a_index)
     // create new tab when there is none
     int tabCount = m_ui->scriptTabWidget->count();
     if (tabCount < 1 && !m_closingApp)
-        slotCreateTab();
+        slotNewScript();
 
     return true;
 }
@@ -1999,7 +2004,7 @@ void MainWindow::slotEditorCopyToNewTab()
     QString text = editor->toPlainText();
     if (text.isEmpty()) return;
 
-    slotCreateTab("", "", text);
+    createTab("", "", text);
 }
 
 void MainWindow::slotOpenFind()
@@ -2367,22 +2372,10 @@ void MainWindow::slotPasteSelectionPointsToScript(const QString &a_pointString)
 
 void MainWindow::slotNewScript()
 {
-    if(!safeToCloseFile())
-        return;
-
+    // load template script
     QString newScriptTemplate = m_pSettingsManager->getNewScriptTemplate();
-
-    int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
-    ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
-    QString &storedFilePath = m_pEditorPreviewVector[currentTabIndex].scriptName;
-
-    storedFilePath.clear();
-
-    editor->setPlainText(newScriptTemplate);
-    editor->moveCursor(QTextCursor::End);
-    editor->setModified(true);
-
-    m_pBenchmarkDialog->resetSavedRange();
+    createTab("", "", newScriptTemplate);
+//    m_pBenchmarkDialog->resetSavedRange();
 }
 
 // END OF void MainWindow::slotNewScript()

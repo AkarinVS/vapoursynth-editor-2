@@ -145,6 +145,10 @@ private:
 
     void createLogView(); // create collapsable widget and view log
 
+    void createTab(const QString & a_tabName = "",
+                       const QString & a_scriptFilePath = "",
+                       const QString & a_scriptText = "");
+
     void createMainToolBar();
 
     void createFindDialog();   
@@ -306,9 +310,6 @@ public slots:
 
 private slots:
 
-    void slotCreateTab(const QString & a_tabName = "",
-                       const QString & a_scriptFilePath = "",
-                       const QString & a_scriptText = "");
     bool slotRemoveTab(int a_index = -1);
     bool slotRemoveAllTabs();
     void slotChangePreviewTab(int a_index);
