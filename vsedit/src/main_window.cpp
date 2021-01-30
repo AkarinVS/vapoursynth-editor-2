@@ -910,11 +910,10 @@ bool MainWindow::loadScriptFromFile(const QString &a_filePath)
     if(a_filePath.isEmpty())
         return false;
 
-    // check if file existed in tab
-    if (IsScriptOpened(a_filePath)) {
-        QMessageBox::critical(this,
-            QString::fromUtf8("File already opened"),
-            QString::fromUtf8("Failed to open the file %1.").arg(a_filePath));
+    // check if file existed in tab, change to tab
+    int tabIndex = IsScriptOpened(a_filePath);
+    if (NULL != tabIndex) {
+        slotChangeScriptTab(tabIndex);
         return false;
     }
 
@@ -989,7 +988,7 @@ bool MainWindow::safeToCloseFile()
 
 }
 
-bool MainWindow::IsScriptOpened(const QString &a_filePath)
+int MainWindow::IsScriptOpened(const QString &a_filePath)
 {
     auto pred = [a_filePath](const EditorPreview item) {
         return item.scriptFilePath == a_filePath;
@@ -999,10 +998,11 @@ bool MainWindow::IsScriptOpened(const QString &a_filePath)
             std::find_if(std::begin(m_pEditorPreviewVector),
                          std::end(m_pEditorPreviewVector), pred);
 
+    // if script already opened, return its index
     if (it != std::end(m_pEditorPreviewVector)) {
-        return true;
+        return m_ui->scriptTabWidget->indexOf(it->editor);
     }
-    return false;
+    return NULL;
 }
 
 void MainWindow::setCurrentScriptFilePath(const QString & a_filePath)

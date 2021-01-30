@@ -173,7 +173,7 @@ private:
     bool saveScriptToFile(const QString& a_filePath);
     bool loadScriptFromFile(const QString& a_filePath);
     bool safeToCloseFile();
-    bool IsScriptOpened(const QString & a_filePath);
+    int IsScriptOpened(const QString & a_filePath);
 
     void setCurrentScriptFilePath(const QString & a_filePath);
     void loadStartUpScript();
