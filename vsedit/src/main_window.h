@@ -143,7 +143,7 @@ private:
     void createEncodeDialog();
     void createJobServerWatcher();
 
-    void createViewLog(); // create collapsable widget and view log
+    void createLogView(); // create collapsable widget and view log
 
     void createMainToolBar();
 

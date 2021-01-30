@@ -30,16 +30,18 @@ private:
     int animationDuration{300};
 
     QString title;
+    bool m_visible;
 
 public:
     void setContentLayout(QLayout & contentLayout);
-
     void setTitle(const QString & a_title);
     void setAnimationDuration(const int a_animationDuration);
 
-
 signals:
 
+public slots:
+
+    void slotToggleView(bool a_visible = true);
 };
 
 #endif // COLLAPSEEXPANDWIDGET_H

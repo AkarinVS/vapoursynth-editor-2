@@ -3,7 +3,8 @@
 #include <QPropertyAnimation>
 
 CollapseExpandWidget::CollapseExpandWidget(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_visible(false)
 {
     toggleButton.setStyleSheet("QToolButton { border: none; }");
     toggleButton.setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -18,6 +19,7 @@ CollapseExpandWidget::CollapseExpandWidget(QWidget *parent) :
 
     contentArea.setStyleSheet("QScrollArea { background-color: white; border: none; }");
     contentArea.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     // start out collapsed
     contentArea.setMaximumHeight(0);
     contentArea.setMinimumHeight(0);
@@ -33,11 +35,8 @@ CollapseExpandWidget::CollapseExpandWidget(QWidget *parent) :
     mainLayout.addWidget(&headerLine, row++, 2, 1, 1);
     mainLayout.addWidget(&contentArea, row, 0, 1, 3);
     setLayout(&mainLayout);
-    QObject::connect(&toggleButton, &QToolButton::clicked, [this](const bool checked) {
-        toggleButton.setArrowType(checked ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
-        toggleAnimation.setDirection(checked ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
-        toggleAnimation.start();
-    });
+
+    connect(&toggleButton, &QToolButton::clicked, this, &CollapseExpandWidget::slotToggleView);
 }
 
 void CollapseExpandWidget::setContentLayout(QLayout & contentLayout)
@@ -68,4 +67,18 @@ void CollapseExpandWidget::setTitle(const QString &a_title)
 void CollapseExpandWidget::setAnimationDuration(const int a_animationDuration)
 {
     animationDuration = a_animationDuration;
+}
+
+void CollapseExpandWidget::slotToggleView(bool a_visible)
+{
+    if (true == m_visible && true == a_visible) {
+        return;
+    }
+
+    m_visible = a_visible;
+    toggleButton.setChecked(m_visible);
+
+    toggleButton.setArrowType(m_visible ? Qt::ArrowType::DownArrow : Qt::ArrowType::RightArrow);
+    toggleAnimation.setDirection(m_visible ? QAbstractAnimation::Forward : QAbstractAnimation::Backward);
+    toggleAnimation.start();
 }

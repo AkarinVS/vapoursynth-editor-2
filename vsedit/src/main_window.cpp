@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *a_pParent) :
     slotCreateTab();
     setTabSignals();
 
-    createViewLog();
+    createLogView();
 
     setTimeLineSignals();
 
@@ -190,6 +190,10 @@ void MainWindow::slotCreateTab(const QString & a_tabName,
 
     connect(ep.processor, &ScriptProcessor::signalWriteLogMessage,
         this, QOverload<int, const QString &>::of(&MainWindow::slotWriteLogMessage));
+
+    // toggle log view widget visible if there's an error
+    connect(ep.processor, &ScriptProcessor::signalWriteLogMessage,
+        m_ui->collapseExpandWidget, &CollapseExpandWidget::slotToggleView);
 
     // signal for file drop load
     connect(ep.editor, &ScriptEditor::signalScriptFileDropped,
@@ -337,7 +341,7 @@ void MainWindow::createJobServerWatcher()
         this, SLOT(slotWriteLogMessage(const QString &, const QString &)));
 }
 
-void MainWindow::createViewLog()
+void MainWindow::createLogView()
 {
     m_ui->collapseExpandWidget->setTitle("");
     m_ui->collapseExpandWidget->setAnimationDuration(300);
