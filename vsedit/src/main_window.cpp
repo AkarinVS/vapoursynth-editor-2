@@ -2717,8 +2717,6 @@ void MainWindow::slotOpenRecentScriptActionTriggered()
     QAction * pAction = qobject_cast<QAction *>(sender());
     if(pAction == nullptr)
         return;
-    if(!safeToCloseFile())
-        return;
     loadScriptFromFile(pAction->data().toString());
 }
 
