@@ -1,5 +1,17 @@
 Vapoursynth Editor 2
 
+R4: [2021-01-31]
+- Add option to release memory on tab
+- Remember tabs on close
+- Opening script that was already opened will change to its tab
+- Fixed a save file dialog pop up when loading from the recent script list while the active script is labeled as modified
+- Fixed script template loading with tabs
+- Fixed log window visibility. The wIndow will show up from hidden when there's an error
+- Removed the ugly white margin around log window
+- Capping frame cache and frame ticket queue sizes, greatly reducing memory usage
+- Added "copy to new tab" option to right click tab context menu
+- Updated more deprecated type cast
+
 R3: [2020-08-28]
 - Fixed a bug where frame cache didn't get released when tab was closed
 - Added a button in settings to open the config file folder
