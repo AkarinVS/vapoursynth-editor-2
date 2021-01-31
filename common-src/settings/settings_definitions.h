@@ -147,6 +147,7 @@ extern const char ACTION_ID_CHANGE_TO_TAB_8[];
 extern const char ACTION_ID_CHANGE_TO_TAB_9[];
 extern const char ACTION_ID_PREVIEW[];
 extern const char ACTION_ID_CHECK_SCRIPT[];
+extern const char ACTION_ID_RELEASE_MEMORY[];
 extern const char ACTION_ID_BENCHMARK[];
 extern const char ACTION_ID_CLI_ENCODE[];
 extern const char ACTION_ID_ENQUEUE_ENCODE_JOB[];

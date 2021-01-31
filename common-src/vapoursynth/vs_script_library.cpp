@@ -310,8 +310,8 @@ bool VSScriptLibrary::initLibrary()
 		}
 		if(!*entry.ppFunction)
 		{
-			QString errorString = trUtf8("Failed to get entry %1() "
-				"in vapoursynth script library!").arg(entry.name);
+            QString errorString = tr("Failed to get entry %1() "
+                "in vapoursynth script library!").arg(entry.name);
 			emit signalWriteLogMessage(mtCritical, errorString);
 			freeLibrary();
 			return false;
