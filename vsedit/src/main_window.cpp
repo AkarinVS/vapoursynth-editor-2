@@ -575,6 +575,9 @@ void MainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotPreviewScript())},
         {&m_pActionCheckScript, ACTION_ID_CHECK_SCRIPT, false, QString(),
             this, SLOT(slotCheckScript())},
+        {&m_pActionReleaseMemory, ACTION_ID_RELEASE_MEMORY, false, QString(),
+            this, SLOT(slotReleaseMemory())},
+
         {&m_pActionBenchmark, ACTION_ID_BENCHMARK, false, QString(),
             this, SLOT(slotBenchmark())},
         {&m_pActionEncode, ACTION_ID_CLI_ENCODE, false, QString(),
@@ -702,6 +705,7 @@ void MainWindow::createMenuActionsAndContextMenuActions()
     QMenu * pScriptMenu = m_ui->menuBar->addMenu(tr("Script"));
     pScriptMenu->addAction(m_pActionPreview);
     pScriptMenu->addAction(m_pActionCheckScript);
+    pScriptMenu->addAction(m_pActionReleaseMemory);
     pScriptMenu->addAction(m_pActionBenchmark);
     pScriptMenu->addAction(m_pActionEncode);
     pScriptMenu->addAction(m_pActionEnqueueEncodeJob);
@@ -809,6 +813,7 @@ void MainWindow::createTabBarContextMenuActions()
 {
     m_pTabBarContectMenu = new QMenu(this);
     m_pTabBarContectMenu->addAction(m_pActionCopyToNewTab);
+    m_pTabBarContectMenu->addAction(m_pActionReleaseMemory);
     m_pTabBarContectMenu->addAction(m_pActionCloseTab);
 
     connect(m_ui->scriptTabWidget, &GenericTabWidget::tabBarRightClicked,
@@ -2527,6 +2532,19 @@ void MainWindow::slotCheckScript()
 }
 
 // END OF void MainWindow::slotCheckScript()
+//==============================================================================
+
+void MainWindow::slotReleaseMemory()
+{
+    int currentIndex = m_ui->scriptTabWidget->currentIndex();
+    auto * processor = m_pEditorPreviewVector[currentIndex].processor;
+
+    if (processor->scriptName() != "") {
+        processor->close();
+    }
+}
+
+// END OF void MainWindow::slotReleaseMemory()
 //==============================================================================
 
 void MainWindow::slotBenchmark()

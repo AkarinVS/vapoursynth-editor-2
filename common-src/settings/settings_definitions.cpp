@@ -68,6 +68,7 @@ const char ACTION_ID_CHANGE_TO_TAB_8[] = "change_to_tab_8";
 const char ACTION_ID_CHANGE_TO_TAB_9[] = "change_to_tab_9";
 const char ACTION_ID_PREVIEW[] = "preview";
 const char ACTION_ID_CHECK_SCRIPT[] = "check_script";
+const char ACTION_ID_RELEASE_MEMORY[] = "release_memory";
 const char ACTION_ID_BENCHMARK[] = "benchmark";
 const char ACTION_ID_CLI_ENCODE[] = "cli_encode";
 const char ACTION_ID_ENQUEUE_ENCODE_JOB[] = "enqueue_encode_job";

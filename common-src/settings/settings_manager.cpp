@@ -162,6 +162,8 @@ void SettingsManager::initializeStandardActions()
 			QKeySequence(Qt::Key_F5)},
         {ACTION_ID_CHECK_SCRIPT, tr("Check script"), QIcon(":check.png"),
 			QKeySequence(Qt::Key_F6)},
+        {ACTION_ID_RELEASE_MEMORY, tr("Release memory"), QIcon(),
+            QKeySequence()},
         {ACTION_ID_BENCHMARK, tr("Benchmark"), QIcon(":benchmark.png"),
 			QKeySequence(Qt::Key_F7)},
         {ACTION_ID_CLI_ENCODE, tr("Encode video"),

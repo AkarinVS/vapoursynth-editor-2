@@ -241,6 +241,7 @@ private:
 
     QAction * m_pActionPreview;
     QAction * m_pActionCheckScript;
+    QAction * m_pActionReleaseMemory;
     QAction * m_pActionBenchmark;
     QAction * m_pActionEncode;
     QAction * m_pActionEnqueueEncodeJob;
@@ -406,6 +407,7 @@ private slots:
     void slotChangeTabByAction();
 
     void slotCheckScript();
+    void slotReleaseMemory();
     void slotBenchmark();
     void slotEncode();
     void slotEnqueueEncodeJob();
