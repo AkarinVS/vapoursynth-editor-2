@@ -146,6 +146,10 @@ public:
 
 	bool setMaxRecentFilesNumber(unsigned int a_maxRecentFilesNumber);
 
+    QStringList getTabScriptsList() const;
+
+    bool setTabScriptsList(const QStringList &tabScriptList);
+
 	QStringList getVapourSynthDocumentationPaths() const;
 
 	bool setVapourSynthDocumentationPaths(const QStringList & a_pathsList);

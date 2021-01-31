@@ -157,6 +157,7 @@ private:
     void createPreviewFilters();
     void createSelectionToolsDialog();
 
+    void setTabs();
     void setTabSignals(); // setup signals between editor and previewArea
     void setTimeLineSignals();
 
@@ -301,6 +302,8 @@ private:
 
     /* compare group */
     QVector<CompareGroup> m_compareGroupList;
+
+    QStringList m_tabScriptsList;
 
 public slots:
 

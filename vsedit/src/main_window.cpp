@@ -93,7 +93,8 @@ MainWindow::MainWindow(QWidget *a_pParent) :
     createSelectionToolsDialog();
 
     createGarbageCollection();
-    slotNewScript();
+
+    setTabs();
     setTabSignals();
 
     createLogView();
@@ -143,12 +144,17 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *a_pEvent)
 {
     m_closingApp = true;
+    m_tabScriptsList.clear();
+
     if (!slotRemoveAllTabs())
     {
         a_pEvent->ignore();
         m_closingApp = false;
         return;
     }
+
+    // save tab list position
+    m_pSettingsManager->setTabScriptsList(m_tabScriptsList);
 
     destroyOrphanQObjects();
     QMainWindow::closeEvent(a_pEvent);
@@ -278,6 +284,7 @@ void MainWindow::createTab(const QString & a_tabName,
 
     int tabCount = m_ui->scriptTabWidget->count();
     m_ui->scriptTabWidget->setCurrentIndex(tabCount-1);
+    m_ui->previewTabWidget->setCurrentIndex(tabCount-1);
 
     // set focus on editor
     ep.editor->setFocus();
@@ -457,6 +464,21 @@ void MainWindow::createSelectionToolsDialog()
 
     connect(m_pSelectionToolsDialog, &SelectionToolsDialog::signalPasteSelectionPointsString,
             this, &MainWindow::slotPasteSelectionPointsToScript);
+}
+
+void MainWindow::setTabs()
+{
+    // loading saved tab scripts
+    m_tabScriptsList = m_pSettingsManager->getTabScriptsList();
+    m_tabScriptsList.removeDuplicates(); // in case of mess up in config
+
+    if (m_tabScriptsList.count() > 0) {
+        for (const QString &scriptPath : m_tabScriptsList) {
+            loadScriptFromFile(scriptPath);
+        }
+    } else {
+        slotNewScript();
+    }
 }
 
 void MainWindow::setTimeLineSignals()
@@ -912,7 +934,7 @@ bool MainWindow::loadScriptFromFile(const QString &a_filePath)
 
     // check if file existed in tab, change to tab
     int tabIndex = IsScriptOpened(a_filePath);
-    if (NULL != tabIndex) {
+    if (0 <= tabIndex) {
         slotChangeScriptTab(tabIndex);
         return false;
     }
@@ -931,7 +953,7 @@ bool MainWindow::loadScriptFromFile(const QString &a_filePath)
     QString scriptText = QString::fromUtf8(utf8Script);
 
     setCurrentScriptFilePath(a_filePath);
-    m_pBenchmarkDialog->resetSavedRange();
+//    m_pBenchmarkDialog->resetSavedRange();
 
     QFileInfo fi(scriptFile);
     QString fileName = fi.fileName(); // tab name
@@ -985,7 +1007,6 @@ bool MainWindow::safeToCloseFile()
         return false;
 
     return true;
-
 }
 
 int MainWindow::IsScriptOpened(const QString &a_filePath)
@@ -1002,7 +1023,7 @@ int MainWindow::IsScriptOpened(const QString &a_filePath)
     if (it != std::end(m_pEditorPreviewVector)) {
         return m_ui->scriptTabWidget->indexOf(it->editor);
     }
-    return NULL;
+    return -1;
 }
 
 void MainWindow::setCurrentScriptFilePath(const QString & a_filePath)
@@ -1012,7 +1033,7 @@ void MainWindow::setCurrentScriptFilePath(const QString & a_filePath)
 
     m_currentTabScriptFilePath = a_filePath;
     m_pSettingsManager->setLastUsedPath(a_filePath);    
-    fillRecentScriptsMenu();
+//    fillRecentScriptsMenu();
 }
 
 void MainWindow::loadStartUpScript()
@@ -1034,6 +1055,7 @@ void MainWindow::fillRecentScriptsMenu()
 {
     m_pMenuRecentScripts->clear();
     QStringList recentSciptsList = m_pSettingsManager->getRecentFilesList();
+
     for(const QString & filePath : recentSciptsList)
     {
         QAction * pAction = new QAction(m_pMenuRecentScripts);
@@ -1251,6 +1273,15 @@ bool MainWindow::slotRemoveTab(int a_index)
         std::sort(m_tabNumberList.begin(), m_tabNumberList.end());
     }
 
+    // save tab position on closing
+    QString scriptFilePath = m_pEditorPreviewVector[currentTabIndex].scriptFilePath;
+    QFileInfo fileInfo(scriptFilePath);
+    QString canonicalPath = fileInfo.canonicalFilePath();
+
+    if (m_closingApp && canonicalPath != "") {
+        m_tabScriptsList.prepend(canonicalPath);
+    }
+
     QString tabName = m_pEditorPreviewVector[currentTabIndex].tabName;
     m_pBookmarkManagerDialog->slotRemoveScriptBookmark(tabName); // remove script from bookmark listing
 
@@ -1277,7 +1308,7 @@ bool MainWindow::slotRemoveAllTabs()
     int tabCount = m_ui->scriptTabWidget->count();
     int totalIndex = tabCount - 1;
     for (int i = totalIndex; i >= 0; --i) {
-        if (!slotRemoveTab()) return false;
+        if (!slotRemoveTab(i)) return false;
         if (i==0) return true;
     }
     return false;
@@ -1350,6 +1381,7 @@ void MainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabInde
 void MainWindow::slotChangeScriptTab(int a_index)
 {    
     int currentIndex = m_ui->previewTabWidget->currentIndex();
+
     if (currentIndex != a_index)
         m_ui->previewTabWidget->setCurrentIndex(a_index); // change preview tab
 

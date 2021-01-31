@@ -30,6 +30,7 @@ const char CROP_MODE_KEY[] = "crop_mode";
 const char CROP_ZOOM_RATIO_KEY[] = "crop_zoom_ratio";
 const char PROMPT_TO_SAVE_CHANGES_KEY[] = "prompt_to_save_changes";
 const char RECENT_FILES_LIST_KEY[] = "recent_files_list";
+const char TAB_SCRIPTS_LIST_KEY[] = "tab_scripts_list";
 const char MAX_RECENT_FILES_NUMBER_KEY[] = "max_recent_files_number";
 const char VAPOURSYNTH_DOCUMENTATION_PATHS_KEY[] =
 	"vapoursynth_documentation_paths";
@@ -738,6 +739,17 @@ bool SettingsManager::setMaxRecentFilesNumber(
 
 //==============================================================================
 
+QStringList SettingsManager::getTabScriptsList() const
+{
+    return value(TAB_SCRIPTS_LIST_KEY).toStringList();
+}
+
+bool SettingsManager::setTabScriptsList(const QStringList &tabScriptsList)
+{
+    return setValue(TAB_SCRIPTS_LIST_KEY, tabScriptsList);
+}
+
+//==============================================================================
 QStringList SettingsManager::getVapourSynthDocumentationPaths() const
 {
 	QStringList paths = value(VAPOURSYNTH_DOCUMENTATION_PATHS_KEY,
