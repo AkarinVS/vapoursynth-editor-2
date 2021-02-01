@@ -173,6 +173,7 @@ void SettingsManager::initializeStandardActions()
         {ACTION_ID_JOBS, tr("Jobs"),
 			QIcon(":jobs.png"), QKeySequence(Qt::Key_F10)},
         {ACTION_ID_ABOUT, tr("About..."), QIcon(), QKeySequence()},
+        {ACTION_ID_ABOUT_VAPOURSYNTH, tr("About VapourSynth"), QIcon(), QKeySequence()},
         {ACTION_ID_AUTOCOMPLETE, tr("Autocomplete"), QIcon(),
 			QKeySequence(Qt::CTRL + Qt::Key_Space)},
         {ACTION_ID_FRAME_TO_CLIPBOARD, tr("Copy frame to clipboard"),

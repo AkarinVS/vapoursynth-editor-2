@@ -74,6 +74,8 @@ MainWindow::MainWindow(QWidget *a_pParent) :
   , m_pActionShowFrameInfoDialog(nullptr)
   , m_pActionShowPreivewFiltersDialog(nullptr)
   , m_pActionShowSelectionToolsDialog(nullptr)
+  , m_pActionAboutVapourSynth(nullptr)
+  , m_pActionAbout(nullptr)
   , m_playing(false)
   , m_closingApp(false)
   , m_closingTab(false)
@@ -599,6 +601,8 @@ void MainWindow::createMenuActionsAndContextMenuActions()
         {&m_pActionShowSelectionToolsDialog, ACTION_ID_SHOW_SELECTION_TOOLS_DIALOG, true, QString(),
             this, SLOT(slotShowSelectionToolsDialog(bool))},
 
+        {&m_pActionAboutVapourSynth, ACTION_ID_ABOUT_VAPOURSYNTH, false, QString(),
+            this, SLOT(slotAboutVapourSynth())},
         {&m_pActionAbout, ACTION_ID_ABOUT, false, QString(),
             this, SLOT(slotAbout())},
 
@@ -787,6 +791,7 @@ void MainWindow::createMenuActionsAndContextMenuActions()
 //------------------------------------------------------------------------------
 
     QMenu * pHelpMenu = m_ui->menuBar->addMenu(tr("Help"));
+    pHelpMenu->addAction(m_pActionAboutVapourSynth);
     pHelpMenu->addAction(m_pActionAbout);
 
     /* add number key switch tab actions*/
@@ -2721,6 +2726,20 @@ void MainWindow::slotAbout()
         aboutResource.size());
     QString aboutString = QString::fromUtf8(aboutData);
     QMessageBox::about(this, VAPOURSYNTH_EDITOR_NAME, aboutString);
+}
+
+void MainWindow::slotAboutVapourSynth()
+{
+    const VSAPI * cpVSAPI = m_pVSScriptLibrary->getVSAPI();
+    VSCore *pCore = cpVSAPI->createCore(1);
+    auto coreInfo = VSCoreInfo{};
+    cpVSAPI->getCoreInfo2(pCore, &coreInfo);
+
+    QMessageBox::about(this, tr("Vapoursynth Verison"), coreInfo.versionString);
+
+    cpVSAPI->freeCore(pCore);
+    pCore = nullptr;
+    cpVSAPI = nullptr;
 }
 
 void MainWindow::slotChangeWindowTitle(const QString & a_title)

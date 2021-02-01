@@ -82,6 +82,7 @@ const char ACTION_ID_PASTE[] = "paste";
 const char ACTION_ID_SELECT_ALL[] = "select_all";
 const char ACTION_ID_COPY_TO_NEW_TAB[] = "copy_to_new_tab";
 const char ACTION_ID_ABOUT[] = "about";
+const char ACTION_ID_ABOUT_VAPOURSYNTH[] = "about_vapoursynth";
 const char ACTION_ID_AUTOCOMPLETE[] = "autocomplete";
 const char ACTION_ID_SAVE_SNAPSHOT[] = "save_snapshot";
 const char ACTION_ID_TOGGLE_ZOOM_PANEL[] = "toggle_zoom_panel";

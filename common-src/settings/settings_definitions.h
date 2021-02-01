@@ -161,6 +161,7 @@ extern const char ACTION_ID_PASTE[];
 extern const char ACTION_ID_SELECT_ALL[];
 extern const char ACTION_ID_COPY_TO_NEW_TAB[];
 extern const char ACTION_ID_ABOUT[];
+extern const char ACTION_ID_ABOUT_VAPOURSYNTH[];
 extern const char ACTION_ID_AUTOCOMPLETE[];
 extern const char ACTION_ID_SAVE_SNAPSHOT[];
 extern const char ACTION_ID_TOGGLE_ZOOM_PANEL[];

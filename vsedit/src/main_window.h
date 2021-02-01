@@ -252,6 +252,7 @@ private:
     QAction * m_pActionShowPreivewFiltersDialog;
     QAction * m_pActionShowSelectionToolsDialog;
 
+    QAction * m_pActionAboutVapourSynth;
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
@@ -417,6 +418,7 @@ private slots:
     void slotSaveSnapshot();
 
     void slotAbout();
+    void slotAboutVapourSynth();
 
     void slotChangeWindowTitle(const QString & a_title);
     void slotEditorTextChanged();
