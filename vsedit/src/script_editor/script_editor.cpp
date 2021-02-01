@@ -243,12 +243,15 @@ void ScriptEditor::slotComplete()
 		wordStart--;
 	m_typedCharacters = cursorIndex - wordStart;
 	QString typedWord = lineString.mid(wordStart, m_typedCharacters);
-	int charactersAfterDot = m_typedCharacters - typedWord.lastIndexOf('.') - 1;
+
+    int charactersAfterDot = -1;
+    if (typedWord.count() > 0) {
+        charactersAfterDot = m_typedCharacters - typedWord.lastIndexOf('.') - 1;
+    }
 
 	QAction * pAction = qobject_cast<QAction *>(sender());
 
-	if((charactersAfterDot < m_charactersTypedToStartCompletion) &&
-		(pAction == nullptr))
+    if((charactersAfterDot < 0) && (pAction == nullptr))
 	{
 		m_pCompleter->popup()->hide();
 		return;
