@@ -80,12 +80,15 @@ VapourSynthPluginsManager::VapourSynthPluginsManager(
 	, m_currentPluginPath()
 	, m_pluginAlreadyLoaded(false)
 	, m_pSettingsManager(a_pSettingsManager)
+    , m_vsRepoPath()
 {
 	if(a_pParent)
 	{
 		connect(this, SIGNAL(signalWriteLogMessage(int, const QString &)),
 		a_pParent, SLOT(slotWriteLogMessage(int, const QString &)));
 	}
+
+    loadVSRepoPath();
 	slotRefill();
 }
 
@@ -317,10 +320,18 @@ void VapourSynthPluginsManager::getCorePlugins()
 
 	cpVSAPI->freeMap(pPluginsMap);
 	cpVSAPI->freeCore(pCore);
-	vsLibrary.unload();
+    vsLibrary.unload();
 }
 
 // END OF void VapourSynthPluginsManager::getCorePlugins()
+//==============================================================================
+
+QString VapourSynthPluginsManager::VSRepoPath()
+{
+    return m_vsRepoPath;
+}
+
+// END OF void VapourSynthPluginsManager::VSRepoPath()
 //==============================================================================
 
 void VapourSynthPluginsManager::pollPaths(const QStringList & a_pluginsPaths)
@@ -445,8 +456,55 @@ void VapourSynthPluginsManager::slotRefill()
 	getCorePlugins();
 	QStringList pluginsPaths = m_pSettingsManager->getVapourSynthPluginsPaths();
 	pollPaths(pluginsPaths);
-	slotSort();
+    slotSort();
 }
 
 // END OF void VapourSynthPluginsManager::slotRefill()
+//==============================================================================
+
+void VapourSynthPluginsManager::loadVSRepoPath()
+{
+    QString vsRepoName("vsrepo.py");
+    QString vsRepoPath;
+
+#ifdef Q_OS_WIN
+    QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat);
+    vsRepoPath = settings.value("VapourSynth/VSRepoPY").toString();
+    if(vsRepoPath.isEmpty())
+    {
+        vsRepoPath = settings.value(
+                    "Wow6432Node/VapourSynth/VSRepoPY").toString();
+    }
+
+    if(vsRepoPath.isEmpty())
+    {
+        QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+        QString basePath;
+
+        basePath = environment.value("ProgramFiles");
+        vsRepoPath = basePath + "\\VapourSynth\\vsrepo\\vsrepo.py";
+    }
+#endif // Q_OS_WIN
+
+    if(vsRepoPath.isEmpty())
+    {
+        QStringList librarySearchPaths = m_pSettingsManager->getVapourSynthLibraryPaths();
+        for(const QString & path : librarySearchPaths)
+        {
+            m_vsRepoPath = vsedit::resolvePathFromApplication(path) +
+                QString("/") + vsRepoName;
+        }
+    }
+
+    if(vsRepoPath.isEmpty())
+    {
+        emit signalWriteLogMessage(mtCritical, "VapourSynth plugins manager: "
+            "Failed to find vsrepo path.");
+        return;
+    }
+
+    m_vsRepoPath = vsRepoPath;
+}
+
+// END OF void VapourSynthPluginsManager::loadVSRepoPath()
 //==============================================================================

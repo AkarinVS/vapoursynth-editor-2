@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *a_pParent) :
   , m_pActionShowFrameInfoDialog(nullptr)
   , m_pActionShowPreivewFiltersDialog(nullptr)
   , m_pActionShowSelectionToolsDialog(nullptr)
-  , m_pActionAboutVapourSynth(nullptr)
+  , m_pActionVapourSynthVersion(nullptr)
   , m_pActionAbout(nullptr)
   , m_playing(false)
   , m_closingApp(false)
@@ -601,8 +601,12 @@ void MainWindow::createMenuActionsAndContextMenuActions()
         {&m_pActionShowSelectionToolsDialog, ACTION_ID_SHOW_SELECTION_TOOLS_DIALOG, true, QString(),
             this, SLOT(slotShowSelectionToolsDialog(bool))},
 
-        {&m_pActionAboutVapourSynth, ACTION_ID_ABOUT_VAPOURSYNTH, false, QString(),
-            this, SLOT(slotAboutVapourSynth())},
+        {&m_pActionVapourSynthVersion, ACTION_ID_VAPOURSYNTH_VERSION, false, QString(),
+            this, SLOT(slotVapourSynthVersion())},
+        {&m_pActionPluginFolder, ACTION_ID_PLUGINS_FOLDER, false, QString(),
+            this, SLOT(slotOpenPluginsFolder())},
+        {&m_pActionScriptFolder, ACTION_ID_SCRIPTS_FOLDER, false, QString(),
+            this, SLOT(slotOpenScriptsFolder())},
         {&m_pActionAbout, ACTION_ID_ABOUT, false, QString(),
             this, SLOT(slotAbout())},
 
@@ -791,7 +795,14 @@ void MainWindow::createMenuActionsAndContextMenuActions()
 //------------------------------------------------------------------------------
 
     QMenu * pHelpMenu = m_ui->menuBar->addMenu(tr("Help"));
-    pHelpMenu->addAction(m_pActionAboutVapourSynth);
+
+    m_pAboutVapoursynth = new QMenu(pHelpMenu);
+    m_pAboutVapoursynth->setTitle("About Vapoursynth");
+    pHelpMenu->addMenu(m_pAboutVapoursynth);
+    m_pAboutVapoursynth->addAction(m_pActionVapourSynthVersion);
+    m_pAboutVapoursynth->addAction(m_pActionPluginFolder);
+    m_pAboutVapoursynth->addAction(m_pActionScriptFolder);
+
     pHelpMenu->addAction(m_pActionAbout);
 
     /* add number key switch tab actions*/
@@ -1734,6 +1745,29 @@ double MainWindow::currentPreviewZoomRatio() {
         }
     }
     return ratio;
+}
+
+QString MainWindow::getPathsByVSRepo(const QString &a_key)
+{
+    QProcess * process = new QProcess(this);
+    QString vsRepoPath = m_pVapourSynthPluginsManager->VSRepoPath();
+    QStringList args;
+    args << vsRepoPath << "paths";
+
+    process->start("python", args);
+    process->waitForFinished();
+    process->setReadChannel(QProcess::StandardOutput);
+
+    QString resultPath;
+    while (process->canReadLine()) {
+        QString line = process->readLine().trimmed();
+        if (line.contains(a_key, Qt::CaseSensitive)) {
+            resultPath= line.split(" ")[1]; // e.g. "Binaries: C:\VS\plugins"
+            break;
+        }
+    }
+    process->close();
+    return resultPath;
 }
 
 void MainWindow::slotSetPreviewPixmap(const QPixmap &a_framePixmap)
@@ -2728,7 +2762,7 @@ void MainWindow::slotAbout()
     QMessageBox::about(this, VAPOURSYNTH_EDITOR_NAME, aboutString);
 }
 
-void MainWindow::slotAboutVapourSynth()
+void MainWindow::slotVapourSynthVersion()
 {
     const VSAPI * cpVSAPI = m_pVSScriptLibrary->getVSAPI();
     VSCore *pCore = cpVSAPI->createCore(1);
@@ -2740,6 +2774,18 @@ void MainWindow::slotAboutVapourSynth()
     cpVSAPI->freeCore(pCore);
     pCore = nullptr;
     cpVSAPI = nullptr;
+}
+
+void MainWindow::slotOpenPluginsFolder()
+{
+    QString path = getPathsByVSRepo("Binaries");
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
+void MainWindow::slotOpenScriptsFolder()
+{
+    QString path = getPathsByVSRepo("Scripts");
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
 void MainWindow::slotChangeWindowTitle(const QString & a_title)

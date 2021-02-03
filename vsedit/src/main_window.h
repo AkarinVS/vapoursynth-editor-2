@@ -184,6 +184,8 @@ private:
     void setUpZoomPanel();
     double currentPreviewZoomRatio();
 
+    QString getPathsByVSRepo(const QString &a_key);
+
     QString createPreviewFilterScript(const QString &a_script, const QMap<QString, int>&);
 
     QFlags<QTextDocument::FindFlag> extractFindFlags(const QMap<QString, bool> & a_flagsMap);
@@ -252,7 +254,11 @@ private:
     QAction * m_pActionShowPreivewFiltersDialog;
     QAction * m_pActionShowSelectionToolsDialog;
 
-    QAction * m_pActionAboutVapourSynth;
+    QMenu * m_pAboutVapoursynth;
+    QAction * m_pActionVapourSynthVersion;
+    QAction * m_pActionPluginFolder;
+    QAction * m_pActionScriptFolder;
+
     QAction * m_pActionAbout;
 
     std::vector<QAction *> m_settableActionsList;
@@ -418,7 +424,9 @@ private slots:
     void slotSaveSnapshot();
 
     void slotAbout();
-    void slotAboutVapourSynth();
+    void slotVapourSynthVersion();
+    void slotOpenPluginsFolder();
+    void slotOpenScriptsFolder();
 
     void slotChangeWindowTitle(const QString & a_title);
     void slotEditorTextChanged();

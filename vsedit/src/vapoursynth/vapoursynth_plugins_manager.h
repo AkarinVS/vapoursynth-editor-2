@@ -17,11 +17,13 @@ class VapourSynthPluginsManager : public QObject
 public:
 
 	VapourSynthPluginsManager(SettingsManager * a_pSettingsManager,
-		QObject * a_pParent = nullptr);
+        QObject * a_pParent = nullptr);
 
-	virtual ~VapourSynthPluginsManager();
+    virtual ~VapourSynthPluginsManager() override;
 
-	void getCorePlugins();
+    void getCorePlugins();
+
+    QString VSRepoPath();
 
 	void pollPaths(const QStringList & a_pluginsPaths);
 
@@ -55,6 +57,8 @@ signals:
 
 private:
 
+    void loadVSRepoPath();
+
 	VSPluginsList m_pluginsList;
 
 	QString m_currentPluginPath;
@@ -62,6 +66,8 @@ private:
 	bool m_pluginAlreadyLoaded;
 
 	SettingsManager * m_pSettingsManager;
+
+    QString m_vsRepoPath;
 };
 
 #endif // VAPOURSYNTHPLUGINSMANAGER_H
