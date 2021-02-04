@@ -19,6 +19,10 @@ bool Frame::operator==(const Frame & a_other) const
 
 //==============================================================================
 
+FrameTicket::FrameTicket()
+{
+}
+
 FrameTicket::FrameTicket(int a_frameNumber, int a_outputIndex,
 		VSNodeRef * a_pOutputNode, bool a_needPreview,
 		VSNodeRef * a_pPreviewNode):

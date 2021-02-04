@@ -31,6 +31,7 @@ struct FrameTicket
 	const VSFrameRef * cpPreviewFrameRef;
 	bool discard;
 
+    FrameTicket();
 	FrameTicket(int a_frameNumber, int a_outputIndex,
 		VSNodeRef * a_pOutputNode, bool a_needPreview = false,
 		VSNodeRef * a_pPreviewNode = nullptr);

@@ -5,6 +5,7 @@
 #include "../settings/settings_manager_core.h"
 
 #include <QObject>
+#include <QVector>
 #include <deque>
 #include <vector>
 #include <map>
