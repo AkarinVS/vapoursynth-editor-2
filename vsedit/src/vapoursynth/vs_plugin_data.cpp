@@ -17,6 +17,7 @@ VSData::FunctionArgument::FunctionArgument(
 	const VSData::FunctionArgument & a_other):
 	name(a_other.name)
 	, type(a_other.type)
+    , value(a_other.value)
 	, optional(a_other.optional)
 	, empty(a_other.empty)
 {
@@ -27,6 +28,7 @@ VSData::FunctionArgument::FunctionArgument(
 	VSData::FunctionArgument && a_other):
 	name(std::move(a_other.name))
 	, type(std::move(a_other.type))
+    , value(std::move(a_other.value))
 	, optional(std::move(a_other.optional))
 	, empty(std::move(a_other.empty))
 {
@@ -38,6 +40,7 @@ VSData::FunctionArgument & VSData::FunctionArgument::operator=(
 {
 	std::swap(name, a_other.name);
 	std::swap(type, a_other.type);
+    std::swap(value, a_other.value);
 	std::swap(optional, a_other.optional);
 	std::swap(empty, a_other.empty);
 
@@ -46,7 +49,7 @@ VSData::FunctionArgument & VSData::FunctionArgument::operator=(
 
 QString VSData::FunctionArgument::toString() const
 {
-	return QString("%1 %2").arg(type).arg(name);
+    return QString("%1 %2 %3").arg(type).arg(name).arg(value);
 }
 
 bool VSData::FunctionArgument::operator<(

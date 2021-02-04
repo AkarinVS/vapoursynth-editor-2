@@ -407,10 +407,9 @@ void VapourSynthPluginsManager::getPyScripts()
                     VSData::FunctionArgument & argument = function.arguments.back();
 
                     argument.name = argumentPairs[0].trimmed(); // for storing clip value
+
                     if (argumentPairs.count() > 1) {
                         argument.value = argumentPairs[1].trimmed();
-                    } else {
-                        argument.value = "";
                     }
                 }
 

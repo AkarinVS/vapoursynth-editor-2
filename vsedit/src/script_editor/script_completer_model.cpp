@@ -67,10 +67,9 @@ void ScriptCompleterModel::setPyScriptsList(const VSPyScriptsList &a_pyScriptsLi
         {
             QStringList argumentsList;
             for(const auto & argument : function.arguments) {
-                if (argument.value == "") {
+                if (argument.value.isEmpty()) {
                     argumentsList << QString("%1").arg(argument.name);
                 } else {
-                    // not working yet, arg values are all empty
                     argumentsList << QString("%1=%2").arg(argument.name).arg(argument.value);
                 }
             }
