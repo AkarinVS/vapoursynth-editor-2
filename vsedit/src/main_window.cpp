@@ -243,6 +243,7 @@ void MainWindow::createTab(const QString & a_tabName,
 
     // autocomplete feature in editor
     ep.editor->setPluginsList(m_vsPluginsList);
+    ep.editor->setPyScriptsList(m_vsPyScriptsList);
     ep.editor->setSettingsManager(m_pSettingsManager);
 
     /* set text if tab is loaded from file*/
@@ -311,6 +312,7 @@ void MainWindow::createSettingDialog()
     m_pVSScriptLibrary = new VSScriptLibrary(m_pSettingsManager, this);
     m_pVapourSynthPluginsManager = new VapourSynthPluginsManager(m_pSettingsManager, this);
     m_vsPluginsList = m_pVapourSynthPluginsManager->pluginsList();
+    m_vsPyScriptsList = m_pVapourSynthPluginsManager->pyScriptsList();
 
     connect(m_pVSScriptLibrary, &VSScriptLibrary::signalWriteLogMessage,
         this, QOverload<int, const QString &>::of(&MainWindow::slotWriteLogMessage));
@@ -954,7 +956,7 @@ bool MainWindow::loadScriptFromFile(const QString &a_filePath)
         return false;
 
     // check if file existed in tab, change to tab
-    int tabIndex = IsScriptOpened(a_filePath);
+    int tabIndex = isScriptOpened(a_filePath);
     if (0 <= tabIndex) {
         slotChangeScriptTab(tabIndex);
         return false;
@@ -1030,7 +1032,7 @@ bool MainWindow::safeToCloseFile()
     return true;
 }
 
-int MainWindow::IsScriptOpened(const QString &a_filePath)
+int MainWindow::isScriptOpened(const QString &a_filePath)
 {
     auto pred = [a_filePath](const EditorPreview item) {
         return item.scriptFilePath == a_filePath;
@@ -1745,29 +1747,6 @@ double MainWindow::currentPreviewZoomRatio() {
         }
     }
     return ratio;
-}
-
-QString MainWindow::getPathsByVSRepo(const QString &a_key)
-{
-    QProcess * process = new QProcess(this);
-    QString vsRepoPath = m_pVapourSynthPluginsManager->VSRepoPath();
-    QStringList args;
-    args << vsRepoPath << "paths";
-
-    process->start("python", args);
-    process->waitForFinished();
-    process->setReadChannel(QProcess::StandardOutput);
-
-    QString resultPath;
-    while (process->canReadLine()) {
-        QString line = process->readLine().trimmed();
-        if (line.contains(a_key, Qt::CaseSensitive)) {
-            resultPath= line.split(" ")[1]; // e.g. "Binaries: C:\VS\plugins"
-            break;
-        }
-    }
-    process->close();
-    return resultPath;
 }
 
 void MainWindow::slotSetPreviewPixmap(const QPixmap &a_framePixmap)
@@ -2778,13 +2757,13 @@ void MainWindow::slotVapourSynthVersion()
 
 void MainWindow::slotOpenPluginsFolder()
 {
-    QString path = getPathsByVSRepo("Binaries");
+    QString path = m_pVapourSynthPluginsManager->pluginsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
 void MainWindow::slotOpenScriptsFolder()
 {
-    QString path = getPathsByVSRepo("Scripts");
+    QString path = m_pVapourSynthPluginsManager->pyScriptsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
@@ -2849,6 +2828,7 @@ void MainWindow::slotSettingsChanged()
     // update each editor with new setting
     for (EditorPreview &item : m_pEditorPreviewVector) {
         item.editor->setPluginsList(m_vsPluginsList);
+        item.editor->setPyScriptsList(m_vsPyScriptsList);
         item.editor->slotLoadSettings();
     }
 

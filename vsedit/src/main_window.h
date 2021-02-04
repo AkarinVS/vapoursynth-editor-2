@@ -130,6 +130,7 @@ private:
     QVector<QObject **> m_orphanQObjects;
 
     VSPluginsList m_vsPluginsList;
+    VSPyScriptsList m_vsPyScriptsList;
 
     void createSettingDialog();
 
@@ -174,7 +175,7 @@ private:
     bool saveScriptToFile(const QString& a_filePath);
     bool loadScriptFromFile(const QString& a_filePath);
     bool safeToCloseFile();
-    int IsScriptOpened(const QString & a_filePath);
+    int isScriptOpened(const QString & a_filePath);
 
     void setCurrentScriptFilePath(const QString & a_filePath);
     void loadStartUpScript();
@@ -183,8 +184,6 @@ private:
 
     void setUpZoomPanel();
     double currentPreviewZoomRatio();
-
-    QString getPathsByVSRepo(const QString &a_key);
 
     QString createPreviewFilterScript(const QString &a_script, const QMap<QString, int>&);
 

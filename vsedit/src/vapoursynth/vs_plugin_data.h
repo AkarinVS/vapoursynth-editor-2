@@ -13,6 +13,7 @@ struct FunctionArgument
 {
 	QString name;
 	QString type;
+    QString value;
 	bool optional;
 	bool empty;
 
@@ -57,8 +58,25 @@ struct Plugin
 	bool operator<(const VSData::Plugin & a_other) const;
 };
 
+struct PyScript
+{
+    QString id;
+    QString moduleName;
+    QString name;
+    std::vector<VSData::Function> functions;
+
+    PyScript();
+    PyScript(const VSData::PyScript & a_other);
+    PyScript(VSData::PyScript && a_other);
+    VSData::PyScript & operator=(VSData::PyScript a_other);
+
+    bool operator==(const VSData::PyScript & a_other) const;
+    bool operator<(const VSData::PyScript & a_other) const;
+};
+
 }
 
 typedef std::vector<VSData::Plugin> VSPluginsList;
+typedef std::vector<VSData::PyScript> VSPyScriptsList;
 
 #endif // VSPLUGINDATA_H_INCLUDED

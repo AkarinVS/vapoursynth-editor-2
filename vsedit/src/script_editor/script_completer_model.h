@@ -13,9 +13,11 @@ public:
 
 	ScriptCompleterModel(QObject * a_pParent = nullptr);
 
-	virtual ~ScriptCompleterModel();
+    virtual ~ScriptCompleterModel() override;
 
 	void setPluginsList(const VSPluginsList & a_pluginsList);
+
+    void setPyScriptsList(const VSPyScriptsList &a_pyScriptsList);
 
 	void setCoreName(const QString & a_coreName);
 };

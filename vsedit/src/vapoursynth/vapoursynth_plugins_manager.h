@@ -23,13 +23,23 @@ public:
 
     void getCorePlugins();
 
-    QString VSRepoPath();
+    void getPyScripts();
+
+    QString vSRepoPath();
+
+    QString pluginsPath();
+
+    QString pyScriptsPath();
+
+    QString definitionsPath();
 
 	void pollPaths(const QStringList & a_pluginsPaths);
 
 	QStringList functions() const;
 
 	VSPluginsList pluginsList() const;
+
+    VSPyScriptsList pyScriptsList() const;
 
 	static VSData::Function parseFunctionSignature(const QString & a_name,
 		const QString & a_arguments);
@@ -59,7 +69,11 @@ private:
 
     void loadVSRepoPath();
 
+    QString getPathsByVSRepo(const QString &a_key);
+
 	VSPluginsList m_pluginsList;
+
+    VSPyScriptsList m_pyScriptsList;
 
 	QString m_currentPluginPath;
 

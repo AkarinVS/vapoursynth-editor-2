@@ -177,3 +177,56 @@ bool VSData::Plugin::operator<(const VSData::Plugin & a_other) const
 }
 
 //==============================================================================
+
+VSData::PyScript::PyScript():
+    id()
+    , moduleName()
+    , name()
+    , functions()
+{
+
+}
+
+VSData::PyScript::PyScript(const VSData::PyScript & a_other):
+    id(a_other.id)
+    , moduleName(a_other.moduleName)
+    , name(a_other.name)
+    , functions(a_other.functions)
+{
+
+}
+
+VSData::PyScript::PyScript(VSData::PyScript && a_other):
+    id(std::move(a_other.id))
+    , moduleName(std::move(a_other.moduleName))
+    , name(std::move(a_other.name))
+    , functions(std::move(a_other.functions))
+{
+
+}
+
+VSData::PyScript & VSData::PyScript::operator=(VSData::PyScript a_other)
+{
+    if(&a_other == this)
+        return *this;
+
+    std::swap(id, a_other.id);
+    std::swap(moduleName, a_other.moduleName);
+    std::swap(name, a_other.name);
+    std::swap(functions, a_other.functions);
+
+    return *this;
+}
+
+bool VSData::PyScript::operator==(const VSData::PyScript & a_other) const
+{
+    return (id == a_other.id);
+}
+
+bool VSData::PyScript::operator<(const VSData::PyScript & a_other) const
+{
+    return (moduleName.compare(a_other.moduleName,
+        Qt::CaseInsensitive) < 0);
+}
+
+//==============================================================================

@@ -8,6 +8,7 @@
 #include <QFileInfoList>
 #include <QSettings>
 #include <QProcessEnvironment>
+#include <QDirIterator>
 #include <algorithm>
 
 //==============================================================================
@@ -77,6 +78,7 @@ VapourSynthPluginsManager::VapourSynthPluginsManager(
 	SettingsManager * a_pSettingsManager, QObject * a_pParent):
 	QObject(a_pParent)
 	, m_pluginsList()
+    , m_pyScriptsList()
 	, m_currentPluginPath()
 	, m_pluginAlreadyLoaded(false)
 	, m_pSettingsManager(a_pSettingsManager)
@@ -89,6 +91,7 @@ VapourSynthPluginsManager::VapourSynthPluginsManager(
 	}
 
     loadVSRepoPath();
+    getPyScripts();
 	slotRefill();
 }
 
@@ -138,8 +141,8 @@ void VapourSynthPluginsManager::getCorePlugins()
 		QString basePath;
 
 #ifdef Q_OS_WIN64
-		basePath = environment.value("ProgramFiles(x86)");
-		libraryFullPath = basePath + "\\VapourSynth\\core64\\vapoursynth.dll";
+        basePath = environment.value("ProgramFiles");
+        libraryFullPath = basePath + "\\VapourSynth\\core\\vapoursynth.dll";
 #else
 		basePath = environment.value("ProgramFiles");
 		libraryFullPath = basePath + "\\VapourSynth\\core32\\vapoursynth.dll";
@@ -326,12 +329,131 @@ void VapourSynthPluginsManager::getCorePlugins()
 // END OF void VapourSynthPluginsManager::getCorePlugins()
 //==============================================================================
 
-QString VapourSynthPluginsManager::VSRepoPath()
+void VapourSynthPluginsManager::getPyScripts()
+{
+    // get vsrepo path, then get the definition path
+    QString definitionPath = definitionsPath();
+
+    // parse the definition file, store package info for type "pyscript",
+    QFile inFile(definitionPath);
+    inFile.open(QIODevice::ReadOnly|QIODevice::Text);
+    QString data = inFile.readAll();
+    inFile.close();
+
+    QJsonDocument d = QJsonDocument::fromJson(data.toUtf8());
+    QJsonObject json = d.object();
+    QJsonArray packagesArray = json["packages"].toArray();
+
+    struct ModuleInfo {
+        QString name;
+        QString id;
+
+        ModuleInfo(){}
+        ModuleInfo(const QString &a_name, const QString &a_id):
+            name(a_name), id(a_id)
+        {}
+    };
+
+    // pack packages into a list for search
+    QMap<QString, ModuleInfo> moduleNamesList;
+    for (const auto package : packagesArray) {
+        auto item = package.toObject();
+        if (item["type"] == "PyScript") {
+            auto moduleInfo = ModuleInfo();
+            moduleInfo.id = item["identifier"].toString();
+            moduleInfo.name = item["name"].toString();
+            auto moduleName = item["modulename"].toString();
+            moduleNamesList.insert(moduleName, moduleInfo);
+        }
+    }
+
+    // use the list to look for py file in the script folder
+    QString scriptsPath = pyScriptsPath();
+    QString in;
+    QDirIterator it(scriptsPath, {"*.py"}, QDir::Files);
+
+    while (it.hasNext()) {
+        QFile file(it.next());
+        QString baseName = QFileInfo(file).baseName(); // filename without exten
+        if (moduleNamesList.contains(baseName)) {
+            file.open(QIODevice::ReadOnly);
+            in = file.readAll();
+
+            // store module info into PyScript data
+            VSData::PyScript pyScriptData;
+            pyScriptData.id = moduleNamesList[baseName].id;
+            pyScriptData.moduleName = baseName;
+            pyScriptData.name = moduleNamesList[baseName].name;
+
+            // parse the module and store the functions into a big pyscript list
+            QRegularExpression re("(?m)^def ([a-zA-Z]\\w*)\\(([^()]*)\\):");
+            QRegularExpressionMatchIterator i = re.globalMatch(in);
+
+            while (i.hasNext()) {
+                QRegularExpressionMatch match = i.next();
+                QString definition = match.captured(1); // function name
+                QString args = match.captured(2); // args string
+
+                VSData::Function function;
+                function.name = definition;
+
+                QStringList argumentsList = args.split(",");
+
+                for(const QString& argumentString : argumentsList)
+                {
+                    QStringList argumentPairs = argumentString.split("=");
+
+                    function.arguments.emplace_back();
+                    VSData::FunctionArgument & argument = function.arguments.back();
+
+                    argument.name = argumentPairs[0].trimmed(); // for storing clip value
+                    if (argumentPairs.count() > 1) {
+                        argument.value = argumentPairs[1].trimmed();
+                    } else {
+                        argument.value = "";
+                    }
+                }
+
+                pyScriptData.functions.push_back(function);
+            }
+            m_pyScriptsList.push_back(pyScriptData);
+        }
+    }
+}
+
+// END OF void VapourSynthPluginsManager::getPyScripts()
+//==============================================================================
+
+QString VapourSynthPluginsManager::vSRepoPath()
 {
     return m_vsRepoPath;
 }
 
 // END OF void VapourSynthPluginsManager::VSRepoPath()
+//==============================================================================
+
+QString VapourSynthPluginsManager::pluginsPath()
+{
+    return getPathsByVSRepo("Binaries");
+}
+
+// END OF void VapourSynthPluginsManager::PluginsPath()
+//==============================================================================
+
+QString VapourSynthPluginsManager::pyScriptsPath()
+{
+    return getPathsByVSRepo("Scripts");
+}
+
+// END OF void VapourSynthPluginsManager::PyScriptsPath()
+//==============================================================================
+
+QString VapourSynthPluginsManager::definitionsPath()
+{
+    return getPathsByVSRepo("Definitions");
+}
+
+// END OF void VapourSynthPluginsManager::DefinitionsPath()
 //==============================================================================
 
 void VapourSynthPluginsManager::pollPaths(const QStringList & a_pluginsPaths)
@@ -385,10 +507,18 @@ QStringList VapourSynthPluginsManager::functions() const
 
 VSPluginsList VapourSynthPluginsManager::pluginsList() const
 {
-	return m_pluginsList;
+    return m_pluginsList;
 }
 
 // END OF VSPluginsList VapourSynthPluginsManager::pluginsList() const
+//==============================================================================
+
+VSPyScriptsList VapourSynthPluginsManager::pyScriptsList() const
+{
+    return m_pyScriptsList;
+}
+
+// END OF VSPyScriptsList VapourSynthPluginsManager::pyScriptsList() const
 //==============================================================================
 
 VSData::Function VapourSynthPluginsManager::parseFunctionSignature(
@@ -396,7 +526,7 @@ VSData::Function VapourSynthPluginsManager::parseFunctionSignature(
 {
 	VSData::Function function;
 	function.name = a_name;
-	QStringList argumentsList = a_arguments.split(';', QString::SkipEmptyParts);
+    QStringList argumentsList = a_arguments.split(';', QString::SkipEmptyParts);
 	if(argumentsList.size() == 0)
 		return function;
 
@@ -504,6 +634,28 @@ void VapourSynthPluginsManager::loadVSRepoPath()
     }
 
     m_vsRepoPath = vsRepoPath;
+}
+
+QString VapourSynthPluginsManager::getPathsByVSRepo(const QString &a_key)
+{
+    QProcess * process = new QProcess(this);
+    QStringList args;
+    args << m_vsRepoPath << "paths";
+
+    process->start("python", args);
+    process->waitForFinished();
+    process->setReadChannel(QProcess::StandardOutput);
+
+    QString resultPath;
+    while (process->canReadLine()) {
+        QString line = process->readLine().trimmed();
+        if (line.contains(a_key, Qt::CaseSensitive)) {
+            resultPath= line.split(" ")[1]; // e.g. "Binaries: C:\VS\plugins"
+            break;
+        }
+    }
+    process->close();
+    return resultPath;
 }
 
 // END OF void VapourSynthPluginsManager::loadVSRepoPath()

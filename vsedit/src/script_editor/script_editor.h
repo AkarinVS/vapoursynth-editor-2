@@ -46,6 +46,8 @@ public:
 
     void setPluginsList(const VSPluginsList & a_pluginsList);
 
+    void setPyScriptsList(const VSPyScriptsList & a_pyScriptsList);
+
 	void setSettingsManager(SettingsManager * a_pSettingsManager);
 
     QVector<QAction *> actionsForMenu() const;

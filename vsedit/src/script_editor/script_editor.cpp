@@ -67,6 +67,7 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	m_pCompleter->setCompletionMode(QCompleter::PopupCompletion);
 	m_pCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 	m_pCompleter->setWrapAround(false);
+    m_pCompleter->popup()->setMaximumWidth(400);
 
 	m_pSyntaxHighlighter = new SyntaxHighlighter(document());
 
@@ -162,10 +163,19 @@ void ScriptEditor::setPluginsList(const VSPluginsList & a_pluginsList)
 {
 	m_pCompleterModel->setPluginsList(a_pluginsList);
     m_pSyntaxHighlighter->setPluginsList(a_pluginsList);
-	update();
+    update();
 }
 
 // END OF void ScriptEditor::setPluginsList(const VSPluginsList & a_pluginsList)
+//==============================================================================
+
+void ScriptEditor::setPyScriptsList(const VSPyScriptsList & a_pyScriptsList)
+{
+    m_pCompleterModel->setPyScriptsList(a_pyScriptsList);
+    update();
+}
+
+// END OF void ScriptEditor::setPyScriptsList(const VSPyScriptsList & a_pyScriptsList)
 //==============================================================================
 
 void ScriptEditor::setSettingsManager(SettingsManager * a_pSettingsManager)

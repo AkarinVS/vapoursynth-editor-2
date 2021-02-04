@@ -48,11 +48,43 @@ void ScriptCompleterModel::setPluginsList(const VSPluginsList & a_pluginsList)
 			QStandardItem * pFunctionItem = new QStandardItem(signature);
 			pPluginItem->appendRow(pFunctionItem);
 		}
-	}
+    }
 }
 
 // END OF void ScriptCompleterModel::setPluginsList(
 //		const VSPluginsList & a_pluginsList)
+//==============================================================================
+
+void ScriptCompleterModel::setPyScriptsList(const VSPyScriptsList &a_pyScriptsList)
+{
+    QStandardItem * pRootItem = invisibleRootItem();
+
+    for (const auto & module : a_pyScriptsList) {
+        QStandardItem * pModuleItem = new QStandardItem(module.moduleName);
+        pRootItem->appendRow(pModuleItem);
+
+        for(const auto & function : module.functions)
+        {
+            QStringList argumentsList;
+            for(const auto & argument : function.arguments) {
+                if (argument.value == "") {
+                    argumentsList << QString("%1").arg(argument.name);
+                } else {
+                    // not working yet, arg values are all empty
+                    argumentsList << QString("%1=%2").arg(argument.name).arg(argument.value);
+                }
+            }
+            QString signature = QString("%1(%2)").arg(function.name)
+                    .arg(argumentsList.join(", "));
+
+            QStandardItem * pFunctionItem = new QStandardItem(signature);
+            pModuleItem->appendRow(pFunctionItem);
+        }
+    }
+}
+
+// END OF void ScriptCompleterModel::setPyScriptsList(
+//		const VSPyScriptsList &a_pyScriptsList)
 //==============================================================================
 
 void ScriptCompleterModel::setCoreName(const QString & a_coreName)
