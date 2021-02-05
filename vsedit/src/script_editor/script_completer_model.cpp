@@ -46,6 +46,9 @@ void ScriptCompleterModel::setPluginsList(const VSPluginsList & a_pluginsList)
 				.arg(argumentsList.join(", "));
 
 			QStandardItem * pFunctionItem = new QStandardItem(signature);
+            pFunctionItem->setData(signature, Qt::UserRole);
+            pFunctionItem->setData(function.name, Qt::DisplayRole); // shorter version
+
 			pPluginItem->appendRow(pFunctionItem);
 		}
     }
@@ -76,7 +79,10 @@ void ScriptCompleterModel::setPyScriptsList(const VSPyScriptsList &a_pyScriptsLi
             QString signature = QString("%1(%2)").arg(function.name)
                     .arg(argumentsList.join(", "));
 
-            QStandardItem * pFunctionItem = new QStandardItem(signature);
+            QStandardItem * pFunctionItem = new QStandardItem();
+            pFunctionItem->setData(signature, Qt::UserRole);
+            pFunctionItem->setData(function.name, Qt::DisplayRole); // shorter version
+
             pModuleItem->appendRow(pFunctionItem);
         }
     }

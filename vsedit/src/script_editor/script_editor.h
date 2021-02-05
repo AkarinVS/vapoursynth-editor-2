@@ -60,7 +60,7 @@ public slots:
 
 	void slotComplete();
 
-	void slotInsertCompletion(const QString & a_completionString);
+    void slotInsertCompletion(const QModelIndex &index);
 
     void slotDuplicateSelection();
 
@@ -157,7 +157,7 @@ private:
 
 	SyntaxHighlighter * m_pSyntaxHighlighter;
 
-	int m_typedCharacters;
+    int m_typedCharactersCounter;
 
 	int m_charactersTypedToStartCompletion;
 

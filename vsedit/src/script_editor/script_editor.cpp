@@ -35,7 +35,7 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	, m_pCompleterModel(nullptr)
 	, m_pCompleter(nullptr)
 	, m_pSyntaxHighlighter(nullptr)
-	, m_typedCharacters(0)
+    , m_typedCharactersCounter(0)
 	, m_charactersTypedToStartCompletion(
 		DEFAULT_CHARACTERS_TYPED_TO_START_COMPLETION)
 	, m_plainText()
@@ -67,14 +67,14 @@ ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	m_pCompleter->setCompletionMode(QCompleter::PopupCompletion);
 	m_pCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 	m_pCompleter->setWrapAround(false);
-    m_pCompleter->popup()->setMaximumWidth(400);
+    m_pCompleter->popup()->setMaximumWidth(350);
 
 	m_pSyntaxHighlighter = new SyntaxHighlighter(document());
 
 	fillVariables();
 
-	connect(m_pCompleter, SIGNAL(activated(const QString &)),
-		this, SLOT(slotInsertCompletion(const QString &)));
+    connect(m_pCompleter, QOverload<const QModelIndex &>::of(&QCompleter::activated),
+        this, &ScriptEditor::slotInsertCompletion);
 	connect(this, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
 	connect(this, SIGNAL(blockCountChanged(int)),
 		this, SLOT(slotUpdateSideBoxWidth()));
@@ -248,15 +248,18 @@ void ScriptEditor::slotComplete()
 	QString lineString = currentCursor.block().text();
 	int cursorIndex = currentCursor.positionInBlock();
 	int wordStart = cursorIndex;
-	while((wordStart > 0) && (lineString[wordStart - 1].isLetterOrNumber() ||
-		(QString("._").contains(lineString[wordStart - 1]))))
+
+    // count . and _ as a character in a word
+    while((wordStart > 0) && (lineString[wordStart - 1].isLetterOrNumber() ||
+        (QString("._").contains(lineString[wordStart - 1]))))
 		wordStart--;
-	m_typedCharacters = cursorIndex - wordStart;
-	QString typedWord = lineString.mid(wordStart, m_typedCharacters);
+
+    m_typedCharactersCounter = cursorIndex - wordStart;
+    QString typedWord = lineString.mid(wordStart, m_typedCharactersCounter);
 
     int charactersAfterDot = -1;
     if (typedWord.count() > 0) {
-        charactersAfterDot = m_typedCharacters - typedWord.lastIndexOf('.') - 1;
+        charactersAfterDot = m_typedCharactersCounter - typedWord.lastIndexOf('.') - 1;
     }
 
 	QAction * pAction = qobject_cast<QAction *>(sender());
@@ -280,14 +283,17 @@ void ScriptEditor::slotComplete()
 // END OF void ScriptEditor::slotComplete()
 //==============================================================================
 
-void ScriptEditor::slotInsertCompletion(const QString & a_completionString)
+void ScriptEditor::slotInsertCompletion(const QModelIndex &index)
 {
-	QTextCursor currentCursor = textCursor();
-	currentCursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor,
-		m_typedCharacters);
-	currentCursor.deleteChar();
-	setTextCursor(currentCursor);
-	insertPlainText(a_completionString);
+    QTextCursor currentCursor = textCursor();
+    currentCursor.select(QTextCursor::WordUnderCursor);
+    currentCursor.removeSelectedText();
+
+    if (index.data(Qt::UserRole).isValid()) {
+        insertPlainText(index.data(Qt::UserRole).toString());
+    } else {
+        insertPlainText(index.data(Qt::DisplayRole).toString());
+    }
 }
 
 // END OF void ScriptEditor::slotInsertCompletion(
