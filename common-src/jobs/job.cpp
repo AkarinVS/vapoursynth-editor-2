@@ -1325,18 +1325,17 @@ void vsedit::Job::startEncodeScriptCLI()
 
 	QString executable = vsedit::resolvePathFromApplication(
 		m_properties.executablePath);
-	QString decodedArguments =
-		decodeArguments(m_properties.arguments);
-	QString commandLine = QString("\"%1\" %2").arg(executable)
-		.arg(decodedArguments);
+    QStringList decodedArguments =
+        decodeArguments(m_properties.arguments).split(" "); // decodeArguments() not necessary?
 
     emit signalLogMessage(tr("Command line:"));
-	emit signalLogMessage(commandLine);
+    emit signalLogMessage(QString("%1 %2")
+                          .arg(executable).arg(decodedArguments.join(" ")));
 
     emit signalLogMessage(tr("Checking the encoder sanity."));
 	m_encodingState = EncodingState::CheckingEncoderSanity;
 
-	m_process.start(commandLine);
+    m_process.start(executable, decodedArguments);
 	if(!m_process.waitForStarted(3000))
 	{
         emit signalLogMessage(tr("Encoder wouldn't start."),
@@ -1360,7 +1359,7 @@ void vsedit::Job::startEncodeScriptCLI()
 
     emit signalLogMessage(tr("Encoder seems sane. Starting."));
 	m_encodingState = EncodingState::StartingEncoder;
-	m_process.start(commandLine);
+    m_process.start(executable, decodedArguments);
 }
 
 // END OF void vsedit::Job::startEncodeScriptCLI()
@@ -1371,14 +1370,13 @@ void vsedit::Job::startRunProcess()
 	changeStateAndNotify(JobState::Running);
 
 	QString executable = vsedit::resolvePathFromApplication(
-		m_properties.executablePath);
-	QString commandLine = QString("\"%1\" %2").arg(executable)
-		.arg(m_properties.arguments);
+        m_properties.executablePath);
+    QStringList argumentsList = m_properties.arguments.simplified().split(" ");
 
     emit signalLogMessage(tr("Command line:"));
-	emit signalLogMessage(commandLine);
+    emit signalLogMessage(QString("%1 %2").arg(executable).arg(m_properties.arguments));
 
-	m_process.start(commandLine);
+    m_process.start(executable, argumentsList);
 }
 
 // END OF void vsedit::Job::startRunProcess()
@@ -1395,7 +1393,8 @@ void vsedit::Job::startRunShellCommand()
 	command = "/bin/sh -c %1";
 #endif
 
-	QProcess::startDetached(command.arg(m_properties.shellCommand));
+    QStringList commandList = command.arg(m_properties.shellCommand).simplified().split(" ");
+    QProcess::startDetached(QString(""), commandList); // dummy holder for the program position
 	changeStateAndNotify(JobState::Completed);
 }
 
