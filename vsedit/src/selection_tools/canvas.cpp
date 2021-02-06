@@ -60,10 +60,10 @@ QString Canvas::selectionXYToString()
         return QString("%1, %2, %3, %4").arg(int(rectXY[0])).arg(int(rectXY[1]))
                 .arg(int(rectXY[2])).arg(int(rectXY[3]));
     } else {
-        int convertedMinX = rectXY[0] * revertFactor;
-        int convertedMinY = rectXY[1] * revertFactor;
-        int convertedMaxX = rectXY[2] * revertFactor;
-        int convertedMaxY = rectXY[3] * revertFactor;
+        int convertedMinX = int(rectXY[0]) * int(revertFactor);
+        int convertedMinY = int(rectXY[1]) * int(revertFactor);
+        int convertedMaxX = int(rectXY[2]) * int(revertFactor);
+        int convertedMaxY = int(rectXY[3]) * int(revertFactor);
 
         return QString("%1, %2, %3, %4").arg(convertedMinX).arg(convertedMinY)
                 .arg(convertedMaxX).arg(convertedMaxY);

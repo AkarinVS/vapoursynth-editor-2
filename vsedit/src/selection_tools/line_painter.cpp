@@ -38,7 +38,7 @@ void LinePainter::updateSelectionRect()
     m_minY *= m_scaleFactor;
     m_maxY *= m_scaleFactor;
 
-    QRect selectionRect(m_minX, m_minY, m_maxX - m_minX, m_maxY - m_minY);
+    QRect selectionRect(int(m_minX), int(m_minY), int(m_maxX - m_minX), int(m_maxY - m_minY));
     painter.drawRect(selectionRect);
 }
 
@@ -143,6 +143,6 @@ void LinePainter::createSelectedRect()
     QPainter painter(&m_selectionPixmap);
     painter.setPen(QPen(Qt::red, 2));
 
-    painter.drawRect(QRect(m_minX, m_minY, m_maxX - m_minX, m_maxY - m_minY));
+    painter.drawRect(QRect(int(m_minX), int(m_minY), int(m_maxX - m_minX), int(m_maxY - m_minY)));
     m_pathPoints.clear();
 }

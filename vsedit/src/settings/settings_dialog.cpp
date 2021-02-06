@@ -21,7 +21,7 @@
 
 SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
 	QWidget * a_pParent) :
-	QDialog(a_pParent, (Qt::WindowFlags)0
+    QDialog(a_pParent, Qt::WindowFlags()
 		| Qt::Dialog
 		| Qt::CustomizeWindowHint
 		| Qt::WindowTitleHint
@@ -133,8 +133,8 @@ void SettingsDialog::slotCall()
 		m_pSettingsManager->getPromptToSaveChanges());
 	m_ui.portableModeCheckBox->setChecked(
 		m_pSettingsManager->getPortableMode());
-	m_ui.maxRecentFilesSpinBox->setValue(
-		m_pSettingsManager->getMaxRecentFilesNumber());
+    m_ui.maxRecentFilesSpinBox->setValue(
+        int(m_pSettingsManager->getMaxRecentFilesNumber()));
 	m_ui.charactersTypedToStartCompletionSpinBox->setValue(
 		m_pSettingsManager->getCharactersTypedToStartCompletion());
 	m_ui.useSpacesAsTabCheckBox->setChecked(
@@ -408,7 +408,7 @@ void SettingsDialog::slotApply()
 	m_pSettingsManager->setPortableMode(
 		m_ui.portableModeCheckBox->isChecked());
 	m_pSettingsManager->setMaxRecentFilesNumber(
-		m_ui.maxRecentFilesSpinBox->value());
+        uint32_t(m_ui.maxRecentFilesSpinBox->value()));
 	m_pSettingsManager->setCharactersTypedToStartCompletion(
 		m_ui.charactersTypedToStartCompletionSpinBox->value());
 	m_pSettingsManager->setUseSpacesAsTab(

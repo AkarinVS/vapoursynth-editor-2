@@ -741,7 +741,7 @@ void vsedit::Job::slotProcessStarted()
                 emit signalLogMessage(tr("Y4M header: ") +
 					QString::fromLatin1(videoHeader), LOG_STYLE_DEBUG);
 
-			m_bytesToWrite = videoHeader.size();
+            m_bytesToWrite = size_t(videoHeader.size());
 			if(m_bytesToWrite > 0)
 			{
 				m_bytesWritten = 0;
@@ -988,9 +988,9 @@ void vsedit::Job::slotProcessBytesWritten(qint64 a_bytes)
 		return;
 	}
 
-	m_bytesWritten += a_bytes;
+    m_bytesWritten += size_t(a_bytes);
 
-	if((m_bytesWritten + m_process.bytesToWrite()) < m_bytesToWrite)
+    if((m_bytesWritten + size_t(m_process.bytesToWrite())) < m_bytesToWrite)
 	{
         emit signalLogMessage(tr("Encoder has lost written "
 			"data. Aborting."), LOG_STYLE_ERROR);
@@ -1404,13 +1404,11 @@ void vsedit::Job::startRunShellCommand()
 QString vsedit::Job::decodeArguments(const QString & a_arguments) const
 {
 	QString decodedString = a_arguments.simplified();
-
 	for(const vsedit::VariableToken & variable : m_variables)
 	{
 		decodedString = decodedString.replace(variable.token,
 			variable.evaluate());
 	}
-
 	return decodedString;
 }
 
@@ -1487,10 +1485,10 @@ void vsedit::Job::processFramesQueue()
 		int prefixSize = framePrefix.size();
 		if(prefixSize > 0)
 		{
-			if((size_t)prefixSize > m_framebuffer.size())
-				m_framebuffer.resize(prefixSize);
-			memcpy(m_framebuffer.data(), framePrefix.data(), prefixSize);
-			currentDataSize += prefixSize;
+            if(size_t(prefixSize) > m_framebuffer.size())
+                m_framebuffer.resize(size_t(prefixSize));
+            memcpy(m_framebuffer.data(), framePrefix.data(), size_t(prefixSize));
+            currentDataSize += size_t(prefixSize);
 		}
 	}
 
@@ -1503,14 +1501,14 @@ void vsedit::Job::processFramesQueue()
 		int height = m_cpVSAPI->getFrameHeight(frame.cpOutputFrameRef, i);
 		int bytes = cpFormat->bytesPerSample;
 
-		size_t planeSize = width * bytes * height;
+        size_t planeSize = size_t(width) * size_t(bytes) * size_t(height);
 		size_t neededFramebufferSize = currentDataSize + planeSize;
 		if(neededFramebufferSize > m_framebuffer.size())
 			m_framebuffer.resize(neededFramebufferSize);
 		int framebufferStride = width * bytes;
 
 		vs_bitblt(m_framebuffer.data() + currentDataSize, framebufferStride,
-			cpPlane, stride, framebufferStride, height);
+            cpPlane, stride, size_t(framebufferStride), size_t(height));
 
 		currentDataSize += planeSize;
 	}
@@ -1522,12 +1520,12 @@ void vsedit::Job::processFramesQueue()
 		int postfixSize = framePostfix.size();
 		if(postfixSize > 0)
 		{
-			size_t neededFramebufferSize = currentDataSize + postfixSize;
+            size_t neededFramebufferSize = currentDataSize + size_t(postfixSize);
 			if(neededFramebufferSize > m_framebuffer.size())
 				m_framebuffer.resize(neededFramebufferSize);
 			memcpy(m_framebuffer.data() + currentDataSize,
-				framePostfix.data(), postfixSize);
-			currentDataSize += postfixSize;
+                framePostfix.data(), size_t(postfixSize));
+            currentDataSize += size_t(postfixSize);
 		}
 	}
 
@@ -1535,7 +1533,7 @@ void vsedit::Job::processFramesQueue()
 	m_bytesToWrite = currentDataSize;
 	m_bytesWritten = 0;
 	qint64 bytesWritten =
-		m_process.write(m_framebuffer.data(), (qint64)m_bytesToWrite);
+        m_process.write(m_framebuffer.data(), qint64(m_bytesToWrite));
 	if(bytesWritten < 0)
 	{
 		m_encodingState = EncodingState::Aborting;
@@ -1608,7 +1606,7 @@ void vsedit::Job::updateFPS()
 	const JobState validStates[] = {JobState::Running, JobState::Pausing};
 	if(vsedit::contains(validStates, m_properties.jobState))
 		totalTime += currentEncodingRangeTime();
-	m_properties.fps = (double)m_properties.framesProcessed / totalTime;
+    m_properties.fps = double(m_properties.framesProcessed) / totalTime;
 }
 
 // END OF void vsedit::Job::updateFPS()

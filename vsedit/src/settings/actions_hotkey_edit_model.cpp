@@ -80,19 +80,19 @@ QVariant ActionsHotkeyEditModel::data(const QModelIndex & a_index, int a_role)
 	if(!a_index.isValid())
 		return QVariant();
 
-	if((a_index.row() >= (int)m_actions.size()) ||
+    if((a_index.row() >= int(m_actions.size())) ||
 		(a_index.column() >= COLUMNS_NUMBER))
 		return QVariant();
 
 	if((a_index.column() == ICON_COLUMN) && (a_role == Qt::DecorationRole))
-		return m_actions[a_index.row()].icon;
+        return m_actions[size_t(a_index.row())].icon;
 	else if((a_index.column() == TITLE_COLUMN) &&
 		((a_role == Qt::DisplayRole) || (a_role == Qt::ToolTipRole)))
-		return m_actions[a_index.row()].title;
+        return m_actions[size_t(a_index.row())].title;
 	else if((a_index.column() == HOTKEY_COLUMN) &&
 		((a_role == Qt::DisplayRole) || (a_role == Qt::ToolTipRole) ||
 		(a_role == Qt::EditRole)))
-		return m_actions[a_index.row()].hotkey;
+        return m_actions[size_t(a_index.row())].hotkey;
 
 	return QVariant();
 }
@@ -104,7 +104,7 @@ QVariant ActionsHotkeyEditModel::data(const QModelIndex & a_index, int a_role)
 int ActionsHotkeyEditModel::rowCount(const QModelIndex & a_parent) const
 {
 	(void)a_parent;
-	return (int)m_actions.size();
+    return int(m_actions.size());
 }
 
 // END OF int ActionsHotkeyEditModel::rowCount(const QModelIndex & a_parent)
@@ -127,7 +127,7 @@ bool ActionsHotkeyEditModel::setData(const QModelIndex & a_index,
 	if((a_index.column() != HOTKEY_COLUMN) || (a_role != Qt::EditRole))
 		return false;
 
-	m_actions[a_index.row()].hotkey = a_value.value<QKeySequence>();
+    m_actions[size_t(a_index.row())].hotkey = a_value.value<QKeySequence>();
 	return true;
 }
 
@@ -140,7 +140,7 @@ void ActionsHotkeyEditModel::reloadHotkeysSettings()
 	for(StandardAction & action : m_actions)
 		action.hotkey = m_pSettingsManager->getHotkey(action.id);
 	emit dataChanged(createIndex(HOTKEY_COLUMN, 0),
-		createIndex(HOTKEY_COLUMN, (int)m_actions.size() - 1));
+        createIndex(HOTKEY_COLUMN, int(m_actions.size()) - 1));
 }
 
 // END OF void ActionsHotkeyEditModel::reloadHotkeysSettings()

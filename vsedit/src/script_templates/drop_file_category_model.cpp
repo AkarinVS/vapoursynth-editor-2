@@ -78,18 +78,18 @@ QVariant DropFileCategoryModel::data(const QModelIndex & a_index, int a_role)
 	if(!a_index.isValid())
 		return QVariant();
 
-	if((a_index.row() >= (int)m_categories.size()) ||
+    if((a_index.row() >= int(m_categories.size())) ||
 		(a_index.column() >= COLUMNS_NUMBER))
 		return QVariant();
 
 	if((a_index.column() == NAME_COLUMN) &&
 		((a_role == Qt::DisplayRole) || (a_role == Qt::ToolTipRole) ||
 		(a_role == Qt::EditRole)))
-		return m_categories[a_index.row()].name;
+        return m_categories[size_t(a_index.row())].name;
 	else if((a_index.column() == MASK_LIST_COLUMN) &&
 		((a_role == Qt::DisplayRole) || (a_role == Qt::ToolTipRole) ||
 		(a_role == Qt::EditRole)))
-		return m_categories[a_index.row()].maskList.join(MASK_LIST_SPLITTER);
+        return m_categories[size_t(a_index.row())].maskList.join(MASK_LIST_SPLITTER);
 
 	return QVariant();
 }
@@ -123,7 +123,7 @@ QVariant DropFileCategoryModel::headerData(int a_section,
 int DropFileCategoryModel::rowCount(const QModelIndex & a_parent) const
 {
 	(void)a_parent;
-	return (int)m_categories.size();
+    return int(m_categories.size());
 }
 
 // END OF int DropFileCategoryModel::rowCount(const QModelIndex & a_parent)
@@ -146,32 +146,35 @@ bool DropFileCategoryModel::setData(const QModelIndex & a_index,
 	if(a_role != Qt::EditRole)
 		return false;
 
-	if((a_index.row() >= (int)m_categories.size()) ||
+    if((a_index.row() >= int(m_categories.size())) ||
 		(a_index.column() >= COLUMNS_NUMBER))
 		return false;
 
 	if(a_index.column() == NAME_COLUMN)
 	{
-		for(int i = 0; i < (int)m_categories.size(); ++i)
+        for(int i = 0; i < int(m_categories.size()); ++i)
 		{
 			if((i != a_index.row()) &&
-				(m_categories[i].name == a_value.toString()))
+                (m_categories[size_t(i)].name == a_value.toString()))
 				return false;
 		}
-		m_categories[a_index.row()].name = a_value.toString();
+        m_categories[size_t(a_index.row())].name = a_value.toString();
 		return true;
 	}
 
 	if(a_index.column() == MASK_LIST_COLUMN)
 	{
 		QStringList maskList = a_value.toString().split(MASK_LIST_SPLITTER);
-		for(int i = 0; i < (int)m_categories.size(); ++i)
+        for(int i = 0; i < int(m_categories.size()); ++i)
 		{
 			if(i == a_index.row())
-				continue;
-			QSet<QString> intersection =
-				maskList.toSet().intersect(m_categories[i].maskList.toSet());
-			if(intersection.size() > 0)
+                continue;
+            QSet<QString> maskSet(maskList.begin(), maskList.end());
+            QSet<QString> savedSet(m_categories[size_t(i)].maskList.begin(),
+                                   m_categories[size_t(i)].maskList.end());
+
+            auto intersection = maskSet.intersect(savedSet);
+            if(intersection.size() > 0)
 				return false;
 		}
 
@@ -185,7 +188,7 @@ bool DropFileCategoryModel::setData(const QModelIndex & a_index,
 				return false;
 		}
 
-		m_categories[a_index.row()].maskList = maskList;
+        m_categories[size_t(a_index.row())].maskList = maskList;
 		return true;
 	}
 
@@ -218,8 +221,8 @@ void DropFileCategoryModel::setCategories(
 
 void DropFileCategoryModel::addCategory()
 {
-	beginInsertRows(QModelIndex(), (int)m_categories.size(),
-		(int)m_categories.size());
+    beginInsertRows(QModelIndex(), int(m_categories.size()),
+        int(m_categories.size()));
 	m_categories.emplace_back();
 	endInsertRows();
 }
@@ -229,7 +232,7 @@ void DropFileCategoryModel::addCategory()
 
 void DropFileCategoryModel::deleteCategory(int a_index)
 {
-	if(a_index >= (int)m_categories.size())
+    if(a_index >= int(m_categories.size()))
 		return;
 	beginRemoveRows(QModelIndex(), a_index, a_index);
 	m_categories.erase(m_categories.begin() + a_index);
@@ -241,9 +244,9 @@ void DropFileCategoryModel::deleteCategory(int a_index)
 
 QString DropFileCategoryModel::sourceTemplate(int a_index) const
 {
-	if(a_index >= (int)m_categories.size())
+    if(a_index >= int(m_categories.size()))
 		return QString();
-	return m_categories[a_index].sourceTemplate;
+    return m_categories[size_t(a_index)].sourceTemplate;
 }
 
 // END OF QString DropFileCategoryModel::sourceTemplate(int a_index) const
@@ -252,9 +255,9 @@ QString DropFileCategoryModel::sourceTemplate(int a_index) const
 void DropFileCategoryModel::setSourceTemplate(int a_index,
 	const QString & a_text)
 {
-	if(a_index >= (int)m_categories.size())
+    if(a_index >= int(m_categories.size()))
 		return;
-	m_categories[a_index].sourceTemplate = a_text;
+    m_categories[size_t(a_index)].sourceTemplate = a_text;
 }
 
 // END OF void DropFileCategoryModel::setSourceTemplate(int a_index,
