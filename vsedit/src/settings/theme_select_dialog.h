@@ -16,7 +16,7 @@ class ThemeSelectDialog : public QDialog
 public:
     explicit ThemeSelectDialog(QStringList a_pThemePresetList,
                                ThemeSelectionFlag a_flag, QWidget *parent = nullptr);
-    ~ThemeSelectDialog();
+    ~ThemeSelectDialog() override;
 
 signals:
 

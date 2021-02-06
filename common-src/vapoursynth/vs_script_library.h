@@ -32,7 +32,7 @@ public:
 	VSScriptLibrary(SettingsManagerCore * a_pSettingsManager,
 		QObject * a_pParent = nullptr);
 
-	virtual ~VSScriptLibrary();
+    virtual ~VSScriptLibrary() override;
 
 	bool initialize();
 

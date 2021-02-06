@@ -13,11 +13,11 @@ class TimeLineSlider : public QWidget
 {
 	Q_OBJECT
 
-public:
+public:    
 
 	TimeLineSlider(QWidget * a_pParent = nullptr);
 
-	virtual ~TimeLineSlider();
+        virtual ~TimeLineSlider() override;
 
 	enum DisplayMode
 	{
@@ -39,7 +39,7 @@ public:
 
 	void setFrame(int a_frame);
 
-    void setFramesNumber(int a_framesNumber);
+        void setFramesNumber(int a_framesNumber);
 
 	void setFPS(double a_fps);
 
@@ -76,27 +76,24 @@ public slots:
 signals:
 
 	void signalSliderMoved(int a_frame);
-
-    void signalFrameChanged(int a_frame);
-
-    void signalFrameRangeChanged(int a_min, int a_max);
-
+        void signalFrameChanged(int a_frame);
+        void signalFrameRangeChanged(int a_min, int a_max);
 	void signalSliderPressed();
-    void signalSliderReleased();
+        void signalSliderReleased();
 
 protected:
 
-	void keyPressEvent(QKeyEvent * a_pEvent);
+        void keyPressEvent(QKeyEvent * a_pEvent) override;
 
-	void mouseMoveEvent(QMouseEvent * a_pEvent);
+        void mouseMoveEvent(QMouseEvent * a_pEvent) override;
 
-	void mousePressEvent(QMouseEvent * a_pEvent);
+        void mousePressEvent(QMouseEvent * a_pEvent) override;
 
-	void mouseReleaseEvent(QMouseEvent * a_pEvent);
+        void mouseReleaseEvent(QMouseEvent * a_pEvent) override;
 
-	void paintEvent(QPaintEvent * a_pEvent);
+        void paintEvent(QPaintEvent * a_pEvent) override;
 
-	void wheelEvent(QWheelEvent * a_pEvent);
+        void wheelEvent(QWheelEvent * a_pEvent) override;
 
 private:
 

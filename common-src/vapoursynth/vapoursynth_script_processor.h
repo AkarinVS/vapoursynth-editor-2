@@ -23,7 +23,7 @@ public:
 	VapourSynthScriptProcessor(SettingsManagerCore * a_pSettingsManager,
 		VSScriptLibrary * a_pVSScriptLibrary, QObject * a_pParent = nullptr);
 
-	virtual ~VapourSynthScriptProcessor();
+    virtual ~VapourSynthScriptProcessor() override;
 
 	bool initialize(const QString& a_script, const QString& a_scriptName);
 

@@ -14,7 +14,7 @@ public:
 	PreviewAdvancedSettingsDialog(SettingsManager * a_pSettingsManager,
 		QWidget * a_pParent = nullptr);
 
-	virtual ~PreviewAdvancedSettingsDialog();
+    virtual ~PreviewAdvancedSettingsDialog() override;
 
 public slots:
 

@@ -14,7 +14,7 @@ public:
 	ActionsHotkeyEditModel(SettingsManager * a_pSettingsManager,
 		QObject * a_pParent = nullptr);
 
-	virtual ~ActionsHotkeyEditModel();
+    virtual ~ActionsHotkeyEditModel() override;
 
 	QModelIndex index(int a_row, int a_column,
 		const QModelIndex & a_parent = QModelIndex()) const override;

@@ -184,7 +184,7 @@ void BookmarkModel::addChapter(QString a_title, int a_timeInMilli, double a_fps)
     }
 
     const int newRow = m_bookmarkData.size();
-    const int frameIndex  = double(a_timeInMilli) / double(1000) * a_fps;
+    const int frameIndex  = int(double(a_timeInMilli) / double(1000) * a_fps);
 
     beginInsertRows(QModelIndex(), newRow, newRow);
         BookmarkData data = {a_title, frameIndex, a_timeInMilli };

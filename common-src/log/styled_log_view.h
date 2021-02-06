@@ -17,7 +17,7 @@ public:
 	static const size_t DEFAULT_MAX_ENTRIES_TO_SHOW;
 
 	StyledLogView(QWidget * a_pParent = nullptr);
-	virtual ~StyledLogView();
+    virtual ~StyledLogView() override;
 
 	virtual TextBlockStyle getStyle(const QString & a_styleName) const;
 

@@ -22,28 +22,27 @@ struct aligned_allocator
 	typedef typename std::allocator<T>::pointer pointer;
 	typedef typename std::allocator<T>::const_pointer const_pointer;
 
-
 	template <class U>
 	struct rebind
 	{
 		typedef aligned_allocator<U, Alignment> other;
 	};
 
-	aligned_allocator() throw()
-	{
+    aligned_allocator() noexcept
+    {
 	}
 
-	aligned_allocator(const aligned_allocator & other) throw() :
+    aligned_allocator(const aligned_allocator & other) noexcept :
 		std::allocator<T>(other)
 	{
 	}
 
 	template <class U>
-	aligned_allocator(const aligned_allocator<U, Alignment> &) throw()
+    aligned_allocator(const aligned_allocator<U, Alignment> &) noexcept
 	{
 	}
 
-	~aligned_allocator() throw()
+    ~aligned_allocator() noexcept
 	{
 	}
 

@@ -33,7 +33,7 @@ public:
 		SettingsManagerCore * a_pSettingsManager = nullptr,
 		VSScriptLibrary * a_pVSScriptLibrary = nullptr,
 		QObject * a_pParent = nullptr);
-	virtual ~Job();
+    virtual ~Job() override;
 
 	enum class EncodingState
 	{

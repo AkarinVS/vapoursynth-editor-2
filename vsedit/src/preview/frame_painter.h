@@ -10,7 +10,7 @@ class FramePainter : public QWidget
 public:
     explicit FramePainter(QWidget *parent = nullptr);
 
-    void virtual paintEvent(QPaintEvent *);
+    void virtual paintEvent(QPaintEvent *) override;
 
     void drawFrame(const QPixmap &a_framePixmap);
 
@@ -22,7 +22,7 @@ private:
 
     QPixmap m_framePixmap;
 
-    qreal m_ratio;
+    double m_ratio;
 
 signals:
 

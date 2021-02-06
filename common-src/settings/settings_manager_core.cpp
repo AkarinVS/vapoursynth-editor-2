@@ -220,40 +220,40 @@ bool SettingsManagerCore::setVapourSynthPluginsPaths(
 
 ResamplingFilter SettingsManagerCore::getChromaResamplingFilter() const
 {
-	return (ResamplingFilter)value(CHROMA_RESAMPLING_FILTER_KEY,
-		(int)DEFAULT_CHROMA_RESAMPLING_FILTER).toInt();
+    return ResamplingFilter(value(CHROMA_RESAMPLING_FILTER_KEY,
+        int(DEFAULT_CHROMA_RESAMPLING_FILTER)).toInt());
 }
 
 bool SettingsManagerCore::setChromaResamplingFilter(ResamplingFilter a_filter)
 {
-	return setValue(CHROMA_RESAMPLING_FILTER_KEY, (int)a_filter);
+    return setValue(CHROMA_RESAMPLING_FILTER_KEY, int(a_filter));
 }
 
 //==============================================================================
 
 YuvMatrixCoefficients SettingsManagerCore::getYuvMatrixCoefficients() const
 {
-	return (YuvMatrixCoefficients)value(YUV_MATRIX_COEFFICIENTS_KEY,
-		(int)DEFAULT_YUV_MATRIX_COEFFICIENTS).toInt();
+    return YuvMatrixCoefficients(value(YUV_MATRIX_COEFFICIENTS_KEY,
+        int(DEFAULT_YUV_MATRIX_COEFFICIENTS)).toInt());
 }
 
 bool SettingsManagerCore::setYuvMatrixCoefficients(
 	YuvMatrixCoefficients a_matrix)
 {
-	return setValue(YUV_MATRIX_COEFFICIENTS_KEY, (int)a_matrix);
+    return setValue(YUV_MATRIX_COEFFICIENTS_KEY, int(a_matrix));
 }
 
 //==============================================================================
 
 ChromaPlacement SettingsManagerCore::getChromaPlacement() const
 {
-	return (ChromaPlacement)value(CHROMA_PLACEMENT_KEY,
-		(int)DEFAULT_CHROMA_PLACEMENT).toInt();
+    return ChromaPlacement(value(CHROMA_PLACEMENT_KEY,
+        int(DEFAULT_CHROMA_PLACEMENT)).toInt());
 }
 
 bool SettingsManagerCore::setChromaPlacement(ChromaPlacement a_placement)
 {
-	return setValue(CHROMA_PLACEMENT_KEY, (int)a_placement);
+    return setValue(CHROMA_PLACEMENT_KEY, int(a_placement));
 }
 
 //==============================================================================
@@ -310,12 +310,12 @@ std::vector<EncodingPreset> SettingsManagerCore::getAllEncodingPresets() const
 
 		EncodingPreset preset;
 		preset.name = presetName;
-		preset.type = (EncodingType)settings.value(
-			ENCODING_PRESET_ENCODING_TYPE_KEY, (int)DEFAULT_ENCODING_TYPE)
-			.toInt();
-		preset.headerType = (EncodingHeaderType)settings.value(
-			ENCODING_PRESET_HEADER_TYPE_KEY, (int)DEFAULT_ENCODING_HEADER_TYPE)
-			.toInt();
+        preset.type = EncodingType(settings.value(
+            ENCODING_PRESET_ENCODING_TYPE_KEY, int(DEFAULT_ENCODING_TYPE))
+            .toInt());
+        preset.headerType = EncodingHeaderType(settings.value(
+            ENCODING_PRESET_HEADER_TYPE_KEY, int(DEFAULT_ENCODING_HEADER_TYPE))
+            .toInt());
 		preset.executablePath = settings.value(
 			ENCODING_PRESET_EXECUTABLE_PATH_KEY).toString();
 		preset.arguments = settings.value(
@@ -342,12 +342,12 @@ EncodingPreset SettingsManagerCore::getEncodingPreset(const QString & a_name) co
 	preset.name = a_name;
 	settings.beginGroup(a_name);
 
-	preset.type = (EncodingType)settings.value(
-		ENCODING_PRESET_ENCODING_TYPE_KEY, (int)DEFAULT_ENCODING_TYPE)
-		.toInt();
-	preset.headerType = (EncodingHeaderType)settings.value(
-		ENCODING_PRESET_HEADER_TYPE_KEY, (int)DEFAULT_ENCODING_HEADER_TYPE)
-		.toInt();
+    preset.type = EncodingType(settings.value(
+        ENCODING_PRESET_ENCODING_TYPE_KEY, int(DEFAULT_ENCODING_TYPE))
+        .toInt());
+    preset.headerType = EncodingHeaderType(settings.value(
+        ENCODING_PRESET_HEADER_TYPE_KEY, int(DEFAULT_ENCODING_HEADER_TYPE))
+        .toInt());
 	preset.executablePath = settings.value(
 		ENCODING_PRESET_EXECUTABLE_PATH_KEY).toString();
 	preset.arguments = settings.value(
@@ -362,9 +362,9 @@ bool SettingsManagerCore::saveEncodingPreset(const EncodingPreset & a_preset)
 	settings.beginGroup(ENCODING_PRESETS_GROUP);
 	settings.beginGroup(a_preset.name);
 
-	settings.setValue(ENCODING_PRESET_ENCODING_TYPE_KEY, (int)a_preset.type);
+    settings.setValue(ENCODING_PRESET_ENCODING_TYPE_KEY, int(a_preset.type));
 	settings.setValue(ENCODING_PRESET_HEADER_TYPE_KEY,
-		(int)a_preset.headerType);
+        int(a_preset.headerType));
 	settings.setValue(ENCODING_PRESET_EXECUTABLE_PATH_KEY,
 		a_preset.executablePath);
 	settings.setValue(ENCODING_PRESET_ARGUMENTS_KEY, a_preset.arguments);
@@ -411,10 +411,10 @@ std::vector<JobProperties> SettingsManagerCore::getJobs() const
 		else
 			job.id = QUuid(idString);
 
-		job.type = (JobType)settings.value(JOB_TYPE_KEY,
-			(int)DEFAULT_JOB_TYPE).toInt();
-		job.jobState = (JobState)settings.value(JOB_STATE_KEY,
-			(int)DEFAULT_JOB_STATE).toInt();
+        job.type = JobType(settings.value(JOB_TYPE_KEY,
+            int(DEFAULT_JOB_TYPE)).toInt());
+        job.jobState = JobState(settings.value(JOB_STATE_KEY,
+            int(DEFAULT_JOB_STATE)).toInt());
 
 		QStringList dependencyIdStrings =
 			settings.value(JOB_DEPENDS_ON_JOBS_KEY).toStringList();
@@ -429,11 +429,11 @@ std::vector<JobProperties> SettingsManagerCore::getJobs() const
 		job.scriptName = settings.value(JOB_SCRIPT_NAME_KEY).toString();
 		job.scriptText = settings.value(JOB_SCRIPT_TEXT_KEY).toString();
 
-		job.encodingType = (EncodingType)settings.value(JOB_ENCODING_TYPE_KEY,
-			(int)DEFAULT_ENCODING_TYPE).toInt();
-		job.encodingHeaderType = (EncodingHeaderType)settings.value(
+        job.encodingType = EncodingType(settings.value(JOB_ENCODING_TYPE_KEY,
+            int(DEFAULT_ENCODING_TYPE)).toInt());
+        job.encodingHeaderType = EncodingHeaderType(settings.value(
 			JOB_ENCODING_HEADER_TYPE_KEY,
-			(int)DEFAULT_ENCODING_HEADER_TYPE).toInt();
+            int(DEFAULT_ENCODING_HEADER_TYPE)).toInt());
 
 		job.executablePath = settings.value(JOB_EXECUTABLE_PATH_KEY).toString();
 		job.arguments = settings.value(JOB_ARGUMENTS_KEY).toString();
@@ -472,8 +472,8 @@ bool SettingsManagerCore::setJobs(const std::vector<JobProperties> & a_jobs)
 		settings.beginGroup(QString("%1").arg(i, 7, 10, QChar('0')));
 
 		settings.setValue(JOB_ID_KEY, job.id.toString());
-		settings.setValue(JOB_TYPE_KEY, (int)job.type);
-		settings.setValue(JOB_STATE_KEY, (int)job.jobState);
+        settings.setValue(JOB_TYPE_KEY, int(job.type));
+        settings.setValue(JOB_STATE_KEY, int(job.jobState));
 
 		QStringList dependencyIdStrings;
 		for(const QUuid & id : job.dependsOnJobIds)
@@ -484,9 +484,9 @@ bool SettingsManagerCore::setJobs(const std::vector<JobProperties> & a_jobs)
 		settings.setValue(JOB_TIME_ENDED_KEY, job.timeEnded);
 		settings.setValue(JOB_SCRIPT_NAME_KEY, job.scriptName);
 		settings.setValue(JOB_SCRIPT_TEXT_KEY, job.scriptText);
-		settings.setValue(JOB_ENCODING_TYPE_KEY, (int)job.encodingType);
+        settings.setValue(JOB_ENCODING_TYPE_KEY, int(job.encodingType));
 		settings.setValue(JOB_ENCODING_HEADER_TYPE_KEY,
-			(int)job.encodingHeaderType);
+            int(job.encodingHeaderType));
 		settings.setValue(JOB_EXECUTABLE_PATH_KEY, job.executablePath);
 		settings.setValue(JOB_ARGUMENTS_KEY, job.arguments);
 		settings.setValue(JOB_SHELL_COMMAND_KEY, job.shellCommand);

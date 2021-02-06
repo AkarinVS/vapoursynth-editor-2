@@ -19,15 +19,15 @@ public:
 
 	TemplatesDialog(SettingsManager * a_pSettingsManager,
 		QWidget * a_pParent = nullptr,
-		Qt::WindowFlags a_flags =
-        (Qt::WindowFlags)nullptr
-		| Qt::Window
-		| Qt::CustomizeWindowHint
-		| Qt::WindowMinimizeButtonHint
-		| Qt::WindowMaximizeButtonHint
-		| Qt::WindowCloseButtonHint);
+        Qt::WindowFlags a_flags =
+            Qt::WindowFlags()
+            | Qt::Window
+            | Qt::CustomizeWindowHint
+            | Qt::WindowMinimizeButtonHint
+            | Qt::WindowMaximizeButtonHint
+            | Qt::WindowCloseButtonHint);
 
-	virtual ~TemplatesDialog();
+    virtual ~TemplatesDialog() override;
 
 	void setPluginsList(const VSPluginsList & a_pluginsList);
 

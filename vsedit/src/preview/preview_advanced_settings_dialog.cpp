@@ -6,7 +6,7 @@
 
 PreviewAdvancedSettingsDialog::PreviewAdvancedSettingsDialog(
 	SettingsManager * a_pSettingsManager, QWidget * a_pParent) :
-	QDialog(a_pParent, (Qt::WindowFlags)0
+    QDialog(a_pParent, Qt::WindowFlags()
 		| Qt::Dialog
 		| Qt::CustomizeWindowHint
 		| Qt::WindowTitleHint
@@ -17,35 +17,35 @@ PreviewAdvancedSettingsDialog::PreviewAdvancedSettingsDialog(
 	setWindowIcon(QIcon(":settings.png"));
 
 	m_ui.yuvMatrixCoefficientsComboBox->addItem(
-        tr("709"), (int)YuvMatrixCoefficients::m709);
+        tr("709"), int(YuvMatrixCoefficients::m709));
 	m_ui.yuvMatrixCoefficientsComboBox->addItem(
-        tr("470BG"), (int)YuvMatrixCoefficients::m470BG);
+        tr("470BG"), int(YuvMatrixCoefficients::m470BG));
 	m_ui.yuvMatrixCoefficientsComboBox->addItem(
-        tr("170M"), (int)YuvMatrixCoefficients::m170M);
+        tr("170M"), int(YuvMatrixCoefficients::m170M));
 	m_ui.yuvMatrixCoefficientsComboBox->addItem(
-        tr("2020 NCL"), (int)YuvMatrixCoefficients::m2020_NCL);
+        tr("2020 NCL"), int(YuvMatrixCoefficients::m2020_NCL));
 	m_ui.yuvMatrixCoefficientsComboBox->addItem(
-        tr("2020 CL"), (int)YuvMatrixCoefficients::m2020_CL);
+        tr("2020 CL"), int(YuvMatrixCoefficients::m2020_CL));
 
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Point"),
-		(int)ResamplingFilter::Point);
+        int(ResamplingFilter::Point));
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Bilinear"),
-		(int)ResamplingFilter::Bilinear);
+        int(ResamplingFilter::Bilinear));
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Bicubic"),
-		(int)ResamplingFilter::Bicubic);
+        int(ResamplingFilter::Bicubic));
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Spline16"),
-		(int)ResamplingFilter::Spline16);
+        int(ResamplingFilter::Spline16));
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Spline36"),
-		(int)ResamplingFilter::Spline36);
+        int(ResamplingFilter::Spline36));
     m_ui.chromaResamplingFilterComboBox->addItem(tr("Lanczos"),
-		(int)ResamplingFilter::Lanczos);
+        int(ResamplingFilter::Lanczos));
 
     m_ui.chromaPlacementComboBox->addItem(tr("MPEG1"),
-		(int)ChromaPlacement::MPEG1);
+        int(ChromaPlacement::MPEG1));
     m_ui.chromaPlacementComboBox->addItem(tr("MPEG2"),
-		(int)ChromaPlacement::MPEG2);
+        int(ChromaPlacement::MPEG2));
     m_ui.chromaPlacementComboBox->addItem(tr("DV"),
-		(int)ChromaPlacement::DV);
+        int(ChromaPlacement::DV));
 
 	connect(m_ui.okButton, SIGNAL(clicked()), this, SLOT(slotOk()));
 	connect(m_ui.applyButton, SIGNAL(clicked()), this, SLOT(slotApply()));
@@ -70,17 +70,17 @@ void PreviewAdvancedSettingsDialog::slotCall()
 	YuvMatrixCoefficients matrix =
 		m_pSettingsManager->getYuvMatrixCoefficients();
 	int comboIndex =
-		m_ui.yuvMatrixCoefficientsComboBox->findData((int)matrix);
+        m_ui.yuvMatrixCoefficientsComboBox->findData(int(matrix));
 	if(comboIndex != -1)
 		m_ui.yuvMatrixCoefficientsComboBox->setCurrentIndex(comboIndex);
 
 	ResamplingFilter filter = m_pSettingsManager->getChromaResamplingFilter();
-	comboIndex = m_ui.chromaResamplingFilterComboBox->findData((int)filter);
+    comboIndex = m_ui.chromaResamplingFilterComboBox->findData(int(filter));
 	if(comboIndex != -1)
 		m_ui.chromaResamplingFilterComboBox->setCurrentIndex(comboIndex);
 
 	ChromaPlacement chromaPlacement = m_pSettingsManager->getChromaPlacement();
-	comboIndex = m_ui.chromaPlacementComboBox->findData((int)chromaPlacement);
+    comboIndex = m_ui.chromaPlacementComboBox->findData(int(chromaPlacement));
 	if(comboIndex != -1)
 		m_ui.chromaPlacementComboBox->setCurrentIndex(comboIndex);
 
@@ -108,12 +108,12 @@ void PreviewAdvancedSettingsDialog::slotOk()
 
 void PreviewAdvancedSettingsDialog::slotApply()
 {
-	m_pSettingsManager->setChromaResamplingFilter((ResamplingFilter)
-		m_ui.chromaResamplingFilterComboBox->currentData().toInt());
-	m_pSettingsManager->setYuvMatrixCoefficients((YuvMatrixCoefficients)
-		m_ui.yuvMatrixCoefficientsComboBox->currentData().toInt());
-	m_pSettingsManager->setChromaPlacement((ChromaPlacement)
-		m_ui.chromaPlacementComboBox->currentData().toInt());
+    m_pSettingsManager->setChromaResamplingFilter(ResamplingFilter(
+        m_ui.chromaResamplingFilterComboBox->currentData().toInt()));
+    m_pSettingsManager->setYuvMatrixCoefficients(YuvMatrixCoefficients(
+        m_ui.yuvMatrixCoefficientsComboBox->currentData().toInt()));
+    m_pSettingsManager->setChromaPlacement(ChromaPlacement(
+        m_ui.chromaPlacementComboBox->currentData().toInt()));
 	m_pSettingsManager->setBicubicFilterParameterB(
 		m_ui.bicubicFilterParameterBSpinBox->value());
 	m_pSettingsManager->setBicubicFilterParameterC(
@@ -130,17 +130,17 @@ void PreviewAdvancedSettingsDialog::slotApply()
 void PreviewAdvancedSettingsDialog::slotResetToDefault()
 {
 	YuvMatrixCoefficients matrix = DEFAULT_YUV_MATRIX_COEFFICIENTS;
-	int comboIndex = m_ui.yuvMatrixCoefficientsComboBox->findData((int)matrix);
+    int comboIndex = m_ui.yuvMatrixCoefficientsComboBox->findData(int(matrix));
 	if(comboIndex != -1)
 		m_ui.yuvMatrixCoefficientsComboBox->setCurrentIndex(comboIndex);
 
 	ResamplingFilter filter = DEFAULT_CHROMA_RESAMPLING_FILTER;
-	comboIndex = m_ui.chromaResamplingFilterComboBox->findData((int)filter);
+    comboIndex = m_ui.chromaResamplingFilterComboBox->findData(int(filter));
 	if(comboIndex != -1)
 		m_ui.chromaResamplingFilterComboBox->setCurrentIndex(comboIndex);
 
 	ChromaPlacement chromaPlacement = DEFAULT_CHROMA_PLACEMENT;
-	comboIndex = m_ui.chromaPlacementComboBox->findData((int)chromaPlacement);
+    comboIndex = m_ui.chromaPlacementComboBox->findData(int(chromaPlacement));
 	if(comboIndex != -1)
 		m_ui.chromaPlacementComboBox->setCurrentIndex(comboIndex);
 

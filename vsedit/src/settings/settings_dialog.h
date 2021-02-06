@@ -23,7 +23,7 @@ public:
 	SettingsDialog(SettingsManager * a_pSettingsManager,
 		QWidget * a_pParent = nullptr);
 
-	virtual ~SettingsDialog();
+    virtual ~SettingsDialog() override;
 
 public slots:
 

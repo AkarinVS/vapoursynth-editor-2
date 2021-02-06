@@ -66,15 +66,15 @@ QVariant LogStylesModel::data(const QModelIndex & a_index, int a_role) const
 	int row = a_index.row();
 	int column = a_index.column();
 
-	if((row >= (int)m_styles.size()) || (column >= 1))
+    if((row >= int(m_styles.size())) || (column >= 1))
 		return QVariant();
 
 	if((a_role == Qt::DisplayRole) || (a_role == Qt::ToolTipRole))
-		return m_styles[row].title;
+        return m_styles[quint64(row)].title;
 	else if(a_role == Qt::UserRole)
-		return m_styles[row].name;
+        return m_styles[quint64(row)].name;
 	else if(a_role == Qt::CheckStateRole)
-		return m_styles[row].isVisible ? Qt::Checked : Qt::Unchecked;
+        return m_styles[quint64(row)].isVisible ? Qt::Checked : Qt::Unchecked;
 
 	return QVariant();
 }
@@ -86,7 +86,7 @@ QVariant LogStylesModel::data(const QModelIndex & a_index, int a_role) const
 int LogStylesModel::rowCount(const QModelIndex & a_parent) const
 {
 	(void)a_parent;
-	return (int)m_styles.size();
+    return int(m_styles.size());
 }
 
 // END OF int LogStylesModel::rowCount(const QModelIndex & a_parent) const
@@ -111,12 +111,12 @@ bool LogStylesModel::setData(const QModelIndex & a_index,
 	int row = a_index.row();
 	int column = a_index.column();
 
-	if((row >= (int)m_styles.size()) || (column >= 1))
+    if((row >= int(m_styles.size())) || (column >= 1))
 		return false;
 
 	if(a_role == Qt::CheckStateRole)
 	{
-		m_styles[row].isVisible = (a_value == Qt::Checked) ? true : false;
+        m_styles[quint64(row)].isVisible = (a_value == Qt::Checked) ? true : false;
 		return true;
 	}
 
@@ -149,7 +149,7 @@ void LogStylesModel::setStyles(const std::vector<TextBlockStyle> & a_styles)
 TextBlockStyle LogStylesModel::style(int a_index) const
 {
 	Q_ASSERT(styleIndexValid(a_index));
-	return m_styles[a_index];
+    return m_styles[quint64(a_index)];
 }
 
 // END OF TextBlockStyle LogStylesModel::style(int a_index) const
@@ -169,7 +169,7 @@ bool LogStylesModel::setStyleFont(int a_index, const QFont & a_font)
 	if(!styleIndexValid(a_index))
 		return false;
 
-	m_styles[a_index].textFormat.setFont(a_font);
+    m_styles[quint64(a_index)].textFormat.setFont(a_font);
 	return true;
 }
 
@@ -181,7 +181,7 @@ bool LogStylesModel::setStyleTextColor(int a_index, const QColor & a_color)
 	if(!styleIndexValid(a_index))
 		return false;
 
-	m_styles[a_index].textFormat.setForeground(a_color);
+    m_styles[quint64(a_index)].textFormat.setForeground(a_color);
 	return true;
 }
 
@@ -195,7 +195,7 @@ bool LogStylesModel::setStyleBackgroundColor(int a_index,
 	if(!styleIndexValid(a_index))
 		return false;
 
-	m_styles[a_index].textFormat.setBackground(a_color);
+    m_styles[quint64(a_index)].textFormat.setBackground(a_color);
 	return true;
 }
 
@@ -205,7 +205,7 @@ bool LogStylesModel::setStyleBackgroundColor(int a_index,
 
 bool LogStylesModel::styleIndexValid(int a_index) const
 {
-	return ((a_index >= 0) && (a_index < (int)m_styles.size()));
+    return ((a_index >= 0) && (a_index < int(m_styles.size())));
 }
 
 // END OF bool LogStylesModel::styleIndexValid(int a_index) const

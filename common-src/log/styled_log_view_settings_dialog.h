@@ -15,7 +15,7 @@ public:
 
 	StyledLogViewSettingsDialog(QWidget * a_pParent = nullptr);
 
-	virtual ~StyledLogViewSettingsDialog();
+    virtual ~StyledLogViewSettingsDialog() override;
 
 	virtual std::vector<TextBlockStyle> styles() const;
 

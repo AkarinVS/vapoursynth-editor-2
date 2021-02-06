@@ -282,21 +282,21 @@ bool VSScriptLibrary::initLibrary()
 
 	Entry vssEntries[] =
 	{
-		  {(QFunctionPointer *)&vssInit, "vsscript_init",
+          {reinterpret_cast<QFunctionPointer *>(&vssInit), "vsscript_init",
 			"_vsscript_init@0"}
-		, {(QFunctionPointer *)&vssGetVSApi, "vsscript_getVSApi",
+        , {reinterpret_cast<QFunctionPointer *>(&vssGetVSApi), "vsscript_getVSApi",
 			"_vsscript_getVSApi@0"}
-		, {(QFunctionPointer *)&vssEvaluateScript, "vsscript_evaluateScript",
+        , {reinterpret_cast<QFunctionPointer *>(&vssEvaluateScript), "vsscript_evaluateScript",
 			"_vsscript_evaluateScript@16"}
-		, {(QFunctionPointer *)&vssGetError, "vsscript_getError",
+        , {reinterpret_cast<QFunctionPointer *>(&vssGetError), "vsscript_getError",
 			"_vsscript_getError@4"}
-		, {(QFunctionPointer *)&vssGetCore, "vsscript_getCore",
+        , {reinterpret_cast<QFunctionPointer *>(&vssGetCore), "vsscript_getCore",
 			"_vsscript_getCore@4"}
-		, {(QFunctionPointer *)&vssGetOutput, "vsscript_getOutput",
+        , {reinterpret_cast<QFunctionPointer *>(&vssGetOutput), "vsscript_getOutput",
 			"_vsscript_getOutput@8"}
-		, {(QFunctionPointer *)&vssFreeScript, "vsscript_freeScript",
+        , {reinterpret_cast<QFunctionPointer *>(&vssFreeScript), "vsscript_freeScript",
 			"_vsscript_freeScript@4"}
-		, {(QFunctionPointer *)&vssFinalize, "vsscript_finalize",
+        , {reinterpret_cast<QFunctionPointer *>(&vssFinalize), "vsscript_finalize",
 			"_vsscript_finalize@0"}
 	};
 

@@ -10,7 +10,7 @@ class JobServerWatcherSocket : public QObject
 public:
 
 	JobServerWatcherSocket(QObject * a_pParent = nullptr);
-	virtual ~JobServerWatcherSocket();
+    virtual ~JobServerWatcherSocket() override;
 
 	bool sendMessage(const QByteArray & a_data);
 

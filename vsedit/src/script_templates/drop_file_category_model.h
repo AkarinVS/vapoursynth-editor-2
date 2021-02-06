@@ -13,7 +13,7 @@ public:
 
 	DropFileCategoryModel(QObject * a_pParent = nullptr);
 
-	virtual ~DropFileCategoryModel();
+    virtual ~DropFileCategoryModel() override;
 
 	virtual QModelIndex index(int a_row, int a_column,
 		const QModelIndex & a_parent = QModelIndex()) const override;

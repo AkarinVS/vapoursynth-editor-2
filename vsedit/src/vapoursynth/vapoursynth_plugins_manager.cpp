@@ -26,7 +26,7 @@ void VS_CC fakeConfigPlugin(const char * a_identifier,
 
 	// Dirty hack encouraged by Myrsloik himself.
 	VapourSynthPluginsManager * pManager =
-		(VapourSynthPluginsManager *)a_pPlugin;
+        reinterpret_cast<VapourSynthPluginsManager *>(a_pPlugin);
 
 	QString id(a_identifier);
 	for(const VSData::Plugin & plugin : pManager->m_pluginsList)
@@ -59,7 +59,7 @@ void VS_CC fakeRegisterFunction(const char * a_name, const char * a_args,
 
     // Dirty hack encouraged by Myrsloik himself.
 	VapourSynthPluginsManager * pManager =
-		(VapourSynthPluginsManager *)a_pPlugin;
+        reinterpret_cast<VapourSynthPluginsManager *>(a_pPlugin);
 
 	if(pManager->m_pluginAlreadyLoaded)
 		return;
@@ -176,12 +176,12 @@ void VapourSynthPluginsManager::getCorePlugins()
 		return;
 	}
 
-	VSGetVapourSynthAPI getVapourSynthAPI =
-		(VSGetVapourSynthAPI)vsLibrary.resolve("getVapourSynthAPI");
+    VSGetVapourSynthAPI getVapourSynthAPI =
+        VSGetVapourSynthAPI(vsLibrary.resolve("getVapourSynthAPI"));
 	if(!getVapourSynthAPI)
 	{ // Win32 fallback
 		getVapourSynthAPI =
-			(VSGetVapourSynthAPI)vsLibrary.resolve("_getVapourSynthAPI@4");
+            VSGetVapourSynthAPI(vsLibrary.resolve("_getVapourSynthAPI@4"));
 	}
 	if(!getVapourSynthAPI)
 	{
@@ -467,18 +467,18 @@ void VapourSynthPluginsManager::pollPaths(const QStringList & a_pluginsPaths)
 			QString filePath = fileInfo.absoluteFilePath();
 			QLibrary plugin(filePath);
 			VSInitPlugin initVSPlugin =
-				(VSInitPlugin)plugin.resolve("VapourSynthPluginInit");
+                VSInitPlugin(plugin.resolve("VapourSynthPluginInit"));
 			if(!initVSPlugin)
 			{ // Win32 fallback
 				initVSPlugin =
-					(VSInitPlugin)plugin.resolve("_VapourSynthPluginInit@12");
+                    VSInitPlugin(plugin.resolve("_VapourSynthPluginInit@12"));
 			}
 			if(!initVSPlugin)
 				continue;
 			m_currentPluginPath = filePath;
 			// Dirty hack encouraged by Myrsloik himself.
 			initVSPlugin(fakeConfigPlugin, fakeRegisterFunction,
-				(VSPlugin *) this);
+                reinterpret_cast<VSPlugin *>(this));
 			plugin.unload();
 			m_pluginAlreadyLoaded = false;
 		}
@@ -526,7 +526,7 @@ VSData::Function VapourSynthPluginsManager::parseFunctionSignature(
 {
 	VSData::Function function;
 	function.name = a_name;
-    QStringList argumentsList = a_arguments.split(';', QString::SkipEmptyParts);
+    QStringList argumentsList = a_arguments.split(';', Qt::SkipEmptyParts);
 	if(argumentsList.size() == 0)
 		return function;
 

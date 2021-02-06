@@ -1190,7 +1190,7 @@ double MainWindow::YCoCgValueAtPoint(size_t a_x, size_t a_y, int a_plane, const 
         y = (a_y >> cpFormat->subSamplingH);
     }
     int stride = a_cpVSAPI->getStride(a_cpFrameRef, a_plane);
-    const uint8_t * cpLine = cpPlane + y * stride;
+    const uint8_t * cpLine = cpPlane + y * uint8_t(stride);
 
     double value = 0.0;
 
@@ -2180,7 +2180,7 @@ void MainWindow::slotAddBookmark()
     double fps = double(vsVideoInfo->fpsNum) / double(vsVideoInfo->fpsDen);
 
     if (currentFrame < 0) return;
-    int timeInMilli = double(currentFrame) / fps * double(1000);
+    int timeInMilli = int(double(currentFrame) / fps * double(1000));
 
     BookmarkModel * bookmarkModel = m_pEditorPreviewVector[currentTabIndex].bookmarkModel;
     bookmarkModel->addBookmark(currentFrame, timeInMilli);
@@ -2246,7 +2246,7 @@ void MainWindow::slotLoadBookmarkFile(QFile & a_file)
             ScriptProcessor * processor = m_pEditorPreviewVector[currentTabIndex].processor;
             const VSVideoInfo * vsVideoInfo = processor->vsVideoInfo();
             double fps = double(vsVideoInfo->fpsNum) / double(vsVideoInfo->fpsDen);
-            int timeInMilli = (double(frameIndex) / fps) * 1000;
+            int timeInMilli = int(double(frameIndex) / fps) * 1000;
 
             bookmarkModel->addBookmark(frameIndex, timeInMilli);
         }
@@ -2360,7 +2360,7 @@ void MainWindow::slotSaveBookmarksToFile()
             case BookmarkSavingFormat::ChapterFormat:
                 // looks for timestamp and title
                 for (auto it = bookmarks.begin(); it != bookmarks.end(); ++it) {
-                    int index = std::distance(bookmarks.begin(), it);
+                    int index = int(std::distance(bookmarks.begin(), it));
                     int chapterCounterIndex = index + 1; // +1 to start counter at 1
                     QTime time = QTime::fromMSecsSinceStartOfDay(it->timeInMilli);
                     int fieldWidth = 2;
@@ -2665,7 +2665,7 @@ void MainWindow::slotSaveSnapshot()
         QString filter;
         int quality = 0;
 
-        ImageProp()= default;
+        ImageProp(){}
         ImageProp(const QString &ft, int qu)
             : filter(ft), quality(qu)
         {}
@@ -2736,7 +2736,7 @@ void MainWindow::slotAbout()
 {
     QResource aboutResource(":readme");
     QByteArray aboutData(reinterpret_cast<const char*>(aboutResource.data()),
-        aboutResource.size());
+        int(aboutResource.size()));
     QString aboutString = QString::fromUtf8(aboutData);
     QMessageBox::about(this, VAPOURSYNTH_EDITOR_NAME, aboutString);
 }

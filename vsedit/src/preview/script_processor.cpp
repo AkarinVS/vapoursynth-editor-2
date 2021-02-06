@@ -170,7 +170,7 @@ QPixmap ScriptProcessor::pixmapFromCompatBGR32(const VSFrameRef *a_cpFrameRef)
     int height = m_cpVSAPI->getFrameHeight(a_cpFrameRef, 0);
     const void * pData = m_cpVSAPI->getReadPtr(a_cpFrameRef, 0);
     int stride = m_cpVSAPI->getStride(a_cpFrameRef, 0);
-    QImage frameImage((const uchar *)pData, width, height,
+    QImage frameImage(static_cast<const uchar *>(pData), width, height,
         stride, QImage::Format_RGB32);
     QImage flippedImage = frameImage.mirrored();
     QPixmap framePixmap = QPixmap::fromImage(flippedImage);
@@ -273,7 +273,7 @@ void ScriptProcessor::slotProcessPlayQueue()
 
         if(secondsToNextFrame > 0)
         {
-            int millisecondsToNextFrame = std::ceil(secondsToNextFrame * 1000);
+            int millisecondsToNextFrame = int(std::ceil(secondsToNextFrame * 1000));
             m_pPlayTimer->start(millisecondsToNextFrame);
             break;
         }

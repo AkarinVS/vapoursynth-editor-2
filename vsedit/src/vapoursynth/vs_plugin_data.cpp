@@ -99,7 +99,7 @@ QString VSData::Function::toString() const
 	size_t argumentsNumber = argumentsCopy.size();
 	size_t firstOptional;
 	for(firstOptional = 0; (firstOptional < argumentsNumber) &&
-		(!argumentsCopy[firstOptional].optional); ++firstOptional){};
+        (!argumentsCopy[firstOptional].optional); ++firstOptional){}
 	QStringList mandatoryArguments;
 	for(size_t i = 0; i < firstOptional; ++i)
 		mandatoryArguments << argumentsCopy[i].toString();

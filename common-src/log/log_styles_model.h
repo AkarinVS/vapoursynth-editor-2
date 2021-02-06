@@ -13,7 +13,7 @@ public:
 
 	LogStylesModel(QObject * a_pParent = nullptr);
 
-	virtual ~LogStylesModel();
+    virtual ~LogStylesModel() override;
 
 	virtual QModelIndex index(int a_row, int a_column,
 		const QModelIndex & a_parent = QModelIndex()) const override;

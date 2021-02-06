@@ -134,8 +134,8 @@ QJsonObject JobProperties::toJson() const
 {
 	QJsonObject jsJob;
 	jsJob[JP_ID] = id.toString();
-	jsJob[JP_TYPE] = (int)type;
-	jsJob[JP_JOB_STATE] = (int)jobState;
+    jsJob[JP_TYPE] = int(type);
+    jsJob[JP_JOB_STATE] = int(jobState);
 
 	QJsonArray jsDependencies;
 	for(const QUuid & dependencyId : dependsOnJobIds)
@@ -146,8 +146,8 @@ QJsonObject JobProperties::toJson() const
 	jsJob[JP_TIME_ENDED] = timeEnded.toMSecsSinceEpoch();
 	jsJob[JP_SCRIPT_NAME] = scriptName;
 	jsJob[JP_SCRIPT_TEXT] = scriptText;
-	jsJob[JP_ENCODING_TYPE] = (int)encodingType;
-	jsJob[JP_ENCODING_HEADER_TYPE] = (int)encodingHeaderType;
+    jsJob[JP_ENCODING_TYPE] = int(encodingType);
+    jsJob[JP_ENCODING_HEADER_TYPE] = int(encodingHeaderType);
 	jsJob[JP_EXECUTABLE_PATH] = executablePath;
 	jsJob[JP_ARGUMENTS] = arguments;
 	jsJob[JP_SHELL_COMMAND] = shellCommand;
@@ -166,9 +166,9 @@ JobProperties JobProperties::fromJson(const QJsonObject & a_object)
 	if(a_object.contains(JP_ID))
 		properties.id = QUuid(a_object[JP_ID].toString());
 	if(a_object.contains(JP_TYPE))
-		properties.type = (JobType)a_object[JP_TYPE].toInt();
+        properties.type = JobType(a_object[JP_TYPE].toInt());
 	if(a_object.contains(JP_JOB_STATE))
-		properties.jobState = (JobState)a_object[JP_JOB_STATE].toInt();
+        properties.jobState = JobState(a_object[JP_JOB_STATE].toInt());
 	if(a_object.contains(JP_DEPENDS_ON_JOB_IDS))
 	{
 		if(a_object[JP_DEPENDS_ON_JOB_IDS].isArray())
@@ -190,10 +190,10 @@ JobProperties JobProperties::fromJson(const QJsonObject & a_object)
 		properties.scriptText = a_object[JP_SCRIPT_TEXT].toString();
 	if(a_object.contains(JP_ENCODING_TYPE))
 		properties.encodingType =
-			(EncodingType)a_object[JP_ENCODING_TYPE].toInt();
+            EncodingType(a_object[JP_ENCODING_TYPE].toInt());
 	if(a_object.contains(JP_ENCODING_HEADER_TYPE))
 		properties.encodingHeaderType =
-			(EncodingHeaderType)a_object[JP_ENCODING_HEADER_TYPE].toInt();
+            EncodingHeaderType(a_object[JP_ENCODING_HEADER_TYPE].toInt());
 	if(a_object.contains(JP_EXECUTABLE_PATH))
 		properties.executablePath = a_object[JP_EXECUTABLE_PATH].toString();
 	if(a_object.contains(JP_ARGUMENTS))

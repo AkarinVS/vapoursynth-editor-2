@@ -87,8 +87,6 @@ TextBlockStyle StyledLogView::getStyle(const QString & a_styleName) const
 
 		styleName = it->originalStyleName;
 	}
-
-	return style;
 }
 
 // END OF TextBlockStyle StyledLogView::getStyle(
@@ -432,10 +430,10 @@ void StyledLogView::createActionsAndMenus()
 
 		ActionToCreate(const QString & a_title, const char * a_slotToConnect) :
 			title(a_title), slotToConnect(a_slotToConnect), isSeparator(false)
-		{};
+        {}
 
 		ActionToCreate() : title(), slotToConnect(nullptr), isSeparator(true)
-		{};
+        {}
 	};
 
 	const ActionToCreate SEPARATOR;

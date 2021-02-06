@@ -11,7 +11,7 @@ public:
 
 	ItemDelegateForHotkey(QObject * a_pParent = nullptr);
 
-	virtual ~ItemDelegateForHotkey();
+    virtual ~ItemDelegateForHotkey() override;
 
 	QWidget * createEditor(QWidget * a_pParent,
 		const QStyleOptionViewItem & a_option, const QModelIndex & a_index)

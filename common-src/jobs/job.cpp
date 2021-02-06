@@ -417,7 +417,7 @@ double vsedit::Job::fps() const
 double vsedit::Job::secondsToFinish() const
 {
 	int framesLeft = framesTotal() - framesProcessed();
-	double seconds = (double)framesLeft / m_properties.fps;
+    double seconds = double(framesLeft) / m_properties.fps;
 	return seconds;
 }
 
@@ -614,7 +614,7 @@ void vsedit::Job::start()
 		else if(m_properties.type == JobType::RunProcess)
 		{
 #ifdef Q_OS_WIN
-			BOOL result = DebugActiveProcessStop((DWORD)m_process.processId());
+            BOOL result = DebugActiveProcessStop(DWORD(m_process.processId()));
 			if(result)
 				changeStateAndNotify(JobState::Running);
 			else
@@ -665,7 +665,7 @@ void vsedit::Job::pause()
 	else if(m_properties.type == JobType::RunProcess)
 	{
 #ifdef Q_OS_WIN
-		BOOL result = DebugActiveProcess((DWORD)m_process.processId());
+        BOOL result = DebugActiveProcess(DWORD(m_process.processId()));
 		if(result)
 			changeStateAndNotify(JobState::Paused);
 		else
@@ -1188,8 +1188,8 @@ void vsedit::Job::fillVariables()
 			{
 				if(!m_cpVideoInfo)
 					return TOKEN_FPS;
-				double fps = (double)m_cpVideoInfo->fpsNum /
-					(double)m_cpVideoInfo->fpsDen;
+                double fps = double(m_cpVideoInfo->fpsNum) /
+                    double(m_cpVideoInfo->fpsDen);
 				return QString::number(fps, 'f', 10);
 			}
 		},

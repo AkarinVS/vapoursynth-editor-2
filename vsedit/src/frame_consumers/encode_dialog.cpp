@@ -20,7 +20,7 @@
 EncodeDialog::EncodeDialog(SettingsManager * a_pSettingsManager,
 	VSScriptLibrary * a_pVSScriptLibrary, QWidget * a_pParent) :
 	QDialog(a_pParent,
-	(Qt::WindowFlags)0
+    Qt::WindowFlags()
 		| Qt::Window
 		| Qt::CustomizeWindowHint
 		| Qt::WindowMinimizeButtonHint
@@ -224,8 +224,8 @@ void EncodeDialog::slotStartEncodeButtonPressed()
 	m_pJob->setExecutablePath(vsedit::resolvePathFromApplication(
 		m_ui.executablePathEdit->text()));
 	m_pJob->setArguments(m_ui.argumentsTextEdit->toPlainText());
-	m_pJob->setEncodingHeaderType((EncodingHeaderType)
-		m_ui.headerTypeComboBox->currentData().toInt());
+    m_pJob->setEncodingHeaderType(EncodingHeaderType
+        (m_ui.headerTypeComboBox->currentData().toInt()));
 	m_pJob->start();
 }
 
@@ -293,8 +293,8 @@ void EncodeDialog::slotEncodingPresetSaveButtonPressed()
 		preset.arguments = m_ui.argumentsTextEdit->toPlainText();
 	}
 
-	preset.headerType = (EncodingHeaderType)
-		m_ui.headerTypeComboBox->currentData().toInt();
+    preset.headerType = EncodingHeaderType(
+        m_ui.headerTypeComboBox->currentData().toInt());
 
 	bool success = m_pSettingsManager->saveEncodingPreset(preset);
 	if(!success)
@@ -401,7 +401,7 @@ void EncodeDialog::slotEncodingPresetComboBoxActivated(const QString & a_text)
 	m_ui.argumentsTextEdit->setPlainText(preset.arguments);
 
 	int headerTypeIndex =
-		m_ui.headerTypeComboBox->findData((int)preset.headerType);
+        m_ui.headerTypeComboBox->findData(int(preset.headerType));
 	if(headerTypeIndex < 0)
 	{
                 m_ui.feedbackTextEdit->addEntry(tr("Error. Preset \'%1\' "
@@ -490,7 +490,7 @@ void EncodeDialog::slotJobProgressChanged()
 	m_ui.processingProgressBar->setValue(properties.framesProcessed);
 
 	QDateTime now = QDateTime::currentDateTimeUtc();
-	double passed = ((double)properties.timeStarted.msecsTo(now)) / 1000.0;
+    double passed = (double(properties.timeStarted.msecsTo(now))) / 1000.0;
 	QString passedString = vsedit::timeToString(passed);
 
         QString text = tr("Time elapsed: %1 - %2 FPS")
@@ -509,8 +509,8 @@ void EncodeDialog::slotJobProgressChanged()
 
 	m_ui.metricsEdit->setText(text);
 
-	int percentage = (int)((double)properties.framesProcessed * 100.0 /
-		(double)properties.framesTotal());
+    int percentage = int(double(properties.framesProcessed) * 100.0 /
+        double(properties.framesTotal()));
         setWindowTitle(tr("%1% Encode: %2")
 		.arg(percentage).arg(properties.scriptName));
 

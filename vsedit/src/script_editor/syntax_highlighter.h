@@ -17,7 +17,7 @@ public:
 
 	SyntaxHighlighter(QTextDocument * a_pDocument,
 		VSPluginsList a_pluginsList = VSPluginsList());
-	virtual ~SyntaxHighlighter();
+    virtual ~SyntaxHighlighter() override;
 
 	void setSettingsManager(SettingsManager * a_pSettingsManager);
 
@@ -31,7 +31,7 @@ public slots:
 
 protected:
 
-	void highlightBlock(const QString & a_text);
+    void highlightBlock(const QString & a_text) override;
 
 private:
 

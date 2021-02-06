@@ -11,7 +11,7 @@ public:
     explicit SpinboxExtendedLineEdit(QWidget *parent = nullptr);
 
 protected:    
-    virtual void mousePressEvent(QMouseEvent *a_pEvent);
+    virtual void mousePressEvent(QMouseEvent *a_pEvent) override;
 };
 
 #endif // SPINBOXEXTENDEDLINEEDIT_H

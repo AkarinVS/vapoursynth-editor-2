@@ -13,7 +13,7 @@ class ScriptStatusBarWidget: public QWidget
 public:
 
 	ScriptStatusBarWidget(QWidget * a_pParent = nullptr);
-	virtual ~ScriptStatusBarWidget();
+    virtual ~ScriptStatusBarWidget() override;
 
 //	virtual bool colorPickerVisible() const;
 

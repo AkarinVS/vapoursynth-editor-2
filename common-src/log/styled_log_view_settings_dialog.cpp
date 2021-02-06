@@ -9,7 +9,7 @@
 //==============================================================================
 
 StyledLogViewSettingsDialog::StyledLogViewSettingsDialog(QWidget * a_pParent):
-	  QDialog(a_pParent, (Qt::WindowFlags)0
+      QDialog(a_pParent, Qt::WindowFlags()
 		| Qt::Dialog
 		| Qt::CustomizeWindowHint
 		| Qt::WindowTitleHint

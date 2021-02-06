@@ -47,7 +47,7 @@ TimeLineSlider::TimeLineSlider(QWidget * a_pParent) : QWidget(a_pParent)
 	setMouseTracking(true);
 
 	QFontMetricsF metrics(m_labelsFont);
-	qreal factor = (qreal)m_textHeight /
+    qreal factor = qreal(m_textHeight) /
 		metrics.tightBoundingRect("9").height();
 	m_labelsFont.setPointSizeF(m_labelsFont.pointSizeF() * factor);
 
@@ -332,7 +332,7 @@ void TimeLineSlider::slotStepBySeconds(double a_seconds)
 	if(m_fps == 0.0)
 		return;
 
-    int framesStep = std::round(a_seconds * m_fps);
+    int framesStep = int(std::round(a_seconds * m_fps));
     slotStepBy(framesStep);
 }
 
@@ -474,7 +474,7 @@ void TimeLineSlider::mouseMoveEvent(QMouseEvent * a_pEvent)
 		if(m_fps != 0.0)
 		{
 			tipString += " - ";
-			tipString += vsedit::timeToString(((double)l_frame) / m_fps);
+            tipString += vsedit::timeToString((double(l_frame)) / m_fps);
 		}
 		QToolTip::showText(a_pEvent->globalPos(), tipString);
 	}
@@ -570,12 +570,12 @@ void TimeLineSlider::paintEvent(QPaintEvent * a_pEvent)
 	if((m_displayMode == Frames) || (m_fps == 0.0))
 		l_displayMode = Frames;
 
-	double unitsInPixel = (double)m_maxFrame /
-		(double)(slideLineInnerWidth() - 1);
-	double maxUnits = (double)m_maxFrame;
+    double unitsInPixel = double(m_maxFrame) /
+        double(slideLineInnerWidth() - 1);
+    double maxUnits = double(m_maxFrame);
 
 	bool ticksAtExactFrames =
-		(unitsInPixel < 1.0 / (double)m_minimumTicksSpacing);
+        (unitsInPixel < 1.0 / double(m_minimumTicksSpacing));
 
 	if(l_displayMode == Time)
 	{
@@ -608,9 +608,9 @@ void TimeLineSlider::paintEvent(QPaintEvent * a_pEvent)
 				if(l_displayMode == Frames)
 					labelString = QString::number(n);
 				else
-					labelString = vsedit::timeToString(((double)n) / m_fps);
-				labelPos.setX(tickPos - labelsFontMetrics.width(labelString) /
-					2 + 1);
+                    labelString = vsedit::timeToString((double(n)) / m_fps);
+                labelPos.setX(int(tickPos - labelsFontMetrics.width(labelString) /
+                    2 + 1));
 				painter.drawText(labelPos, labelString);
 			}
 			else if(n % 5 == 0)
@@ -622,9 +622,9 @@ void TimeLineSlider::paintEvent(QPaintEvent * a_pEvent)
 	else
 	{
 		double minUnitsPerTick =
-			unitsInPixel * (double)m_minimumTicksSpacing;
+            unitsInPixel * double(m_minimumTicksSpacing);
 		double unitsPerTick =
-			std::pow(10.0, std::floor(std::log10((double)maxUnits)));
+            std::pow(10.0, std::floor(std::log10(double(maxUnits))));
 		while(unitsPerTick > minUnitsPerTick)
 			unitsPerTick /= 10.0;
 
@@ -671,7 +671,7 @@ void TimeLineSlider::paintEvent(QPaintEvent * a_pEvent)
 		int n = 0;
 		while(units - maxUnits < 0.001)
 		{
-			int tickPos = startPos + (int)(units / unitsInPixel);
+            int tickPos = startPos + int(units / unitsInPixel);
 			if(n % 10 == 0)
 			{
 				painter.drawLine(tickPos, longTickTop, tickPos, tickBottom);
@@ -681,8 +681,8 @@ void TimeLineSlider::paintEvent(QPaintEvent * a_pEvent)
 					labelString = QString::number(units);
 				else
 					labelString = vsedit::timeToString(units);
-				labelPos.setX(tickPos - labelsFontMetrics.width(labelString) /
-					2 + 1);
+                labelPos.setX(int(tickPos - labelsFontMetrics.width(labelString) /
+                    2 + 1));
 				painter.drawText(labelPos, labelString);
 			}
 			else if(n % 5 == 0)
@@ -743,8 +743,8 @@ int TimeLineSlider::frameToPos(int a_frame) const
 {
 	if(a_frame > m_maxFrame)
 		a_frame = m_maxFrame;
-	int framePos = (int)((double)(slideLineInnerWidth() - 1) /
-		(double)m_maxFrame * (double)a_frame);
+    int framePos = int(double(slideLineInnerWidth() - 1) /
+        double(m_maxFrame) * double(a_frame));
 	framePos += m_sideMargin + m_slideLineFrameWidth;
 	return framePos;
 }
@@ -761,9 +761,9 @@ int TimeLineSlider::posToFrame(int a_pos) const
 	else if(a_pos > last)
 		return m_maxFrame;
 
-	int l_frame = (int)std::round((double)m_maxFrame /
-		(double)(slideLineInnerWidth() - 1) *
-		(double)(a_pos - start));
+    int l_frame = int(std::round(double(m_maxFrame) /
+        double(slideLineInnerWidth() - 1) *
+        double(a_pos - start)));
 	return l_frame;
 }
 

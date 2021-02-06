@@ -128,11 +128,11 @@ void SettingsManager::initializeStandardActions()
         {ACTION_ID_COPY_TO_NEW_TAB, tr("Copy To New Tab"), QIcon(), QKeySequence()},
         {ACTION_ID_FIND, tr("Find"), QIcon(), QKeySequence::Find},
         {ACTION_ID_DUPLICATE_SELECTION, tr("Duplicate selection or line"),
-			QIcon(), QKeySequence(Qt::CTRL + Qt::Key_D)},
+            QIcon(), QKeySequence(Qt::CTRL, Qt::Key_D)},
         {ACTION_ID_COMMENT_SELECTION, tr("Comment lines"), QIcon(),
-			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C)},
+            QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_C)},
         {ACTION_ID_UNCOMMENT_SELECTION, tr("Uncomment lines"), QIcon(),
-			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_X)},
+            QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_X)},
 		{ACTION_ID_REPLACE_TAB_WITH_SPACES,
             tr("Replace Tab characters with spaces"), QIcon(),
 			QKeySequence()},
@@ -177,7 +177,7 @@ void SettingsManager::initializeStandardActions()
         {ACTION_ID_PLUGINS_FOLDER, tr("Open plugins folder"), QIcon(), QKeySequence()},
         {ACTION_ID_SCRIPTS_FOLDER, tr("Open scripts folder"), QIcon(), QKeySequence()},
         {ACTION_ID_AUTOCOMPLETE, tr("Autocomplete"), QIcon(),
-			QKeySequence(Qt::CTRL + Qt::Key_Space)},
+            QKeySequence(Qt::CTRL, Qt::Key_Space)},
         {ACTION_ID_FRAME_TO_CLIPBOARD, tr("Copy frame to clipboard"),
 			QIcon(":image_to_clipboard.png"), QKeySequence(Qt::Key_X)},
         {ACTION_ID_SAVE_SNAPSHOT, tr("Save snapshot"),
@@ -207,10 +207,10 @@ void SettingsManager::initializeStandardActions()
 			QIcon(":timeline_frames.png"), QKeySequence()},
         {ACTION_ID_TIME_STEP_FORWARD, tr("Time: step forward"),
 			QIcon(":time_forward.png"),
-			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Right)},
+            QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Right)},
         {ACTION_ID_TIME_STEP_BACK, tr("Time: step back"),
 			QIcon(":time_back.png"),
-			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Left)},
+            QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Left)},
         {ACTION_ID_ADVANCED_PREVIEW_SETTINGS, tr("Preview advanced settings"),
             QIcon(":settings.png"), QKeySequence()},
         {ACTION_ID_TOGGLE_COLOR_PICKER, tr("Color panel"),
@@ -227,7 +227,7 @@ void SettingsManager::initializeStandardActions()
 		{ACTION_ID_TIMELINE_BOOKMARK_CURRENT_FRAME,
             tr("Bookmark current frame"),
 			QIcon(":timeline_bookmark_add.png"),
-			QKeySequence(Qt::CTRL + Qt::Key_B)},
+            QKeySequence(Qt::CTRL, Qt::Key_B)},
 		{ACTION_ID_PASTE_SHOWN_FRAME_NUMBER_INTO_SCRIPT,
             tr("Paste shown frame number into script"), QIcon(),
 			QKeySequence()},
@@ -235,11 +235,11 @@ void SettingsManager::initializeStandardActions()
             tr("Save bookmark to file"), QIcon(),
             QKeySequence()},
         {ACTION_ID_MOVE_TEXT_BLOCK_UP, tr("Move text block up"), QIcon(),
-			QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Up)},
+            QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Up)},
         {ACTION_ID_MOVE_TEXT_BLOCK_DOWN, tr("Move text block down"),
-			QIcon(), QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Down)},
+            QIcon(), QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_Down)},
         {ACTION_ID_TOGGLE_COMMENT, tr("Toggle comment"),
-			QIcon(), QKeySequence(Qt::CTRL + Qt::Key_Slash)},
+            QIcon(), QKeySequence(Qt::CTRL, Qt::Key_Slash)},
         {ACTION_ID_SHUTDOWN_SERVER_AND_EXIT, tr("Shutdown server and exit"),
 			QIcon(":exit.png"), QKeySequence()},
 		{ACTION_ID_SET_TRUSTED_CLIENTS_ADDRESSES,
@@ -370,7 +370,7 @@ QTextCharFormat SettingsManager::getDefaultTextFormat(
 		timelineLabelsFont.setFamily(QString("Digital Mini"));
 
 		QFontMetricsF metrics(timelineLabelsFont);
-		qreal factor = (qreal)DEFAULT_TIMELINE_LABELS_HEIGHT /
+        qreal factor = qreal(DEFAULT_TIMELINE_LABELS_HEIGHT) /
 			metrics.tightBoundingRect("9").height();
 		qreal currentFontSize = timelineLabelsFont.pointSizeF();
 		timelineLabelsFont.setPointSizeF(currentFontSize * factor);
@@ -638,12 +638,12 @@ bool SettingsManager::setZoomPanelVisible(bool a_zoomPanelVisible)
 
 ZoomMode SettingsManager::getZoomMode() const
 {
-	return (ZoomMode)value(ZOOM_MODE_KEY, (int)DEFAULT_ZOOM_MODE).toInt();
+    return ZoomMode(value(ZOOM_MODE_KEY, int(DEFAULT_ZOOM_MODE)).toInt());
 }
 
 bool SettingsManager::setZoomMode(ZoomMode a_zoomMode)
 {
-	return setValue(ZOOM_MODE_KEY, (int)a_zoomMode);
+    return setValue(ZOOM_MODE_KEY, int(a_zoomMode));
 }
 
 //==============================================================================
@@ -662,25 +662,25 @@ bool SettingsManager::setZoomRatio(double a_zoomRatio)
 
 Qt::TransformationMode SettingsManager::getScaleMode() const
 {
-	return (Qt::TransformationMode)value(SCALE_MODE_KEY,
-		(int)DEFAULT_SCALE_MODE).toInt();
+    return static_cast<Qt::TransformationMode>(value(SCALE_MODE_KEY,
+        int(DEFAULT_SCALE_MODE)).toInt());
 }
 
 bool SettingsManager::setScaleMode(Qt::TransformationMode a_scaleMode)
 {
-	return setValue(SCALE_MODE_KEY, (int)a_scaleMode);
+    return setValue(SCALE_MODE_KEY, int(a_scaleMode));
 }
 
 //==============================================================================
 
 CropMode SettingsManager::getCropMode() const
 {
-	return (CropMode)value(CROP_MODE_KEY, (int)DEFAULT_CROP_MODE).toInt();
+    return static_cast<CropMode>(value(CROP_MODE_KEY, int(DEFAULT_CROP_MODE)).toInt());
 }
 
 bool SettingsManager::setCropMode(CropMode a_cropMode)
 {
-	return setValue(CROP_MODE_KEY, (int)a_cropMode);
+    return setValue(CROP_MODE_KEY, int(a_cropMode));
 }
 
 //==============================================================================
@@ -723,7 +723,7 @@ bool SettingsManager::addToRecentFilesList(const QString & a_filePath)
 	recentFilesList.removeAll(canonicalPath);
 	recentFilesList.prepend(canonicalPath);
 	unsigned int maxRecentFilesNumber = getMaxRecentFilesNumber();
-	while((unsigned int)recentFilesList.size() > maxRecentFilesNumber)
+    while(static_cast<unsigned int>(recentFilesList.size()) > maxRecentFilesNumber)
 		recentFilesList.removeLast();
 	return setValue(RECENT_FILES_LIST_KEY, recentFilesList);
 }
@@ -788,14 +788,14 @@ bool SettingsManager::setCharactersTypedToStartCompletion(
 
 TimeLineSlider::DisplayMode SettingsManager::getTimeLineMode() const
 {
-	return (TimeLineSlider::DisplayMode)value(TIMELINE_MODE_KEY,
-		(int)DEFAULT_TIMELINE_MODE).toInt();
+    return static_cast<TimeLineSlider::DisplayMode>(value(TIMELINE_MODE_KEY,
+        int(DEFAULT_TIMELINE_MODE)).toInt());
 }
 
 bool SettingsManager::setTimeLineMode(
 	TimeLineSlider::DisplayMode a_timeLineMode)
 {
-	return setValue(TIMELINE_MODE_KEY, (int)a_timeLineMode);
+    return setValue(TIMELINE_MODE_KEY, int(a_timeLineMode));
 }
 
 //==============================================================================
@@ -827,13 +827,13 @@ bool SettingsManager::setColorPickerVisible(bool a_colorPickerVisible)
 
 PlayFPSLimitMode SettingsManager::getPlayFPSLimitMode() const
 {
-	return (PlayFPSLimitMode)value(PLAY_FPS_LIMIT_MODE_KEY,
-        int(DEFAULT_PLAY_FPS_LIMIT_MODE)).toInt();
+    return static_cast<PlayFPSLimitMode>(value(PLAY_FPS_LIMIT_MODE_KEY,
+        int(DEFAULT_PLAY_FPS_LIMIT_MODE)).toInt());
 }
 
 bool SettingsManager::setPlayFPSLimitMode(PlayFPSLimitMode a_mode)
 {
-	return setValue(PLAY_FPS_LIMIT_MODE_KEY, (int)a_mode);
+    return setValue(PLAY_FPS_LIMIT_MODE_KEY, int(a_mode));
 }
 
 //==============================================================================

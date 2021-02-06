@@ -14,7 +14,7 @@ class FindDialog : public QDialog
 
 public:
     explicit FindDialog(QWidget *parent = nullptr);
-    ~FindDialog();
+    ~FindDialog() override;
 
 private:
     Ui::FindDialog *ui;

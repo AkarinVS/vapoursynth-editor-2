@@ -15,7 +15,7 @@ class FrameInfoDialog : public QDialog
 
 public:
     explicit FrameInfoDialog(SettingsManager * a_pSettingsManager, QWidget *parent = nullptr);
-    ~FrameInfoDialog();
+    ~FrameInfoDialog() override;
 
     void setColorPickerString(const QString & a_string);
     void setMousePositionString(const QString & a_string);

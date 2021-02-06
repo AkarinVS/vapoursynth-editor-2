@@ -16,7 +16,7 @@ class SettingsManager : public SettingsManagerCore
 public:        
 
 	SettingsManager(QObject * a_pParent);
-	virtual ~SettingsManager();
+    virtual ~SettingsManager() override;
 
 	//----------------------------------------------------------------------
 

@@ -157,7 +157,7 @@ void BookmarkManagerDialog::slotLoadBookmarkFile(QString fileName)
             QRegularExpressionMatch bookmarkMatch = i.next();
             int frameIndex = bookmarkMatch.captured(0).toInt();
 
-            int timeInMilli = (double(frameIndex) / m_fps) * double(1000);
+            int timeInMilli = int(double(frameIndex) / m_fps * double(1000));
 
             m_bookmarkModel->addBookmark(frameIndex, timeInMilli);
         }

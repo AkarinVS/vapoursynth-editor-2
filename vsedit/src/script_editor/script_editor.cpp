@@ -986,7 +986,6 @@ void ScriptEditor::loadThemeSettings()
         if (element.id == COLOR_ID_SELECTION_MATCHES) {
             m_selectionMatchesColor = element.color;
         }
-
     }
 
     QFont commonScriptTextFont = m_commonScriptTextFormat.font();
@@ -995,7 +994,7 @@ void ScriptEditor::loadThemeSettings()
     m_tabText = m_pSettingsManager->getTabText();
     m_spacesInTab = m_pSettingsManager->getSpacesInTab();
     QFontMetrics metrics(commonScriptTextFont);
-    setTabStopWidth(metrics.width(' ') * m_spacesInTab);
+    setTabStopDistance(metrics.horizontalAdvance(' ') * m_spacesInTab);
 
     QColor textColor = m_commonScriptTextFormat.foreground().color();
 
@@ -1118,7 +1117,7 @@ int ScriptEditor::sideBoxWidth() const
 
 	QFont commonTextFont = m_commonScriptTextFormat.font();
 	QFontMetrics metrics(commonTextFont);
-	int space = metrics.width(controlString);
+    int space = metrics.horizontalAdvance(controlString);
 	space += m_sideBoxTextMargin * 2;
 	space += m_sideBoxLineWidth;
 
@@ -1150,7 +1149,7 @@ void ScriptEditor::paintSideBox(QPaintEvent * a_pEvent)
 		m_sideBoxTextMargin * 2;
 	QPointF offset = contentOffset();
 	int viewportHeight = viewport()->rect().height();
-	qreal blockTop;
+    qreal blockTop = 0.0;
 	for(QTextBlock textBlock = firstVisibleBlock();
 		textBlock.isValid() &&
 		((blockTop = blockBoundingGeometry(textBlock).translated(offset).top())
@@ -1160,7 +1159,7 @@ void ScriptEditor::paintSideBox(QPaintEvent * a_pEvent)
 		if(!textBlock.isVisible())
 			continue;
 		QString number = QString::number(textBlock.blockNumber() + 1);
-		painter.drawText(m_sideBoxTextMargin, blockTop, lineNumberWidth,
+        painter.drawText(m_sideBoxTextMargin, int(blockTop), lineNumberWidth,
 			labelHeight, Qt::AlignRight, number);
 	}
 }

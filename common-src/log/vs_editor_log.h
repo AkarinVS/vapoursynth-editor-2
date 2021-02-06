@@ -13,7 +13,7 @@ class VSEditorLog : public StyledLogView
 public:
 
 	VSEditorLog(QWidget * a_pParent = nullptr);
-	virtual ~VSEditorLog();
+    virtual ~VSEditorLog() override;
 
 	virtual QString name() const;
 	virtual void setName(const QString & a_name);

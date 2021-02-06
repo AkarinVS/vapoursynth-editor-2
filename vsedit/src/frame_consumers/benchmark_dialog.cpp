@@ -16,7 +16,7 @@ ScriptBenchmarkDialog::ScriptBenchmarkDialog(
 	SettingsManager * a_pSettingsManager, VSScriptLibrary * a_pVSScriptLibrary,
 	QWidget * a_pParent):
 	VSScriptProcessorDialog(a_pSettingsManager, a_pVSScriptLibrary, a_pParent,
-	(Qt::WindowFlags)0
+        Qt::WindowFlags()
 		| Qt::Window
 		| Qt::CustomizeWindowHint
 		| Qt::WindowMinimizeButtonHint
@@ -297,7 +297,7 @@ void ScriptBenchmarkDialog::updateMetrics()
 
 	m_ui.metricsEdit->setText(text);
 
-	int percentage = (int)((double)m_framesProcessed * 100.0 /
+    int percentage = int(double(m_framesProcessed) * 100.0 /
         double(m_framesTotal));
     setWindowTitle(tr("%1% Benchmark: %2")
 		.arg(percentage).arg(scriptName()));

@@ -16,12 +16,12 @@ QString vsedit::timeToString(double a_seconds, bool a_fullFormat)
 	a_seconds = std::round(a_seconds * 1000.0) / 1000.0;
 
 	// Seconds
-	uint64_t integer = (uint64_t)a_seconds;
+    uint64_t integer = uint64_t(a_seconds);
 	int seconds = integer % 60ll;
 	integer /= 60ll;
 	int minutes = integer % 60ll;
 	integer /= 60ll;
-	int hours = integer;
+    int hours = int(integer);
 
 	QString timeString;
 
@@ -64,9 +64,9 @@ QString vsedit::videoInfoString(const VSVideoInfo * a_cpVideoInfo)
 	double time = 0.0;
 	if(a_cpVideoInfo->fpsDen != 0)
 	{
-		fps = (double)a_cpVideoInfo->fpsNum / (double)a_cpVideoInfo->fpsDen;
-		time = (double)a_cpVideoInfo->numFrames *
-		(double)a_cpVideoInfo->fpsDen / (double)a_cpVideoInfo->fpsNum;
+        fps = double(a_cpVideoInfo->fpsNum) / double(a_cpVideoInfo->fpsDen);
+        time = double(a_cpVideoInfo->numFrames) *
+        double(a_cpVideoInfo->fpsDen) / double(a_cpVideoInfo->fpsNum);
 	}
 
 	QString infoString = QString("Frames: %frames% | Time: %time% | Size: "
@@ -88,10 +88,10 @@ QString vsedit::videoInfoString(const VSVideoInfo * a_cpVideoInfo)
 
 double vsedit::qtimeToSeconds(const QTime & a_qtime)
 {
-    double seconds = (double)a_qtime.msec() / 1000.0;
-    seconds += (double)a_qtime.second();
-    seconds += (double)a_qtime.minute() * 60.0;
-    seconds += (double)a_qtime.hour() * 360.0;
+    double seconds = double(a_qtime.msec()) / 1000.0;
+    seconds += double(a_qtime.second());
+    seconds += double(a_qtime.minute()) * 60.0;
+    seconds += double(a_qtime.hour()) * 360.0;
     return seconds;
 }
 
@@ -109,14 +109,14 @@ QTime vsedit::secondsToQTime(double a_seconds)
 	a_seconds = std::round(a_seconds * 1000.0) / 1000.0;
 
 	// Seconds
-	uint64_t integer = (uint64_t)a_seconds;
+    uint64_t integer = uint64_t(a_seconds);
 	int seconds = integer % 60ll;
 	integer /= 60ll;
 	int minutes = integer % 60ll;
 	integer /= 60ll;
 	int hours = integer % 60ll;
 
-	int milliseconds = (int)(((a_seconds - std::round(a_seconds)) * 1000.0));
+    int milliseconds = int(((a_seconds - std::round(a_seconds)) * 1000.0));
 
 	qtime.setHMS(hours, minutes, seconds, milliseconds);
 	return qtime;
@@ -252,20 +252,20 @@ vsedit::FP32 vsedit::halfToSingle(vsedit::FP16 a_half)
 			} while ((m & 0x400) == 0);
 
 			o.parts.Mantissa = (m & 0x3ff) << 13;
-			o.parts.Exponent = 127 - 15 - e;
+            o.parts.Exponent = uint32_t(127 - 15 - e);
 			o.parts.Sign = a_half.parts.Sign;
 		}
 		else if (a_half.parts.Exponent == 0x1f) // Inf/NaN
 		{
 			// NOTE: It's safe to treat both with the same code path
 			// by just truncating lower Mantissa bits in NaNs (this is valid).
-			o.parts.Mantissa = a_half.parts.Mantissa << 13;
+            o.parts.Mantissa = uint32_t(a_half.parts.Mantissa << 13);
 			o.parts.Exponent = 255;
 			o.parts.Sign = a_half.parts.Sign;
 		}
 		else // Normalized number
 		{
-			o.parts.Mantissa = a_half.parts.Mantissa << 13;
+            o.parts.Mantissa = uint32_t(a_half.parts.Mantissa << 13);
 			o.parts.Exponent = 127 - 15 + a_half.parts.Exponent;
 			o.parts.Sign = a_half.parts.Sign;
 		}
@@ -279,7 +279,7 @@ vsedit::FP32 vsedit::halfToSingle(vsedit::FP16 a_half)
 
 double vsedit::round(double a_fps)
 {
-    return std::floor((a_fps * 100) + .5) / 100;
+    return std::floor((a_fps * 100) + .5) / 100; // round number to two decimal
 }
 
 // END OF void vsedit::round(double a_fps)

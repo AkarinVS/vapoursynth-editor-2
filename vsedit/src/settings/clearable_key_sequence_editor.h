@@ -15,7 +15,7 @@ public:
 
 	ClearableKeySequenceEditor(QWidget * a_pParent);
 
-	virtual ~ClearableKeySequenceEditor();
+    virtual ~ClearableKeySequenceEditor() override;
 
 	QKeySequence keySequence() const;
 

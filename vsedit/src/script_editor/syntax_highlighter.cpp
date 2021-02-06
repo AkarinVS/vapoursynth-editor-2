@@ -166,8 +166,8 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 //------Long string continuation, single quotes---------------------------------
 
 		if((i == 0) && (
-			(previousBlockState() == (int)BlockState::LongStringSingleStart) ||
-			(previousBlockState() == (int)BlockState::LongStringSingleMiddle)))
+            (previousBlockState() == int(BlockState::LongStringSingleStart)) ||
+            (previousBlockState() == int(BlockState::LongStringSingleMiddle))))
 		{
 			bool foundMatchingQuotes = false;
 			for(j = i; j < textLength - 2; ++j)
@@ -190,7 +190,7 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 			}
 			else
 			{
-				setCurrentBlockState((int)BlockState::LongStringSingleMiddle);
+                setCurrentBlockState(int(BlockState::LongStringSingleMiddle));
 				setFormat(0, a_text.length(), m_stringFormat);
 				return;
 			}
@@ -199,8 +199,8 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 //------Long string continuation, double quotes---------------------------------
 
 		if((i == 0) && (
-			(previousBlockState() == (int)BlockState::LongStringDoubleStart) ||
-			(previousBlockState() == (int)BlockState::LongStringDoubleMiddle)))
+            (previousBlockState() == int(BlockState::LongStringDoubleStart)) ||
+            (previousBlockState() == int(BlockState::LongStringDoubleMiddle))))
 		{
 			bool foundMatchingQuotes = false;
 			for(j = i; j < textLength - 2; ++j)
@@ -223,7 +223,7 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 			}
 			else
 			{
-				setCurrentBlockState((int)BlockState::LongStringDoubleMiddle);
+                setCurrentBlockState(int(BlockState::LongStringDoubleMiddle));
 				setFormat(0, a_text.length(), m_stringFormat);
 				return;
 			}
@@ -263,7 +263,7 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 				j = textLength - i;
 				Token newToken(a_text.mid(i, j), i, j, TokenType::String);
 				tokens.push_back(newToken);
-				setCurrentBlockState((int)BlockState::LongStringSingleStart);
+                setCurrentBlockState(int(BlockState::LongStringSingleStart));
 				break;
 			}
 		}
@@ -303,7 +303,7 @@ void SyntaxHighlighter::highlightBlock(const QString & a_text)
 				j = textLength - i;
 				Token newToken(a_text.mid(i, j), i, j, TokenType::String);
 				tokens.push_back(newToken);
-				setCurrentBlockState((int)BlockState::LongStringDoubleStart);
+                setCurrentBlockState(int(BlockState::LongStringDoubleStart));
 				break;
 			}
 		}

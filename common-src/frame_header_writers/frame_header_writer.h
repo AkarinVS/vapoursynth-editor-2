@@ -14,7 +14,7 @@ public:
 	FrameHeaderWriter(const VSAPI * a_cpVSAPI = nullptr,
 		const VSVideoInfo * a_cpVideoInfo = nullptr,
 		QObject * a_pParent = nullptr);
-	virtual ~FrameHeaderWriter();
+    virtual ~FrameHeaderWriter() override;
 
 	virtual void setVSAPI(const VSAPI * a_cpVSAPI);
 	virtual void setVideoInfo(const VSVideoInfo * a_cpVideoInfo);

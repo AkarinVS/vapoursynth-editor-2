@@ -352,8 +352,8 @@ void VapourSynthScriptProcessor::slotResetSettings()
 	m_yuvMatrix = m_pSettingsManager->getYuvMatrixCoefficients();
 
 	m_chromaResamplingFilter = m_pSettingsManager->getChromaResamplingFilter();
-	m_resamplingFilterParameterA = NAN;
-	m_resamplingFilterParameterB = NAN;
+    m_resamplingFilterParameterA = double(NAN);
+    m_resamplingFilterParameterB = double(NAN);
 	if(m_chromaResamplingFilter == ResamplingFilter::Bicubic)
 	{
 		m_resamplingFilterParameterA =
@@ -482,7 +482,7 @@ void VapourSynthScriptProcessor::processFrameTicketsQueue()
 	Q_ASSERT(m_cpVSAPI);
 
 	size_t oldInQueue = m_frameTicketsQueue.size();
-	size_t oldInProcess = m_frameTicketsInProcess.size();
+    size_t oldInProcess = size_t(m_frameTicketsInProcess.size());
 
 
     /* move frame ticket from queue to inProcess */
@@ -521,7 +521,7 @@ void VapourSynthScriptProcessor::processFrameTicketsQueue()
 	}
 
 	size_t inQueue = m_frameTicketsQueue.size();
-	size_t inProcess = m_frameTicketsInProcess.size();
+    size_t inProcess = size_t(m_frameTicketsInProcess.size());
 	if((inQueue != oldInQueue) || (oldInProcess != inProcess))
 		sendFrameQueueChangeSignal();
 
@@ -535,8 +535,8 @@ void VapourSynthScriptProcessor::processFrameTicketsQueue()
 void VapourSynthScriptProcessor::sendFrameQueueChangeSignal()
 {
 	size_t inQueue = m_frameTicketsQueue.size();
-	size_t inProcess = m_frameTicketsInProcess.size();
-	size_t maxThreads = m_cpCoreInfo->numThreads;
+    size_t inProcess = size_t(m_frameTicketsInProcess.size());
+    size_t maxThreads = size_t(m_cpCoreInfo->numThreads);
 	emit signalFrameQueueStateChanged(inQueue, inProcess, maxThreads);
 }
 
@@ -549,7 +549,7 @@ bool VapourSynthScriptProcessor::recreatePreviewNode(NodePair & a_nodePair)
     if(!a_nodePair.pOutputNode)
         return false;
 
-	if(!m_cpVSAPI)
+    if(!m_cpVSAPI)
 		return false;
 
 	if(a_nodePair.pPreviewNode)
@@ -832,7 +832,7 @@ QString VapourSynthScriptProcessor::framePropsString(
                 {0, "full range"},
                 {1, "limited range"}
             };
-            currentPropString += colorRangeMap[colorRange];
+            currentPropString += colorRangeMap[int(colorRange)];
 
         } else
         if (QString(propKey) == "_FieldBased") {
@@ -843,7 +843,7 @@ QString VapourSynthScriptProcessor::framePropsString(
                 {1, "bottom field first"},
                 {2, "top field first"}
             };
-            currentPropString += fieldBasedMap[fieldBased];
+            currentPropString += fieldBasedMap[int(fieldBased)];
 
         } else
         if (QString(propKey) == "_ChromaLocation") {
@@ -857,7 +857,7 @@ QString VapourSynthScriptProcessor::framePropsString(
                 {4, "bottom left"},
                 {5, "bottom"}
             };
-            currentPropString += chromaLocationMap[chromaLocation];
+            currentPropString += chromaLocationMap[int(chromaLocation)];
 
         } else
         if (QString(propKey) == "_Matrix") {
@@ -893,7 +893,7 @@ QString VapourSynthScriptProcessor::framePropsString(
                 {13, {""}},
                 {14, {"Rec. ITU-R BT.2100-1 ICTCP"}}
             };
-            currentPropString += matrixMap[matrix].join(", ");
+            currentPropString += matrixMap[int(matrix)].join(", ");
         } else
         if (QString(propKey) == "_PictType") {
             QString pictType = m_cpVSAPI->propGetData(cpProps, propKey, 0, &error);

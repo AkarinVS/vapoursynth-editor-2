@@ -2,11 +2,11 @@
 #include <QDebug>
 
 TimeLineView::TimeLineView (QWidget * a_pParent ):
-    m_playing(false),
-    m_mousePressed(false),
-    m_pSlider(nullptr),
     m_pScene(nullptr),
-    m_pTimeLine(nullptr)
+    m_pSlider(nullptr),
+    m_pTimeLine(nullptr),
+    m_playing(false),
+    m_mousePressed(false)
 {
     // setup scene and timeline items
     m_pScene = new QGraphicsScene(this);

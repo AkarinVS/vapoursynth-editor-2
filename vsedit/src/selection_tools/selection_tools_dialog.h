@@ -20,7 +20,7 @@ class SelectionToolsDialog : public QDialog
 
 public:
     explicit SelectionToolsDialog(QWidget *a_pParent = nullptr);
-    ~SelectionToolsDialog();
+    ~SelectionToolsDialog() override;
 
     void setFramePixmap(const QPixmap&);
 
