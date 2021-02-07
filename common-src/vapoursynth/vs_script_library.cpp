@@ -64,7 +64,7 @@ bool VSScriptLibrary::initialize()
 	}
 	m_vsScriptInitialized = true;
 
-	m_cpVSAPI = vssGetVSApi();
+    m_cpVSAPI = vssGetVSApi(VAPOURSYNTH_API_VERSION);
 	if(!m_cpVSAPI)
 	{
         QString errorString = tr("Failed to get VapourSynth API!");
@@ -73,7 +73,7 @@ bool VSScriptLibrary::initialize()
 		return false;
 	}
 
-	m_cpVSAPI->setMessageHandler(::vsMessageHandler,
+    m_cpVSAPI->addMessageHandler(::vsMessageHandler, nullptr,
 		static_cast<void *>(this));
 
 	m_initialized = true;
@@ -284,8 +284,8 @@ bool VSScriptLibrary::initLibrary()
 	{
           {reinterpret_cast<QFunctionPointer *>(&vssInit), "vsscript_init",
 			"_vsscript_init@0"}
-        , {reinterpret_cast<QFunctionPointer *>(&vssGetVSApi), "vsscript_getVSApi",
-			"_vsscript_getVSApi@0"}
+        , {reinterpret_cast<QFunctionPointer *>(&vssGetVSApi), "vsscript_getVSApi2",
+            "_vsscript_getVSApi2@0"}
         , {reinterpret_cast<QFunctionPointer *>(&vssEvaluateScript), "vsscript_evaluateScript",
 			"_vsscript_evaluateScript@16"}
         , {reinterpret_cast<QFunctionPointer *>(&vssGetError), "vsscript_getError",
@@ -300,6 +300,7 @@ bool VSScriptLibrary::initLibrary()
 			"_vsscript_finalize@0"}
 	};
 
+    // rename vss function pointers for vs editor
 	for(Entry & entry : vssEntries)
 	{
 		Q_ASSERT(entry.ppFunction);

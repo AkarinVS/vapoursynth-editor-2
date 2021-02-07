@@ -11,7 +11,7 @@ class SettingsManagerCore;
 //==============================================================================
 
 typedef int (VS_CC *FNP_vssInit)(void);
-typedef const VSAPI * (VS_CC *FNP_vssGetVSApi)(void);
+typedef const VSAPI * (VS_CC *FNP_vssGetVSApi)(int a_version);
 typedef int (VS_CC *FNP_vssEvaluateScript)(VSScript ** a_ppScript,
 	const char * a_scriptText, const char * a_scriptFilename, int a_flags);
 typedef const char * (VS_CC *FNP_vssGetError)(VSScript * a_pScript);
