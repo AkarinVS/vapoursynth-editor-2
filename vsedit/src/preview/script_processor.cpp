@@ -343,6 +343,11 @@ void ScriptProcessor::slotGotoFrame(int a_frameNumber)
     m_frameShown = a_frameNumber;
 }
 
+void ScriptProcessor::slotResetSettings()
+{
+    m_pVapourSynthScriptProcessor->slotResetSettings();
+}
+
 void ScriptProcessor::slotShowFrame(int a_frameNumber)
 {
     if(m_playing)

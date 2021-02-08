@@ -76,6 +76,7 @@ public slots:
     bool slotPlay(bool a_play);
     void slotSetPlaySpeed(double a_secondsPerFrames);
     void slotGotoFrame(int a_frameNumber);
+    void slotResetSettings();
 
 signals:
 

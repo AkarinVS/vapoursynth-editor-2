@@ -241,6 +241,10 @@ void MainWindow::createTab(const QString & a_tabName,
     connect(this, &MainWindow::signalUpdatePreviewFiltersDisplay,
             m_pPreviewFiltersDialog, &PreviewFiltersDialog::slotUpdateDisplay);
 
+    // don't know what this does
+    connect(m_pPreviewAdvancedSettingsDialog, &PreviewAdvancedSettingsDialog::signalSettingsChanged,
+           ep.processor, &ScriptProcessor::slotResetSettings);
+
     // autocomplete feature in editor
     ep.editor->setPluginsList(m_vsPluginsList);
     ep.editor->setPyScriptsList(m_vsPyScriptsList);
@@ -323,7 +327,7 @@ void MainWindow::createSettingDialog()
 
 void MainWindow::createAdvancedSettingsDialog()
 {
-    m_pAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
+    m_pPreviewAdvancedSettingsDialog = new PreviewAdvancedSettingsDialog(
         m_pSettingsManager, this);
 }
 

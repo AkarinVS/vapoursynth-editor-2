@@ -120,7 +120,7 @@ private:
     TemplatesDialog * m_pTemplatesDialog;
     FrameInfoDialog * m_pFrameInfoDialog;
     FindDialog * m_pFindDialog;
-    PreviewAdvancedSettingsDialog * m_pAdvancedSettingsDialog;
+    PreviewAdvancedSettingsDialog * m_pPreviewAdvancedSettingsDialog;
     BookmarkManagerDialog * m_pBookmarkManagerDialog;
     PreviewFiltersDialog * m_pPreviewFiltersDialog;
     SelectionToolsDialog * m_pSelectionToolsDialog;
