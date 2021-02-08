@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *a_pParent) :
   , m_pBenchmarkDialog(nullptr)
   , m_pEncodeDialog(nullptr)
   , m_pTemplatesDialog(nullptr)
-  , m_pAdvancedSettingsDialog(nullptr)
+  , m_pPreviewAdvancedSettingsDialog(nullptr)
   , m_pSelectionToolsDialog(nullptr)
 
   , m_pPreviewContextMenu(nullptr)
@@ -1240,7 +1240,7 @@ void MainWindow::createGarbageCollection()
         reinterpret_cast<QObject **>(&m_pEncodeDialog),
         reinterpret_cast<QObject **>(&m_pTemplatesDialog),
         reinterpret_cast<QObject **>(&m_pFrameInfoDialog),
-        reinterpret_cast<QObject **>(&m_pAdvancedSettingsDialog),
+        reinterpret_cast<QObject **>(&m_pPreviewAdvancedSettingsDialog),
         reinterpret_cast<QObject **>(&m_pBookmarkManagerDialog)
     };
 }
@@ -1889,7 +1889,7 @@ void MainWindow::slotPreviewAreaMouseRightButtonReleased()
 
 void MainWindow::slotCallAdvancedSettingsDialog()
 {
-    m_pAdvancedSettingsDialog->slotCall();
+    m_pPreviewAdvancedSettingsDialog->slotCall();
 }
 
 void MainWindow::slotPasteShownFrameNumberIntoScript()
