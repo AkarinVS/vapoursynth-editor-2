@@ -1,5 +1,4 @@
 CONFIG += qt
-CONFIG += c++17
 
 QT += widgets
 QT += network
@@ -138,7 +137,7 @@ contains(QMAKE_COMPILER, clang) {
 }
 
 contains(QMAKE_COMPILER, gcc) {
-	QMAKE_CXXFLAGS += -std=c++11
+        QMAKE_CXXFLAGS += -std=c++17
 	QMAKE_CXXFLAGS += -Wall
 	QMAKE_CXXFLAGS += -Wextra
 	QMAKE_CXXFLAGS += -Wredundant-decls
@@ -148,7 +147,7 @@ contains(QMAKE_COMPILER, gcc) {
 
 	LIBS += -L$$[QT_INSTALL_LIBS]
 } else {
-    CONFIG += c++11
+    CONFIG += c++17
 }
 
 include($${COMMON_DIRECTORY}/pro/common.pri)
