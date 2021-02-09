@@ -2522,10 +2522,13 @@ void MainWindow::slotChangeTabByAction()
     }
 
     if (!action->data().isNull()) {
-        int tabIndex = action->data().toInt();
+        int destIndex = action->data().toInt();
+        int currentIndex = m_ui->previewTabWidget->currentIndex();
 
-        if (tabIndex > m_ui->scriptTabWidget->count() - 1) return;
-        slotChangeScriptTab(tabIndex);
+        if (currentIndex != destIndex) {
+            if (destIndex > m_ui->scriptTabWidget->count() - 1) return;
+            slotChangeScriptTab(destIndex);
+        }
     }
 }
 
