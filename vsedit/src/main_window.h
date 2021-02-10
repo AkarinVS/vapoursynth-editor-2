@@ -293,7 +293,6 @@ private:
     QIcon m_iconPlay;
     QIcon m_iconPause;
     bool m_playing;
-    int m_currentPlayingFrame;
 
     /* Window */
     QString m_currentTabScriptFilePath;

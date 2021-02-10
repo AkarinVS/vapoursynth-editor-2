@@ -1386,7 +1386,6 @@ void MainWindow::slotSaveTabBeforeChanged(int a_leftTabIndex, int a_rightTabInde
         if (processor->isPlaying()) {
             processor->slotPlay(false);
             m_playing = true;
-            m_currentPlayingFrame = currentFrame;
         }
     } else {
         /* search for all other clip with the same group and copy current frame to them */
@@ -1442,9 +1441,10 @@ void MainWindow::slotChangeScriptTab(int a_index)
         previewArea->setPreviewScrollBarPos(savedPreviewScrollBarPos);
 
         if (m_playing) {
-            processor->slotGotoFrame(m_currentPlayingFrame);
-            processor->slotPlay(true);
+            processor->slotGotoFrame(savedFrame);
+            processor->slotPlay(m_playing);
         } else {
+            processor->slotPlay(m_playing);
             m_pActionPlay->setIcon(m_iconPlay);
 
             m_ui->timeLineView->setFrame(savedFrame);
@@ -1942,7 +1942,6 @@ void MainWindow::slotPlay(bool a_play)
         m_pActionPlay->setIcon(m_iconPlay);
     }
 
-    m_playing = playing;
     m_ui->timeLineView->setPlay(playing); // passing the flag into timeline
 }
 
@@ -2541,7 +2540,6 @@ void MainWindow::slotCheckScript()
     int currentTabIndex = m_ui->scriptTabWidget->currentIndex();
     ScriptEditor * editor = m_pEditorPreviewVector[currentTabIndex].editor;
     QString &storedFilePath = m_pEditorPreviewVector[currentTabIndex].scriptName;
-
 
     connect(&tempProcessor, SIGNAL(signalWriteLogMessage(int, const QString &)),
         this, SLOT(slotWriteLogMessage(int, const QString &)));
