@@ -1421,6 +1421,9 @@ void MainWindow::slotChangeScriptTab(int a_index)
     QString tabName = m_pEditorPreviewVector[a_index].tabName;
 
     if (!script.isEmpty()) {
+        // block signal to prevent setting frame twice
+        m_ui->frameNumberIndicatorSpinBox->blockSignals(true);
+
         m_ui->timeLineView->setEnabled(true);
 
         int savedFrame = m_pEditorPreviewVector[a_index].lastTimeLineFrameIndex;
@@ -1461,6 +1464,8 @@ void MainWindow::slotChangeScriptTab(int a_index)
 
         m_pStatusBarWidget->show();
         m_pStatusBarWidget->setVideoInfo(vsVideoInfo);
+
+        m_ui->frameNumberIndicatorSpinBox->blockSignals(false); // unblock signal
     } else {
         // set satusbar to null
         m_pStatusBarWidget->hide();
