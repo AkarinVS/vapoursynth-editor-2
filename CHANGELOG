@@ -1,5 +1,18 @@
 Vapoursynth Editor 2
 
+R5: [2021-02-10]
+- Bug fixed: switching from tab A with a larger frame number than the max frame number of tab B will cause an out of range frame request error
+- Bug fixed: switching to tabs that are not in the same group during playback would keep on playing
+- Bug fixed: in group playback, switching to the same tab using hotkey would break the playback
+- Fixed missing connect for preview advance setting dialog, but its usage is still unknown to me
+- Config file now saved as vsedit2.config to avoid conflicting with the original version
+- Updated to VSAPI 3.6 calls, now requires Vapoursynth R47 or higher
+- Updated deprecated QProcess calls for encode and job server watcher
+- Autocompleter list shows only function names instead of the entire definition
+- Autocompletion for Python script functions, but only limited to non alias calls
+- Autocompletion popup now triggers on zero character type after "." on known filter/script names, normal words will not be affected
+- Added "about Vapoursynth", "open plugins folder" and "open scripts folder" options to menu
+
 R4: [2021-01-31]
 - Add option to release memory on tab
 - Remember tabs on close
