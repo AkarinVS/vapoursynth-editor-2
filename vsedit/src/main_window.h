@@ -273,7 +273,6 @@ private:
     QAction * m_pActionSetZoomModeNoZoom;
     QAction * m_pActionSetZoomModeFixedRatio;
     QAction * m_pActionSetZoomModeFitToFrame;
-    QAction * m_pActionToggleCropPanel;
     QAction * m_pActionTimeStepForward;
     QAction * m_pActionTimeStepBack;
     QAction * m_pActionPasteCropSnippetIntoScript;
@@ -285,9 +284,6 @@ private:
     std::map<QString, ZoomMode> m_actionIDToZoomModeMap;
 
 //    std::map<QString, Qt::TransformationMode> m_actionIDToZoomScaleModeMap;
-
-    std::map<QString, TimeLineSlider::DisplayMode>
-        m_actionIDToTimeLineModeMap;
 
     /* playback icon */
     QIcon m_iconPlay;

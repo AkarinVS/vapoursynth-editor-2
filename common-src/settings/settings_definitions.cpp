@@ -22,8 +22,6 @@ const unsigned int DEFAULT_MAX_RECENT_FILES_NUMBER = 10;
 const QStringList DEFAULT_DOCUMENTATION_PATHS("./documentation");
 const int DEFAULT_CHARACTERS_TYPED_TO_START_COMPLETION = 2;
 const double DEFAULT_TIME_STEP = 5.0;
-const TimeLineSlider::DisplayMode DEFAULT_TIMELINE_MODE =
-	TimeLineSlider::DisplayMode::Time;
 const bool DEFAULT_COLOR_PICKER_VISIBLE = false;
 const PlayFPSLimitMode DEFAULT_PLAY_FPS_LIMIT_MODE =
 	PlayFPSLimitMode::FromVideo;
@@ -96,7 +94,6 @@ const char ACTION_ID_SET_ZOOM_SCALE_MODE_NEAREST[] =
 	"set_zoom_scale_mode_nearest";
 const char ACTION_ID_SET_ZOOM_SCALE_MODE_BILINEAR[] =
 	"set_zoom_scale_mode_bilinear";
-const char ACTION_ID_TOGGLE_CROP_PANEL[] = "toggle_crop_panel";
 const char ACTION_ID_PASTE_CROP_SNIPPET_INTO_SCRIPT[] =
 	"paste_crop_snippet_into_script";
 const char ACTION_ID_FRAME_TO_CLIPBOARD[] = "frame_to_clipboard";

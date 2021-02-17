@@ -158,10 +158,6 @@ public:
 
 	bool setCharactersTypedToStartCompletion(int a_charactersNumber);
 
-	TimeLineSlider::DisplayMode getTimeLineMode() const;
-
-	bool setTimeLineMode(TimeLineSlider::DisplayMode a_timeLineMode);
-
 	double getTimeStep() const;
 
 	bool setTimeStep(double a_timeStep);

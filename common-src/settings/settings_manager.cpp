@@ -194,8 +194,6 @@ void SettingsManager::initializeStandardActions()
 			QIcon(), QKeySequence()},
         {ACTION_ID_SET_ZOOM_SCALE_MODE_BILINEAR, tr("Scale: Bilinear"),
 			QIcon(), QKeySequence()},
-        {ACTION_ID_TOGGLE_CROP_PANEL, tr("Crop assistant"),
-			QIcon(":crop.png"), QKeySequence(Qt::Key_C)},
 		{ACTION_ID_PASTE_CROP_SNIPPET_INTO_SCRIPT,
             tr("Paste crop snippet into script"), QIcon(":paste.png"),
 			QKeySequence()},
@@ -782,20 +780,6 @@ bool SettingsManager::setCharactersTypedToStartCompletion(
 {
 	return setValue(CHARACTERS_TYPED_TO_START_COMPLETION_KEY,
 		a_charactersNumber);
-}
-
-//==============================================================================
-
-TimeLineSlider::DisplayMode SettingsManager::getTimeLineMode() const
-{
-    return static_cast<TimeLineSlider::DisplayMode>(value(TIMELINE_MODE_KEY,
-        int(DEFAULT_TIMELINE_MODE)).toInt());
-}
-
-bool SettingsManager::setTimeLineMode(
-	TimeLineSlider::DisplayMode a_timeLineMode)
-{
-    return setValue(TIMELINE_MODE_KEY, int(a_timeLineMode));
 }
 
 //==============================================================================

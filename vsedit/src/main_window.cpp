@@ -624,8 +624,6 @@ void MainWindow::createMenuActionsAndContextMenuActions()
             this, SLOT(slotZoomModeChanged())},
 
 
-//        {&m_pActionToggleCropPanel, ACTION_ID_TOGGLE_CROP_PANEL,
-//         true, SLOT(slotToggleCropPanelVisible(bool))},
 //        {&m_pActionTimeStepForward, ACTION_ID_TIME_STEP_FORWARD,
 //         false, SLOT(slotTimeStepForward())},
 //        {&m_pActionTimeStepBack, ACTION_ID_TIME_STEP_BACK,

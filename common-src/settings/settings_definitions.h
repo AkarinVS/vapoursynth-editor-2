@@ -1,7 +1,6 @@
 #ifndef SETTINGS_DEFINITIONS_H_INCLUDED
 #define SETTINGS_DEFINITIONS_H_INCLUDED
 
-#include "../timeline_slider/timeline_slider.h"
 #include "../log/styled_log_view_structures.h"
 
 #include <QString>
@@ -104,7 +103,6 @@ extern const unsigned int DEFAULT_MAX_RECENT_FILES_NUMBER;
 extern const QStringList DEFAULT_DOCUMENTATION_PATHS;
 extern const int DEFAULT_CHARACTERS_TYPED_TO_START_COMPLETION;
 extern const double DEFAULT_TIME_STEP;
-extern const TimeLineSlider::DisplayMode DEFAULT_TIMELINE_MODE;
 extern const bool DEFAULT_COLOR_PICKER_VISIBLE;
 extern const PlayFPSLimitMode DEFAULT_PLAY_FPS_LIMIT_MODE;
 extern const double DEFAULT_PLAY_FPS_LIMIT;
@@ -172,7 +170,6 @@ extern const char ACTION_ID_SET_ZOOM_MODE_FIXED_RATIO[];
 extern const char ACTION_ID_SET_ZOOM_MODE_FIT_TO_FRAME[];
 extern const char ACTION_ID_SET_ZOOM_SCALE_MODE_NEAREST[];
 extern const char ACTION_ID_SET_ZOOM_SCALE_MODE_BILINEAR[];
-extern const char ACTION_ID_TOGGLE_CROP_PANEL[];
 extern const char ACTION_ID_PASTE_CROP_SNIPPET_INTO_SCRIPT[];
 extern const char ACTION_ID_FRAME_TO_CLIPBOARD[];
 extern const char ACTION_ID_TOGGLE_TIMELINE_PANEL[];

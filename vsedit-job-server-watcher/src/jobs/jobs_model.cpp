@@ -4,6 +4,7 @@
 #include "../../../common-src/helpers.h"
 
 #include <QGuiApplication>
+#include <set>
 
 //==============================================================================
 
@@ -115,8 +116,6 @@ QVariant JobsModel::headerData(int a_section, Qt::Orientation a_orientation,
 	default:
 		return QVariant();
 	}
-
-	return QVariant();
 }
 
 // END OF QVariant JobsModel::headerData(int a_section,
