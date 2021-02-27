@@ -1325,17 +1325,18 @@ void vsedit::Job::startEncodeScriptCLI()
 
 	QString executable = vsedit::resolvePathFromApplication(
 		m_properties.executablePath);
-    QStringList decodedArguments =
-        decodeArguments(m_properties.arguments).split(" "); // decodeArguments() not necessary?
+    QString decodedArguments =
+        decodeArguments(m_properties.arguments);
+    QStringList argumentsList = QProcess::splitCommand(decodedArguments);
 
     emit signalLogMessage(tr("Command line:"));
     emit signalLogMessage(QString("%1 %2")
-                          .arg(executable).arg(decodedArguments.join(" ")));
+                          .arg(executable).arg(argumentsList.join(" ")));
 
     emit signalLogMessage(tr("Checking the encoder sanity."));
 	m_encodingState = EncodingState::CheckingEncoderSanity;
 
-    m_process.start(executable, decodedArguments);
+    m_process.start(executable, argumentsList);
 	if(!m_process.waitForStarted(3000))
 	{
         emit signalLogMessage(tr("Encoder wouldn't start."),
@@ -1359,7 +1360,7 @@ void vsedit::Job::startEncodeScriptCLI()
 
     emit signalLogMessage(tr("Encoder seems sane. Starting."));
 	m_encodingState = EncodingState::StartingEncoder;
-    m_process.start(executable, decodedArguments);
+    m_process.start(executable, argumentsList);
 }
 
 // END OF void vsedit::Job::startEncodeScriptCLI()
@@ -1371,7 +1372,9 @@ void vsedit::Job::startRunProcess()
 
 	QString executable = vsedit::resolvePathFromApplication(
         m_properties.executablePath);
-    QStringList argumentsList = m_properties.arguments.simplified().split(" ");
+    QString decodedArguments =
+        decodeArguments(m_properties.arguments);
+    QStringList argumentsList = QProcess::splitCommand(decodedArguments);
 
     emit signalLogMessage(tr("Command line:"));
     emit signalLogMessage(QString("%1 %2").arg(executable).arg(m_properties.arguments));
@@ -1393,7 +1396,7 @@ void vsedit::Job::startRunShellCommand()
 	command = "/bin/sh -c %1";
 #endif
 
-    QStringList commandList = command.arg(m_properties.shellCommand).simplified().split(" ");
+    QStringList commandList = QProcess::splitCommand(command.arg(m_properties.shellCommand));
     QProcess::startDetached(QString(""), commandList); // dummy holder for the program position
 	changeStateAndNotify(JobState::Completed);
 }
