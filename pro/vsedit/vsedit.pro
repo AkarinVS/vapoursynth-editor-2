@@ -104,6 +104,7 @@ QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}resources$${S}vsedit.svg $${D}$${S}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}README $${D}$${S}README $${E}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}LICENSE $${D}$${S}LICENSE $${E}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}CHANGELOG $${D}$${S}CHANGELOG $${E}
+QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}vsedit_logger.dll $${D}$${S}vsedit_logger.dll $${E}
 
 macx {
 	INCLUDEPATH += /usr/local/include

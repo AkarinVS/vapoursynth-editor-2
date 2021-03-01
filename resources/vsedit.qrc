@@ -44,6 +44,10 @@
         <file alias="jobs.png">sheduled_task.png</file>
         <file alias="readme">../README</file>
         <file alias="fonts/DigitalMini.ttf">fonts/DigitalMini.ttf</file>
-        <file alias="preview_filters/channels.vpy">preview_filters/channels.vpy</file>
+    </qresource>
+    <qresource prefix="/preview filters">
+        <file alias="channels">preview_filters/channels.vpy</file>
+        <file alias="logger_footer">preview_filters/logger_footer.vpy</file>
+        <file alias="logger_header">preview_filters/logger_header.vpy</file>
     </qresource>
 </RCC>
