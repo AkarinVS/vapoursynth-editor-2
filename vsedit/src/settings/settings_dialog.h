@@ -113,6 +113,8 @@ private slots:
     void slotChangeThemePreset(const QString & a_themePreset);
 
     void slotRemoveThemePreset();
+
+    void slotAssociateVpyFile();
 };
 
 #endif // SETTINGSDIALOG_H

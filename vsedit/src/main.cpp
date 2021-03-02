@@ -74,6 +74,12 @@ int main(int argc, char *argv[])
 	qRegisterMetaType<VSNodeRef *>("VSNodeRef *");
 
     pMainWindow = new MainWindow();
+
+    if (argc == 2) {
+        QString filePath(argv[1]);
+        pMainWindow->loadFileFromCLI(filePath);
+    }
+
 //    qInstallMessageHandler(handleQtMessage);
 	pMainWindow->show();
 	int exitCode = application.exec();

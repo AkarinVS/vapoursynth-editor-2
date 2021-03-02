@@ -16,6 +16,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QDesktopServices>
+#include <QSettings>
 
 //==============================================================================
 
@@ -58,6 +59,9 @@ SettingsDialog::SettingsDialog(SettingsManager * a_pSettingsManager,
     /* theme setting */
     m_ui.themePresetCopyWidget->setVisible(false);
     loadThemePresets();
+
+    connect(m_ui.associateVpyButton, &QPushButton::clicked,
+            this, &SettingsDialog::slotAssociateVpyFile);
 
     connect(m_ui.settingsFileDirButton, &QPushButton::clicked,
             this, &SettingsDialog::slotOpenSettingsFileDir);
@@ -1098,6 +1102,18 @@ void SettingsDialog::slotRemoveThemePreset()
 
     m_tempThemePresets =
             ThemeElementsModel::removeThemeFromListString(m_tempThemePresets, selectedThemePreset);
+}
+
+void SettingsDialog::slotAssociateVpyFile()
+{
+#ifdef Q_OS_WIN
+
+    QSettings regType("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES", QSettings::NativeFormat);
+    regType.setValue(".vpy/DefaultIcon/.",QDir::toNativeSeparators(qApp->applicationFilePath()));
+    regType.setValue(".vpy/.","");
+    regType.setValue(".vpy/Shell/Open/Command/.", QDir::toNativeSeparators(qApp->applicationFilePath()) + " %1");
+
+#endif
 }
 
 /* overloaded operator for QTextCharFormat data */

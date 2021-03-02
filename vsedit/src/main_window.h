@@ -90,6 +90,8 @@ public:
     explicit MainWindow(QWidget *a_pParent = nullptr);
     ~MainWindow() override;
 
+    void loadFileFromCLI(const QString &a_filePath);
+
     VSEditorLog * m_logView;
 
 protected:

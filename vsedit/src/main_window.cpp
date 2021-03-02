@@ -143,6 +143,11 @@ MainWindow::~MainWindow()
     destroyOrphanQObjects();
 }
 
+void MainWindow::loadFileFromCLI(const QString &a_filePath)
+{
+    loadScriptFromFile(a_filePath);
+}
+
 void MainWindow::closeEvent(QCloseEvent *a_pEvent)
 {
     m_closingApp = true;
