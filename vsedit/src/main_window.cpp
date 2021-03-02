@@ -1126,30 +1126,42 @@ QString MainWindow::createPreviewFilterScript(const QString &a_script, const QMa
 {
     if (a_filtersMap.isEmpty()) return a_script;
 
-    QRegularExpression reScriptOutput("(?smi)^[().\\w]+\\.set_output\\(\\)(?!.*^[().\\w]+\\.set_output\\(\\))");
     QString scriptChain = "";
 
-    if (a_filtersMap["channels"] > -1) {
-        QFile file(":/preview_filters/channels.vpy"); // read from resource file
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        scriptChain = file.readAll();
+    // add logger header file
+    QFile file(":/preview filters/logger_header"); // read from resource file
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    scriptChain = file.readAll();
 
+    // append script from editor
+    scriptChain.append(a_script);
+
+    QString tempString = "";
+    if (a_filtersMap["channels"] > -1) {
+        QFile file(":/preview filters/channels"); // read from resource file
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        tempString = file.readAll();
+
+        QRegularExpression reScriptOutput("(?smi)^[().\\w]+\\.set_output\\(\\)(?!.*^[().\\w]+\\.set_output\\(\\))");
         QRegularExpressionMatch match = reScriptOutput.match(a_script);
         if (!match.hasMatch()) {
-            qDebug() << "no match or clip output function changed, check vs doc";
+//            qDebug() << "no match or clip output function changed, check vs doc";
         } else {
             QString clipOutputString = match.captured(0); // get last capture of set_output
-            scriptChain.prepend(a_script); // prepend editor script to filter script
 
             QRegularExpression reClipPlaceHolder("{c}");
-            scriptChain.replace(reClipPlaceHolder, clipOutputString);
+            tempString.replace(reClipPlaceHolder, clipOutputString);
 
             QRegularExpression rePlanePlaceHolder("{x}");
-            scriptChain.replace(rePlanePlaceHolder, QVariant(a_filtersMap["channels"]).toString());
+            tempString.replace(rePlanePlaceHolder, QVariant(a_filtersMap["channels"]).toString());
+
+            scriptChain.append(tempString);
         }
-    } else {
-        return a_script;
     }
+
+    QFile ffile(":/preview filters/logger_footer"); // read from resource file
+    ffile.open(QIODevice::ReadOnly | QIODevice::Text);
+    scriptChain.append(ffile.readAll());
 
     return scriptChain;
 }
