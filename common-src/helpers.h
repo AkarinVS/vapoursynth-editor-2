@@ -50,6 +50,8 @@ QByteArray jsonMessage(const QString & a_command,
 
 double round(double a_fps); // round fps to 2 decimal
 
+QString CLIArgToLongPathName(const char*);
+
 template<typename T1, typename T2, typename T3>
 	void clamp(T1& a_value, const T2& a_low, const T3& a_high)
 {

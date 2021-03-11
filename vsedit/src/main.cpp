@@ -1,8 +1,12 @@
 #include "main_window.h"
 
 #include "../../common-src/log/vs_editor_log.h"
+#include "../../common-src/kdsingleapplication/kdsingleapplication.h"
+#include "../../../common-src/helpers.h"
 
 #include <QApplication>
+#include <QObject>
+#include <QFileInfo>
 
 Q_DECLARE_OPAQUE_POINTER(const VSFrameRef *)
 Q_DECLARE_OPAQUE_POINTER(VSNodeRef *)
@@ -63,21 +67,38 @@ void handleQtMessage(QtMsgType a_type, const QMessageLogContext & a_context,
 }
 
 int main(int argc, char *argv[])
-{
-	QApplication application(argc, argv);
+{    
+    QApplication application(argc, argv);
 
-	// Make text in message box selectable
-	application.setStyleSheet(
-		"QMessageBox { messagebox-text-interaction-flags: 5; }");
+    // single instance app implementation
+    KDSingleApplication kdsa;
 
-	qRegisterMetaType<const VSFrameRef *>("const VSFrameRef *");
-	qRegisterMetaType<VSNodeRef *>("VSNodeRef *");
+    if (kdsa.isPrimaryInstance()) {
+        pMainWindow = new MainWindow();
 
-    pMainWindow = new MainWindow();
+        // Make text in message box selectable
+        application.setStyleSheet(
+            "QMessageBox { messagebox-text-interaction-flags: 5; }");
 
-    if (argc == 2) {
-        QString filePath(argv[1]);
-        pMainWindow->loadFileFromCLI(filePath);
+        qRegisterMetaType<const VSFrameRef *>("const VSFrameRef *");
+        qRegisterMetaType<VSNodeRef *>("VSNodeRef *");
+
+        if (argc >= 2) {
+            QString canonicalPath = vsedit::CLIArgToLongPathName(argv[1]);
+            QByteArray br = canonicalPath.toUtf8();
+            pMainWindow->slotLoadMessageFromCLI(br);
+        }
+
+        QObject::connect(&kdsa, &KDSingleApplication::messageReceived,
+                         pMainWindow, &MainWindow::slotLoadMessageFromCLI);
+
+    } else {
+        if (argc >= 2) {
+            QString canonicalPath = vsedit::CLIArgToLongPathName(argv[1]);
+            QByteArray br = canonicalPath.toUtf8();
+            kdsa.sendMessage(br);
+        }
+         return 0;
     }
 
 //    qInstallMessageHandler(handleQtMessage);

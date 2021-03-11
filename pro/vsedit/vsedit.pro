@@ -219,6 +219,9 @@ HEADERS += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_stringl
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.h
 HEADERS += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/kdsingleapplication/kdsingleapplication_lib.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/kdsingleapplication/kdsingleapplication_localsocket_p.h
+HEADERS += $${COMMON_DIRECTORY}/common-src/kdsingleapplication/kdsingleapplication.h
 
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.h
 HEADERS += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.h
@@ -284,6 +287,8 @@ SOURCES += $${COMMON_DIRECTORY}/common-src/qt_widgets_subclasses/generic_stringl
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/timeline_view.cpp
 SOURCES += $${COMMON_DIRECTORY}/common-src/frame_timeline/slider.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/kdsingleapplication/kdsingleapplication.cpp
+SOURCES += $${COMMON_DIRECTORY}/common-src/kdsingleapplication/kdsingleapplication_localsocket.cpp
 
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/actions_hotkey_edit_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/settings/clearable_key_sequence_editor.cpp
@@ -320,5 +325,7 @@ SOURCES += $${PROJECT_DIRECTORY}/src/bookmark_manager/bookmark_model.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/preview_filters/preview_filters_dialog.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main_window.cpp
 SOURCES += $${PROJECT_DIRECTORY}/src/main.cpp
+
+DEFINES += KDSINGLEAPPLICATION_STATIC_BUILD
 
 include($${COMMON_DIRECTORY}/pro/local_quirks.pri)

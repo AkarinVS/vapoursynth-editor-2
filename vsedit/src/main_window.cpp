@@ -143,11 +143,6 @@ MainWindow::~MainWindow()
     destroyOrphanQObjects();
 }
 
-void MainWindow::loadFileFromCLI(const QString &a_filePath)
-{
-    loadScriptFromFile(a_filePath);
-}
-
 void MainWindow::closeEvent(QCloseEvent *a_pEvent)
 {
     m_closingApp = true;
@@ -2929,6 +2924,11 @@ void MainWindow::slotWriteLogMessage(const QString & a_message,
 
     QUrl fileUrl = QUrl::fromLocalFile(filePath);
     QDesktopServices::openUrl(fileUrl);
+}
+
+void MainWindow::slotLoadMessageFromCLI(const QByteArray &message)
+{
+    loadScriptFromFile(message);
 }
 
 inline bool operator==(const ClipProp& lhs, const ClipProp& rhs)

@@ -90,8 +90,6 @@ public:
     explicit MainWindow(QWidget *a_pParent = nullptr);
     ~MainWindow() override;
 
-    void loadFileFromCLI(const QString &a_filePath);
-
     VSEditorLog * m_logView;
 
 protected:
@@ -314,6 +312,8 @@ public slots:
     void slotWriteLogMessage(int a_messageType, const QString & a_message);
     void slotWriteLogMessage(const QString & a_message,
         const QString & a_style = LOG_STYLE_DEFAULT);
+
+    void slotLoadMessageFromCLI(const QByteArray &message);
 
 private slots:
 

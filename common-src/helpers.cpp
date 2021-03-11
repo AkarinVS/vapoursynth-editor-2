@@ -284,3 +284,40 @@ double vsedit::round(double a_fps)
 
 // END OF void vsedit::round(double a_fps)
 //==============================================================================
+
+#ifdef Q_OS_WIN
+    namespace win32 {
+        #include "windows.h"
+    }
+#endif
+
+#define BUFSIZE 4096
+QString vsedit::CLIArgToLongPathName(const char * a_cpArg)
+{
+#ifdef Q_OS_WIN
+
+    // convert char* to LPCWSTR
+    wchar_t scriptShortPath[BUFSIZE];
+    win32::MultiByteToWideChar(CP_ACP, 0, a_cpArg, -1, scriptShortPath, BUFSIZE);
+
+    win32::DWORD retval=0;
+    win32::TCHAR scriptLongPath[BUFSIZE];
+
+    // get long filename from short filename
+    retval = win32::GetLongPathName(scriptShortPath, scriptLongPath, BUFSIZE);
+
+    QString filePath = "";
+    if (retval > 0) {
+        filePath = QString::fromWCharArray(scriptLongPath);
+    }
+
+#else
+
+    QString filePath = a_cpArg;
+
+#endif // Q_OS_WIN64
+
+    // path check
+    QFileInfo fi(filePath);
+    return fi.canonicalFilePath();
+}
