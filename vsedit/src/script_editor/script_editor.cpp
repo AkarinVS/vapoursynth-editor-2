@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <QCoreApplication>
 
 ScriptEditor::ScriptEditor(QWidget * a_pParent) :
 	QPlainTextEdit(a_pParent)
@@ -960,7 +961,7 @@ void ScriptEditor::loadThemeSettings()
 {
     QString savedThemeName = m_pSettingsManager->getThemeName();
 
-    QFile file("theme_presets.txt");
+    QFile file(QCoreApplication::applicationDirPath() + "/theme_presets.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         file.open(QIODevice::WriteOnly); // create file if it doesn't exist
         file.open(QIODevice::ReadOnly | QIODevice::Text);

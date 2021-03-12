@@ -289,7 +289,7 @@ void SettingsDialog::loadThemePresets()
      * load from temp string and add preset names to theme list model
      * the list model will then update combobox automatically
     */
-    QFile file("theme_presets.txt");
+    QFile file(QCoreApplication::applicationDirPath() + "/theme_presets.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         file.open(QIODevice::WriteOnly); // create file if it doesn't exist
         file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -379,7 +379,7 @@ void SettingsDialog::saveThemeSettings()
     m_pSettingsManager->setThemeName(
                 m_ui.themePresetSelectionComboBox->currentText());
 
-    QFile file("theme_presets.txt");
+    QFile file(QCoreApplication::applicationDirPath() + "/theme_presets.txt");
     if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text )) {
         QMessageBox::information(this, tr("Unable to write to file"),
                                  file.errorString());
