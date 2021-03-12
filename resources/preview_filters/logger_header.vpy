@@ -17,3 +17,6 @@ logging.getLogger('py.warnings').addHandler(VSWarningsHandler(warning_messages))
 
 def get_warnings():
     return warning_messages
+
+from vapoursynth import core
+core.std.LoadPlugin(r"{{p}}")

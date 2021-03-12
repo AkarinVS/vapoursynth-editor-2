@@ -1133,6 +1133,11 @@ QString MainWindow::createPreviewFilterScript(const QString &a_script, const QMa
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     scriptChain = file.readAll();
 
+    // replace placeholder with vsedit_logger.dll path
+    QString loggerDllPath = QCoreApplication::applicationDirPath() + "/vsedit_logger.dll";
+    QRegularExpression reFilePathPlaceHolder("{{p}}");
+    scriptChain.replace(reFilePathPlaceHolder, loggerDllPath);
+
     // append script from editor
     scriptChain.append(a_script);
 
@@ -1149,10 +1154,10 @@ QString MainWindow::createPreviewFilterScript(const QString &a_script, const QMa
         } else {
             QString clipOutputString = match.captured(0); // get last capture of set_output
 
-            QRegularExpression reClipPlaceHolder("{c}");
+            QRegularExpression reClipPlaceHolder("{{c}}");
             tempString.replace(reClipPlaceHolder, clipOutputString);
 
-            QRegularExpression rePlanePlaceHolder("{x}");
+            QRegularExpression rePlanePlaceHolder("{{x}}");
             tempString.replace(rePlanePlaceHolder, QVariant(a_filtersMap["channels"]).toString());
 
             scriptChain.append(tempString);
