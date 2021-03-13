@@ -1513,6 +1513,7 @@ void MainWindow::slotPreviewScript()
 
     QString script = m_pEditorPreviewVector[currentIndex].editor->text();
     QString scriptName = m_pEditorPreviewVector[currentIndex].scriptName;
+    QString scriptFilePath = m_pEditorPreviewVector[currentIndex].scriptFilePath;
 
     ScriptProcessor * processor = m_pEditorPreviewVector[currentIndex].processor;
 
@@ -1520,7 +1521,7 @@ void MainWindow::slotPreviewScript()
     QMap<QString,int> previewFilters = m_pEditorPreviewVector[currentIndex].previewFilters;
     QString scriptChain = createPreviewFilterScript(script, previewFilters);
 
-    if (processor->previewScript(scriptChain, scriptName)) {
+    if (processor->previewScript(scriptChain, scriptFilePath)) {
         if (!m_ui->timeLineView->isEnabled())
             m_ui->timeLineView->setEnabled(true);
 
