@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <VapourSynth.h>
+#include <vapoursynth/VapourSynth.h>
 
 static void VS_CC loggerLog(const VSMap *in, VSMap *out, void *userData, VSCore *core, const VSAPI *vsapi) {
 	int n = vsapi->propNumElements(in, "name");
