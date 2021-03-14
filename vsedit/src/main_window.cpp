@@ -1,3 +1,4 @@
+#include <iostream>
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "preview/script_processor.h"
@@ -34,6 +35,7 @@
 
 MainWindow::MainWindow(QWidget *a_pParent) :
     QMainWindow(a_pParent),
+    m_logView(nullptr),
     m_ui(new Ui::MainWindow)
   , m_pSettingsManager(nullptr)
   , m_pVSScriptLibrary(nullptr)  
@@ -2896,6 +2898,11 @@ void MainWindow::slotWriteLogMessage(int a_messageType,
 void MainWindow::slotWriteLogMessage(const QString & a_message,
     const QString & a_style)
 {
+    if (m_logView == nullptr) {
+        std::cerr << a_style.toStdString() << ": " << a_message.toStdString() << endl;
+        return;
+    }
+
     m_logView->addEntry(a_message, a_style);
 
     QString fatalTypes[] = {LOG_STYLE_VS_FATAL, LOG_STYLE_QT_FATAL};
