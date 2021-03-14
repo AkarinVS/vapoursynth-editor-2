@@ -104,7 +104,12 @@ QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}resources$${S}vsedit.svg $${D}$${S}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}README $${D}$${S}README $${E}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}LICENSE $${D}$${S}LICENSE $${E}
 QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}CHANGELOG $${D}$${S}CHANGELOG $${E}
-QMAKE_POST_LINK += $${QMAKE_COPY} $${SC}$${S}vsedit_logger.dll $${D}$${S}vsedit_logger.dll $${E}
+# TODO: use proper way to build this.
+EXEDIR =
+macx {
+	EXEDIR = /vsedit.app/Contents/MacOS/
+}
+QMAKE_POST_LINK += $${QMAKE_CC} ${INCPATH} -shared -o $${D}$${S}$${EXEDIR}vsedit_logger.dll $${PROJECT_DIRECTORY}/src/vapoursynth/logger.c
 
 macx {
 	INCLUDEPATH += /usr/local/include
