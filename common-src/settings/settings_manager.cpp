@@ -876,7 +876,7 @@ QString SettingsManager::getDefaultNewScriptTemplate()
 {
 	return QString(
 		"import vapoursynth as vs\n"
-		"core = vs.get_core()\n"
+		"core = vs.core\n"
 	);
 }
 
