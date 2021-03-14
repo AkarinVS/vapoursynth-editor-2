@@ -1,4 +1,4 @@
-CONFIG += qt c++14
+CONFIG += qt
 
 QT += widgets
 QT += network
@@ -152,6 +152,7 @@ contains(QMAKE_COMPILER, gcc) {
 	QMAKE_CXXFLAGS += -pedantic
 
 	LIBS += -L$$[QT_INSTALL_LIBS]
+	CONFIG += c++17
 } else {
     CONFIG += c++17
 }
