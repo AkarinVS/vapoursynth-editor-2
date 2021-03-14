@@ -1,4 +1,4 @@
-CONFIG += qt
+CONFIG += qt c++14
 
 QT += widgets
 QT += network
